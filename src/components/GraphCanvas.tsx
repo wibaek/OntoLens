@@ -192,7 +192,7 @@ export function GraphCanvas({
       return;
     }
 
-    const nextWidth = width / 1.95;
+    const nextWidth = width / 1.25;
     const nextHeight = nextWidth * (height / width);
     setViewBox({
       x: node.x - nextWidth / 2,
