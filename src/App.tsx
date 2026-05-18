@@ -1,5 +1,4 @@
 import {
-  AlertTriangle,
   Atom,
   Code2,
   Database,
@@ -17,6 +16,7 @@ import {
   X,
 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { type ErrorDiagnostic, ErrorDiagnosticPanel } from "./components/ErrorDiagnosticPanel";
 import { GraphCanvas } from "./components/GraphCanvas";
 import { GraphErrorBoundary } from "./components/GraphErrorBoundary";
 import { RawResultPanel } from "./components/RawResultPanel";
@@ -41,6 +41,7 @@ import {
   executeSelect,
   fetchEndpointSummary,
   getErrorMessage,
+  SparqlClientError,
   searchEndpoint,
   toSelectResult,
 } from "./lib/sparql";
@@ -99,6 +100,7 @@ function App() {
   const [namespaceFilters, setNamespaceFilters] = useState(defaultNamespaceFilters);
   const [predicateFilter, setPredicateFilter] = useState("all");
   const [status, setStatus] = useState<LoadState>("idle");
+  const [lastError, setLastError] = useState<ErrorDiagnostic | null>(null);
   const [message, setMessage] = useState("endpoint를 연결하면 class 지도가 여기에 표시됩니다.");
   const [sparqlDraft, setSparqlDraft] = useState(
     buildClassMapConstructQuery(defaultSettings.edgeLimit),
@@ -148,6 +150,19 @@ function App() {
   const selectedGraphIri =
     selectedGraph === "auto" || selectedGraph === "default" ? null : selectedGraph;
 
+  const reportDiagnostic = useCallback((diagnostic: ErrorDiagnostic) => {
+    setLastError(diagnostic);
+    setStatus("error");
+    setMessage(diagnostic.message);
+  }, []);
+
+  const reportError = useCallback(
+    (error: unknown, context: string) => {
+      reportDiagnostic(createErrorDiagnostic(error, context));
+    },
+    [reportDiagnostic],
+  );
+
   const connectEndpoint = useCallback(
     async (graphSelectionOverride?: string) => {
       const graphSelection = graphSelectionOverride ?? selectedGraph;
@@ -155,6 +170,7 @@ function App() {
         graphSelection === "auto" || graphSelection === "default" ? null : graphSelection;
 
       setStatus("loading");
+      setLastError(null);
       setMessage("endpoint 요약을 가져오는 중입니다.");
       setSelectedNodeId(null);
       setSelectResult(null);
@@ -202,11 +218,10 @@ function App() {
       } catch (error) {
         setSummary(null);
         setGraphData(emptyGraphData);
-        setStatus("error");
-        setMessage(getErrorMessage(error));
+        reportError(error, "Endpoint 연결 및 요약 조회");
       }
     },
-    [endpoint, selectedGraph, settings],
+    [endpoint, reportError, selectedGraph, settings],
   );
 
   useEffect(() => {
@@ -231,6 +246,7 @@ function App() {
     );
     setSparqlDraft(query);
     setStatus("loading");
+    setLastError(null);
     setActiveView("graph");
     setMessage(
       `${compactIri(iri, graphData.localNamespaces)} 주변 ${safeDepth} depth 탐색 중입니다.`,
@@ -282,8 +298,7 @@ function App() {
         return;
       }
 
-      setStatus("error");
-      setMessage(getErrorMessage(error));
+      reportError(error, "선택 노드 주변 그래프 탐색");
     }
   }
 
@@ -301,14 +316,20 @@ function App() {
 
   async function loadFullGraph() {
     if ((summary?.tripleCount ?? Number.POSITIVE_INFINITY) > settings.edgeLimit) {
-      setStatus("error");
-      setMessage("전체 그래프는 triple count가 edge limit보다 작을 때만 로드할 수 있습니다.");
+      reportDiagnostic({
+        title: "전체 그래프가 현재 limit보다 큽니다",
+        message: "전체 그래프는 triple count가 edge limit보다 작을 때만 로드할 수 있습니다.",
+        context: "전체 그래프 로드",
+        kind: "too-large",
+        suggestion: "Edge limit을 올리거나, class map 또는 노드 중심 탐색을 사용하세요.",
+      });
       return;
     }
 
     const query = buildFullGraphConstructQuery(settings.edgeLimit, selectedGraphIri);
     setSparqlDraft(query);
     setStatus("loading");
+    setLastError(null);
     setActiveView("graph");
     setMessage("작은 전체 그래프를 가져오는 중입니다.");
     neighborhoodRequestRef.current += 1;
@@ -328,8 +349,7 @@ function App() {
       setStatus("ready");
       setMessage("full graph ready");
     } catch (error) {
-      setStatus("error");
-      setMessage(getErrorMessage(error));
+      reportError(error, "전체 그래프 CONSTRUCT 실행");
     }
   }
 
@@ -338,6 +358,7 @@ function App() {
 
     if (operation === "select") {
       setStatus("loading");
+      setLastError(null);
       setMessage("SELECT 결과를 가져오는 중입니다.");
       neighborhoodRequestRef.current += 1;
 
@@ -354,19 +375,24 @@ function App() {
         setStatus("ready");
         setMessage(`SELECT result ready: ${formatCount(result.rows.length)} rows`);
       } catch (error) {
-        setStatus("error");
-        setMessage(getErrorMessage(error));
+        reportError(error, "SELECT 쿼리 실행");
       }
       return;
     }
 
     if (operation !== "construct" && operation !== "describe") {
-      setStatus("error");
-      setMessage("현재는 SELECT, CONSTRUCT, DESCRIBE 쿼리 실행을 지원합니다.");
+      reportDiagnostic({
+        title: "지원하지 않는 SPARQL 쿼리 형식입니다",
+        message: "현재는 SELECT, CONSTRUCT, DESCRIBE 쿼리 실행을 지원합니다.",
+        context: "SPARQL 실행",
+        kind: "syntax",
+        suggestion: "ASK는 이후 boolean 결과 뷰를 추가할 때 연결하는 편이 좋습니다.",
+      });
       return;
     }
 
     setStatus("loading");
+    setLastError(null);
     setActiveView("graph");
     setMessage("SPARQL 결과를 그래프로 변환하는 중입니다.");
     neighborhoodRequestRef.current += 1;
@@ -386,8 +412,7 @@ function App() {
       setStatus("ready");
       setMessage("custom SPARQL graph ready");
     } catch (error) {
-      setStatus("error");
-      setMessage(getErrorMessage(error));
+      reportError(error, "그래프 쿼리 실행");
     }
   }
 
@@ -404,6 +429,7 @@ function App() {
     }
 
     setSearchState("loading");
+    setLastError(null);
 
     try {
       const results = await searchEndpoint(endpoint, trimmed, 24, selectedGraphIri);
@@ -414,7 +440,7 @@ function App() {
       }
     } catch (error) {
       setSearchState("error");
-      setMessage(getErrorMessage(error));
+      reportError(error, "검색 쿼리 실행");
     }
   }
 
@@ -810,10 +836,11 @@ function App() {
           ) : null}
 
           {status === "error" ? (
-            <div className="absolute bottom-4 left-4 right-4 z-20 flex items-start gap-3 rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800 shadow-sm">
-              <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
-              <p>{message}</p>
-            </div>
+            <ErrorDiagnosticPanel
+              diagnostic={lastError ?? createErrorDiagnostic(new Error(message), "알 수 없는 작업")}
+              hasRawResult={!!rawResult}
+              onOpenRaw={() => setActiveView("raw")}
+            />
           ) : null}
 
           {status === "loading" ? (
@@ -1029,6 +1056,59 @@ function App() {
       ) : null}
     </div>
   );
+}
+
+function createErrorDiagnostic(error: unknown, context: string): ErrorDiagnostic {
+  const message = getErrorMessage(error);
+  const rawMessage = error instanceof Error ? error.message : String(error);
+
+  if (error instanceof SparqlClientError) {
+    return {
+      title: getErrorTitle(error.kind),
+      message,
+      context,
+      kind: error.kind,
+      status: error.status,
+      suggestion: getErrorSuggestion(error.kind),
+      rawMessage,
+    };
+  }
+
+  return {
+    title: "요청을 처리하지 못했습니다",
+    message,
+    context,
+    suggestion: "Endpoint URL, 네트워크 연결, 실행한 SPARQL을 순서대로 확인하세요.",
+    rawMessage,
+  };
+}
+
+function getErrorTitle(kind: string) {
+  const titles: Record<string, string> = {
+    network: "네트워크 요청 실패",
+    cors: "브라우저 CORS 차단",
+    auth: "Endpoint 인증 실패",
+    syntax: "SPARQL 문법 오류",
+    "too-large": "결과가 너무 큼",
+    empty: "결과 없음",
+    endpoint: "Endpoint 오류",
+  };
+
+  return titles[kind] ?? "SPARQL 요청 실패";
+}
+
+function getErrorSuggestion(kind: string) {
+  const suggestions: Record<string, string> = {
+    network: "Endpoint URL, VPN, TLS 인증서, 사내망 접근 가능 여부를 확인하세요.",
+    cors: "브라우저 직접 요청이 막힌 상태입니다. Endpoint CORS 허용이나 프록시 구성이 필요합니다.",
+    auth: "인증이 필요한 endpoint입니다. 인증 헤더나 접근 권한 설정을 확인하세요.",
+    syntax: "SPARQL 패널에서 생성된 쿼리를 열고 endpoint가 반환한 문법 오류 위치를 확인하세요.",
+    "too-large": "Depth, node limit, edge limit을 낮추거나 더 좁은 노드 중심 탐색을 사용하세요.",
+    empty: "선택한 named graph, namespace, 검색어가 실제 데이터와 맞는지 확인하세요.",
+    endpoint: "Endpoint가 오류 응답을 반환했습니다. raw message와 서버 로그를 함께 확인하세요.",
+  };
+
+  return suggestions[kind] ?? "Endpoint 응답과 실행한 SPARQL을 함께 확인하세요.";
 }
 
 function Metric({ label, value }: { label: string; value: string }) {
