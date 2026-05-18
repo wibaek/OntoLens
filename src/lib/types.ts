@@ -21,6 +21,18 @@ export type RdfQuad = {
   object: RdfTerm;
 };
 
+export type SparqlBindingValue = {
+  type: string;
+  value: string;
+  datatype?: string;
+  "xml:lang"?: string;
+};
+
+export type SparqlSelectResult = {
+  variables: string[];
+  rows: Record<string, SparqlBindingValue>[];
+};
+
 export type CountItem = {
   iri: string;
   label: string;

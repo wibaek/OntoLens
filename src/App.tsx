@@ -18,6 +18,7 @@ import {
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { GraphCanvas } from "./components/GraphCanvas";
 import { GraphErrorBoundary } from "./components/GraphErrorBoundary";
+import { ResultTable } from "./components/ResultTable";
 import {
   buildClassMapGraph,
   emptyGraphData,
@@ -33,10 +34,13 @@ import {
   buildClassMapConstructQuery,
   buildFullGraphConstructQuery,
   buildNeighborhoodConstructQuery,
+  detectSparqlOperation,
   executeConstruct,
+  executeSelect,
   fetchEndpointSummary,
   getErrorMessage,
   searchEndpoint,
+  toSelectResult,
 } from "./lib/sparql";
 import type {
   EndpointSummary,
@@ -46,6 +50,7 @@ import type {
   LoadState,
   NamespaceFilters,
   SearchResult,
+  SparqlSelectResult,
 } from "./lib/types";
 import { DEFAULT_ENDPOINT } from "./lib/types";
 
@@ -70,11 +75,15 @@ const namespaceLabels = {
   unknown: "unknown / raw IRI",
 };
 
+type ResultView = "graph" | "table";
+
 function App() {
   const [endpoint, setEndpoint] = useState(DEFAULT_ENDPOINT);
   const [selectedGraph, setSelectedGraph] = useState("auto");
   const [summary, setSummary] = useState<EndpointSummary | null>(null);
   const [graphData, setGraphData] = useState<GraphData>(emptyGraphData);
+  const [selectResult, setSelectResult] = useState<SparqlSelectResult | null>(null);
+  const [activeView, setActiveView] = useState<ResultView>("graph");
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
   const [settings, setSettings] = useState(defaultSettings);
   const [namespaceFilters, setNamespaceFilters] = useState(defaultNamespaceFilters);
@@ -138,6 +147,8 @@ function App() {
       setStatus("loading");
       setMessage("endpoint 요약을 가져오는 중입니다.");
       setSelectedNodeId(null);
+      setSelectResult(null);
+      setActiveView("graph");
       setSearchResults([]);
       neighborhoodRequestRef.current += 1;
 
@@ -205,6 +216,7 @@ function App() {
     );
     setSparqlDraft(query);
     setStatus("loading");
+    setActiveView("graph");
     setMessage(
       `${compactIri(iri, graphData.localNamespaces)} 주변 ${safeDepth} depth 탐색 중입니다.`,
     );
@@ -227,6 +239,7 @@ function App() {
         : mergeGraphData(graphData, incomingGraph, settings);
 
       setGraphData(limited.graph);
+      setSelectResult(null);
       setSelectedNodeId(iri);
       setFocusToken((value) => value + 1);
       setStatus("ready");
@@ -267,6 +280,7 @@ function App() {
     const query = buildFullGraphConstructQuery(settings.edgeLimit, selectedGraphIri);
     setSparqlDraft(query);
     setStatus("loading");
+    setActiveView("graph");
     setMessage("작은 전체 그래프를 가져오는 중입니다.");
     neighborhoodRequestRef.current += 1;
 
@@ -277,6 +291,7 @@ function App() {
       );
       const limited = enforceGraphLimits(nextGraph, settings);
       setGraphData(limited.graph);
+      setSelectResult(null);
       setSelectedNodeId(null);
       setStatus("ready");
       setMessage("full graph ready");
@@ -286,14 +301,35 @@ function App() {
     }
   }
 
-  async function runCustomConstruct() {
-    if (!/^\s*(PREFIX|BASE|CONSTRUCT|DESCRIBE)/i.test(sparqlDraft)) {
+  async function runCustomSparql() {
+    const operation = detectSparqlOperation(sparqlDraft);
+
+    if (operation === "select") {
+      setStatus("loading");
+      setMessage("SELECT 결과를 가져오는 중입니다.");
+      neighborhoodRequestRef.current += 1;
+
+      try {
+        const result = toSelectResult(await executeSelect(endpoint, sparqlDraft));
+        setSelectResult(result);
+        setActiveView("table");
+        setStatus("ready");
+        setMessage(`SELECT result ready: ${formatCount(result.rows.length)} rows`);
+      } catch (error) {
+        setStatus("error");
+        setMessage(getErrorMessage(error));
+      }
+      return;
+    }
+
+    if (operation !== "construct" && operation !== "describe") {
       setStatus("error");
-      setMessage("현재 MVP에서는 CONSTRUCT/DESCRIBE 계열 그래프 쿼리만 캔버스로 불러옵니다.");
+      setMessage("현재는 SELECT, CONSTRUCT, DESCRIBE 쿼리 실행을 지원합니다.");
       return;
     }
 
     setStatus("loading");
+    setActiveView("graph");
     setMessage("SPARQL 결과를 그래프로 변환하는 중입니다.");
     neighborhoodRequestRef.current += 1;
 
@@ -304,6 +340,7 @@ function App() {
       );
       const limited = enforceGraphLimits(nextGraph, settings);
       setGraphData(limited.graph);
+      setSelectResult(null);
       setSelectedNodeId(null);
       setStatus("ready");
       setMessage("custom SPARQL graph ready");
@@ -621,22 +658,46 @@ function App() {
           <div className="absolute left-4 top-4 z-10 flex items-center gap-2 rounded-md border border-slate-200 bg-white/90 px-3 py-2 text-xs shadow-sm backdrop-blur">
             <Database className="h-4 w-4 text-slate-500" aria-hidden="true" />
             <span className="font-medium text-slate-700">
-              {formatCount(visibleCounts.nodes)} nodes / {formatCount(visibleCounts.edges)} edges
+              {activeView === "table" && selectResult
+                ? `${formatCount(selectResult.rows.length)} rows / ${formatCount(selectResult.variables.length)} columns`
+                : `${formatCount(visibleCounts.nodes)} nodes / ${formatCount(visibleCounts.edges)} edges`}
             </span>
           </div>
-          <div className="absolute right-4 top-4 z-10 flex items-center gap-2">
+          <div className="absolute left-4 top-16 z-10 inline-flex overflow-hidden rounded-md border border-slate-200 bg-white/90 p-1 text-xs font-semibold shadow-sm backdrop-blur">
             <button
               type="button"
-              onClick={() => updateSetting("showEdgeLabels", !settings.showEdgeLabels)}
-              className={`rounded-md border px-3 py-2 text-xs font-semibold shadow-sm ${
-                settings.showEdgeLabels
-                  ? "border-blue-200 bg-blue-50 text-blue-700"
-                  : "border-slate-200 bg-white text-slate-700"
+              onClick={() => setActiveView("graph")}
+              className={`rounded px-3 py-1.5 ${
+                activeView === "graph" ? "bg-slate-950 text-white" : "text-slate-600"
               }`}
             >
-              <Eye className="mr-1 inline h-3.5 w-3.5" aria-hidden="true" />
-              Edge label
+              Graph
             </button>
+            <button
+              type="button"
+              onClick={() => setActiveView("table")}
+              className={`rounded px-3 py-1.5 ${
+                activeView === "table" ? "bg-slate-950 text-white" : "text-slate-600"
+              }`}
+            >
+              Table
+            </button>
+          </div>
+          <div className="absolute right-4 top-4 z-10 flex items-center gap-2">
+            {activeView === "graph" ? (
+              <button
+                type="button"
+                onClick={() => updateSetting("showEdgeLabels", !settings.showEdgeLabels)}
+                className={`rounded-md border px-3 py-2 text-xs font-semibold shadow-sm ${
+                  settings.showEdgeLabels
+                    ? "border-blue-200 bg-blue-50 text-blue-700"
+                    : "border-slate-200 bg-white text-slate-700"
+                }`}
+              >
+                <Eye className="mr-1 inline h-3.5 w-3.5" aria-hidden="true" />
+                Edge label
+              </button>
+            ) : null}
             <button
               type="button"
               onClick={() => setSettingsOpen((value) => !value)}
@@ -647,21 +708,29 @@ function App() {
             </button>
           </div>
 
-          <GraphErrorBoundary
-            resetKey={`${graphData.nodes.length}:${graphData.edges.length}:${selectedNodeId ?? "none"}`}
-          >
-            <GraphCanvas
-              graphData={graphData}
-              filters={graphFilters}
-              selectedNodeId={selectedNodeId}
-              showEdgeLabels={settings.showEdgeLabels}
-              focusToken={focusToken}
-              onNodeSelect={selectGraphNode}
-              onStageClick={() => setSearchResults([])}
+          {activeView === "graph" ? (
+            <GraphErrorBoundary
+              resetKey={`${graphData.nodes.length}:${graphData.edges.length}:${selectedNodeId ?? "none"}`}
+            >
+              <GraphCanvas
+                graphData={graphData}
+                filters={graphFilters}
+                selectedNodeId={selectedNodeId}
+                showEdgeLabels={settings.showEdgeLabels}
+                focusToken={focusToken}
+                onNodeSelect={selectGraphNode}
+                onStageClick={() => setSearchResults([])}
+              />
+            </GraphErrorBoundary>
+          ) : (
+            <ResultTable
+              result={selectResult}
+              localNamespaces={graphData.localNamespaces}
+              onOpenIri={(iri) => void loadNeighborhood(iri, settings.depth, true)}
             />
-          </GraphErrorBoundary>
+          )}
 
-          {graphData.nodes.length === 0 ? (
+          {activeView === "graph" && graphData.nodes.length === 0 ? (
             <div className="pointer-events-none absolute inset-0 z-10 grid place-items-center">
               <div className="w-[420px] rounded-lg border border-dashed border-slate-300 bg-white/90 p-6 text-center shadow-sm backdrop-blur">
                 <Network className="mx-auto mb-3 h-9 w-9 text-slate-400" aria-hidden="true" />
@@ -879,7 +948,7 @@ function App() {
             </span>
             <button
               type="button"
-              onClick={() => void runCustomConstruct()}
+              onClick={() => void runCustomSparql()}
               className="inline-flex items-center gap-2 rounded-md bg-slate-950 px-3 py-2 text-sm font-semibold text-white hover:bg-slate-800"
             >
               <Play className="h-4 w-4" aria-hidden="true" />

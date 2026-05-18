@@ -7,6 +7,8 @@ import type {
   RdfQuad,
   RdfTerm,
   SearchResult,
+  SparqlBindingValue,
+  SparqlSelectResult,
 } from "./types";
 
 const PREFIXES = `PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
@@ -16,18 +18,16 @@ PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
 PREFIX schema: <https://schema.org/>
 `;
 
-type SparqlBindingValue = {
-  type: string;
-  value: string;
-  datatype?: string;
-  "xml:lang"?: string;
-};
-
 type SparqlJson = {
+  head?: {
+    vars?: string[];
+  };
   results: {
     bindings: Record<string, SparqlBindingValue>[];
   };
 };
+
+export type SparqlOperation = "select" | "construct" | "describe" | "ask" | "unknown";
 
 export type SparqlErrorKind =
   | "network"
@@ -118,6 +118,42 @@ async function requestSparql(endpoint: string, query: string, accept: string) {
 export async function executeSelect(endpoint: string, query: string) {
   const response = await requestSparql(endpoint, query, "application/sparql-results+json");
   return (await response.json()) as SparqlJson;
+}
+
+export function toSelectResult(json: SparqlJson): SparqlSelectResult {
+  const inferredVariables = [
+    ...new Set(json.results.bindings.flatMap((binding) => Object.keys(binding))),
+  ];
+
+  return {
+    variables: json.head?.vars?.length ? json.head.vars : inferredVariables,
+    rows: json.results.bindings,
+  };
+}
+
+export function detectSparqlOperation(query: string): SparqlOperation {
+  let body = query.replace(/#[^\n\r]*/g, " ").trim();
+
+  while (body) {
+    const prefixMatch = body.match(/^(PREFIX\s+[A-Za-z][\w-]*:\s*<[^>]*>|BASE\s*<[^>]*>)\s*/i);
+    if (!prefixMatch) {
+      break;
+    }
+    body = body.slice(prefixMatch[0].length).trimStart();
+  }
+
+  const operation = body.match(/^(SELECT|CONSTRUCT|DESCRIBE|ASK)\b/i)?.[1]?.toLowerCase();
+
+  if (
+    operation === "select" ||
+    operation === "construct" ||
+    operation === "describe" ||
+    operation === "ask"
+  ) {
+    return operation;
+  }
+
+  return "unknown";
 }
 
 export async function executeConstruct(endpoint: string, query: string): Promise<RdfQuad[]> {
