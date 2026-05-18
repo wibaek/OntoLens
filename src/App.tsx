@@ -19,6 +19,7 @@ import {
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { GraphCanvas } from "./components/GraphCanvas";
 import { GraphErrorBoundary } from "./components/GraphErrorBoundary";
+import { RawResultPanel } from "./components/RawResultPanel";
 import { ResultTable } from "./components/ResultTable";
 import {
   buildClassMapGraph,
@@ -77,7 +78,13 @@ const namespaceLabels = {
   unknown: "unknown / raw IRI",
 };
 
-type ResultView = "graph" | "table";
+type ResultView = "graph" | "table" | "raw";
+
+type RawResult = {
+  title: string;
+  content: string;
+  meta: string;
+};
 
 function App() {
   const [endpoint, setEndpoint] = useState(DEFAULT_ENDPOINT);
@@ -85,6 +92,7 @@ function App() {
   const [summary, setSummary] = useState<EndpointSummary | null>(null);
   const [graphData, setGraphData] = useState<GraphData>(emptyGraphData);
   const [selectResult, setSelectResult] = useState<SparqlSelectResult | null>(null);
+  const [rawResult, setRawResult] = useState<RawResult | null>(null);
   const [activeView, setActiveView] = useState<ResultView>("graph");
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
   const [settings, setSettings] = useState(defaultSettings);
@@ -177,6 +185,11 @@ function App() {
 
         setSummary(nextSummary);
         setGraphData(limited.graph);
+        setRawResult({
+          title: "Class map CONSTRUCT",
+          content: JSON.stringify(classQuads, null, 2),
+          meta: `${formatCount(classQuads.length)} quads`,
+        });
         cacheRef.current.clear();
         setStatus("ready");
         setMessage(
@@ -224,9 +237,23 @@ function App() {
     );
 
     try {
-      const incomingGraph =
-        cached ??
-        quadsToGraphData(await executeConstruct(endpoint, query), graphData.localNamespaces);
+      let incomingGraph = cached;
+
+      if (incomingGraph) {
+        setRawResult({
+          title: "Cached neighborhood graph",
+          content: JSON.stringify(incomingGraph, null, 2),
+          meta: `${formatCount(incomingGraph.nodes.length)} nodes / ${formatCount(incomingGraph.edges.length)} edges`,
+        });
+      } else {
+        const quads = await executeConstruct(endpoint, query);
+        incomingGraph = quadsToGraphData(quads, graphData.localNamespaces);
+        setRawResult({
+          title: "Neighborhood CONSTRUCT",
+          content: JSON.stringify(quads, null, 2),
+          meta: `${formatCount(quads.length)} quads`,
+        });
+      }
 
       if (!cached) {
         cacheRef.current.set(cacheKey, incomingGraph);
@@ -287,12 +314,15 @@ function App() {
     neighborhoodRequestRef.current += 1;
 
     try {
-      const nextGraph = quadsToGraphData(
-        await executeConstruct(endpoint, query),
-        graphData.localNamespaces,
-      );
+      const quads = await executeConstruct(endpoint, query);
+      const nextGraph = quadsToGraphData(quads, graphData.localNamespaces);
       const limited = enforceGraphLimits(nextGraph, settings);
       setGraphData(limited.graph);
+      setRawResult({
+        title: "Full graph CONSTRUCT",
+        content: JSON.stringify(quads, null, 2),
+        meta: `${formatCount(quads.length)} quads`,
+      });
       setSelectResult(null);
       setSelectedNodeId(null);
       setStatus("ready");
@@ -312,8 +342,14 @@ function App() {
       neighborhoodRequestRef.current += 1;
 
       try {
-        const result = toSelectResult(await executeSelect(endpoint, sparqlDraft));
+        const json = await executeSelect(endpoint, sparqlDraft);
+        const result = toSelectResult(json);
         setSelectResult(result);
+        setRawResult({
+          title: "SELECT JSON",
+          content: JSON.stringify(json, null, 2),
+          meta: `${formatCount(result.rows.length)} rows`,
+        });
         setActiveView("table");
         setStatus("ready");
         setMessage(`SELECT result ready: ${formatCount(result.rows.length)} rows`);
@@ -336,12 +372,15 @@ function App() {
     neighborhoodRequestRef.current += 1;
 
     try {
-      const nextGraph = quadsToGraphData(
-        await executeConstruct(endpoint, sparqlDraft),
-        graphData.localNamespaces,
-      );
+      const quads = await executeConstruct(endpoint, sparqlDraft);
+      const nextGraph = quadsToGraphData(quads, graphData.localNamespaces);
       const limited = enforceGraphLimits(nextGraph, settings);
       setGraphData(limited.graph);
+      setRawResult({
+        title: `${operation.toUpperCase()} RDF`,
+        content: JSON.stringify(quads, null, 2),
+        meta: `${formatCount(quads.length)} quads`,
+      });
       setSelectResult(null);
       setSelectedNodeId(null);
       setStatus("ready");
@@ -660,9 +699,11 @@ function App() {
           <div className="absolute left-4 top-4 z-10 flex items-center gap-2 rounded-md border border-slate-200 bg-white/90 px-3 py-2 text-xs shadow-sm backdrop-blur">
             <Database className="h-4 w-4 text-slate-500" aria-hidden="true" />
             <span className="font-medium text-slate-700">
-              {activeView === "table" && selectResult
-                ? `${formatCount(selectResult.rows.length)} rows / ${formatCount(selectResult.variables.length)} columns`
-                : `${formatCount(visibleCounts.nodes)} nodes / ${formatCount(visibleCounts.edges)} edges`}
+              {activeView === "raw" && rawResult
+                ? `${rawResult.meta} / raw`
+                : activeView === "table" && selectResult
+                  ? `${formatCount(selectResult.rows.length)} rows / ${formatCount(selectResult.variables.length)} columns`
+                  : `${formatCount(visibleCounts.nodes)} nodes / ${formatCount(visibleCounts.edges)} edges`}
             </span>
           </div>
           <div className="absolute left-4 top-16 z-10 inline-flex overflow-hidden rounded-md border border-slate-200 bg-white/90 p-1 text-xs font-semibold shadow-sm backdrop-blur">
@@ -683,6 +724,15 @@ function App() {
               }`}
             >
               Table
+            </button>
+            <button
+              type="button"
+              onClick={() => setActiveView("raw")}
+              className={`rounded px-3 py-1.5 ${
+                activeView === "raw" ? "bg-slate-950 text-white" : "text-slate-600"
+              }`}
+            >
+              Raw
             </button>
           </div>
           <div className="absolute right-4 top-4 z-10 flex items-center gap-2">
@@ -739,12 +789,14 @@ function App() {
                 onStageClick={() => setSearchResults([])}
               />
             </GraphErrorBoundary>
-          ) : (
+          ) : activeView === "table" ? (
             <ResultTable
               result={selectResult}
               localNamespaces={graphData.localNamespaces}
               onOpenIri={(iri) => void loadNeighborhood(iri, settings.depth, true)}
             />
+          ) : (
+            <RawResultPanel result={rawResult} />
           )}
 
           {activeView === "graph" && graphData.nodes.length === 0 ? (
