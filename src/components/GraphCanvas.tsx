@@ -65,6 +65,7 @@ type GraphCanvasProps = {
   filters: GraphFilters;
   selectedNodeId: string | null;
   showEdgeLabels: boolean;
+  physicsEnabled: boolean;
   focusToken: number;
   onNodeSelect: (nodeId: string) => void;
   onStageClick: () => void;
@@ -75,6 +76,7 @@ export function GraphCanvas({
   filters,
   selectedNodeId,
   showEdgeLabels,
+  physicsEnabled,
   focusToken,
   onNodeSelect,
   onStageClick,
@@ -89,6 +91,7 @@ export function GraphCanvas({
   const edgesRef = useRef<SimEdge[]>([]);
   const simulationRef = useRef<Simulation<SimNode, undefined> | null>(null);
   const frameRef = useRef<number | null>(null);
+  const physicsEnabledRef = useRef(physicsEnabled);
   const dragRef = useRef<{
     nodeId: string;
     offsetX: number;
@@ -118,6 +121,20 @@ export function GraphCanvas({
   }, [visibleGraph.labelIds]);
 
   useEffect(() => {
+    physicsEnabledRef.current = physicsEnabled;
+
+    if (!physicsEnabled) {
+      simulationRef.current?.stop();
+      simulationRef.current = null;
+      return;
+    }
+
+    if (nodesRef.current.length && !simulationRef.current) {
+      simulationRef.current = createSimulation(nodesRef.current, edgesRef.current, syncLayout);
+    }
+  }, [physicsEnabled, syncLayout]);
+
+  useEffect(() => {
     if (!visibleGraph.nodes.length) {
       nodesRef.current = [];
       edgesRef.current = [];
@@ -144,37 +161,14 @@ export function GraphCanvas({
     setLayout({ nodes, edges, labelIds: visibleGraph.labelIds });
     setViewBox(defaultViewBox);
 
-    const density = Math.min(1, edges.length / Math.max(1, nodes.length * 7));
-    const simulation = forceSimulation<SimNode>(nodes)
-      .force(
-        "link",
-        forceLink<SimNode, SimEdge>(edges)
-          .id((node) => node.id)
-          .distance((edge) => linkDistance(edge))
-          .strength(0.16 - density * 0.08),
-      )
-      .force(
-        "charge",
-        forceManyBody<SimNode>().strength((node) => chargeStrength(node, density)),
-      )
-      .force("center", forceCenter(width / 2, height / 2).strength(0.08))
-      .force(
-        "radial",
-        forceRadial<SimNode>((node) => radialDistance(node), width / 2, height / 2).strength(
-          (node) => (node.kind === "literal" ? 0.2 : 0.08),
-        ),
-      )
-      .force(
-        "collide",
-        forceCollide<SimNode>()
-          .radius((node) => nodeRadius(node) + labelPadding(node))
-          .iterations(2),
-      )
-      .alpha(0.96)
-      .alphaDecay(0.035);
+    if (!physicsEnabledRef.current) {
+      simulationRef.current = null;
+      return;
+    }
+
+    const simulation = createSimulation(nodes, edges, syncLayout);
 
     simulationRef.current = simulation;
-    simulation.on("tick", syncLayout);
 
     return () => {
       simulation.stop();
@@ -560,6 +554,43 @@ function buildVisibleGraph(graphData: GraphData, filters: GraphFilters): Visible
     edges,
     labelIds: rankedIds,
   };
+}
+
+function createSimulation(
+  nodes: SimNode[],
+  edges: SimEdge[],
+  onTick: () => void,
+): Simulation<SimNode, undefined> {
+  const density = Math.min(1, edges.length / Math.max(1, nodes.length * 7));
+
+  return forceSimulation<SimNode>(nodes)
+    .force(
+      "link",
+      forceLink<SimNode, SimEdge>(edges)
+        .id((node) => node.id)
+        .distance((edge) => linkDistance(edge))
+        .strength(0.16 - density * 0.08),
+    )
+    .force(
+      "charge",
+      forceManyBody<SimNode>().strength((node) => chargeStrength(node, density)),
+    )
+    .force("center", forceCenter(width / 2, height / 2).strength(0.08))
+    .force(
+      "radial",
+      forceRadial<SimNode>((node) => radialDistance(node), width / 2, height / 2).strength(
+        (node) => (node.kind === "literal" ? 0.2 : 0.08),
+      ),
+    )
+    .force(
+      "collide",
+      forceCollide<SimNode>()
+        .radius((node) => nodeRadius(node) + labelPadding(node))
+        .iterations(2),
+    )
+    .alpha(0.96)
+    .alphaDecay(0.035)
+    .on("tick", onTick);
 }
 
 function NodeShape({ node }: { node: SimNode }) {

@@ -103,6 +103,7 @@ export type GraphLimits = {
 export type ExplorerSettings = GraphLimits & {
   depth: number;
   showEdgeLabels: boolean;
+  physicsEnabled: boolean;
 };
 
 export type NamespaceFilters = Record<NamespaceGroup, boolean>;

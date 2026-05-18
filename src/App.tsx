@@ -1,5 +1,6 @@
 import {
   AlertTriangle,
+  Atom,
   Code2,
   Database,
   Eye,
@@ -59,6 +60,7 @@ const defaultSettings: ExplorerSettings = {
   nodeLimit: 500,
   edgeLimit: 5000,
   showEdgeLabels: false,
+  physicsEnabled: true,
 };
 
 const defaultNamespaceFilters: NamespaceFilters = {
@@ -685,18 +687,32 @@ function App() {
           </div>
           <div className="absolute right-4 top-4 z-10 flex items-center gap-2">
             {activeView === "graph" ? (
-              <button
-                type="button"
-                onClick={() => updateSetting("showEdgeLabels", !settings.showEdgeLabels)}
-                className={`rounded-md border px-3 py-2 text-xs font-semibold shadow-sm ${
-                  settings.showEdgeLabels
-                    ? "border-blue-200 bg-blue-50 text-blue-700"
-                    : "border-slate-200 bg-white text-slate-700"
-                }`}
-              >
-                <Eye className="mr-1 inline h-3.5 w-3.5" aria-hidden="true" />
-                Edge label
-              </button>
+              <>
+                <button
+                  type="button"
+                  onClick={() => updateSetting("physicsEnabled", !settings.physicsEnabled)}
+                  className={`rounded-md border px-3 py-2 text-xs font-semibold shadow-sm ${
+                    settings.physicsEnabled
+                      ? "border-emerald-200 bg-emerald-50 text-emerald-700"
+                      : "border-slate-200 bg-white text-slate-700"
+                  }`}
+                >
+                  <Atom className="mr-1 inline h-3.5 w-3.5" aria-hidden="true" />
+                  Physics
+                </button>
+                <button
+                  type="button"
+                  onClick={() => updateSetting("showEdgeLabels", !settings.showEdgeLabels)}
+                  className={`rounded-md border px-3 py-2 text-xs font-semibold shadow-sm ${
+                    settings.showEdgeLabels
+                      ? "border-blue-200 bg-blue-50 text-blue-700"
+                      : "border-slate-200 bg-white text-slate-700"
+                  }`}
+                >
+                  <Eye className="mr-1 inline h-3.5 w-3.5" aria-hidden="true" />
+                  Edge label
+                </button>
+              </>
             ) : null}
             <button
               type="button"
@@ -717,6 +733,7 @@ function App() {
                 filters={graphFilters}
                 selectedNodeId={selectedNodeId}
                 showEdgeLabels={settings.showEdgeLabels}
+                physicsEnabled={settings.physicsEnabled}
                 focusToken={focusToken}
                 onNodeSelect={selectGraphNode}
                 onStageClick={() => setSearchResults([])}
@@ -766,6 +783,7 @@ function App() {
                 <SettingRow label="Depth" value={`${settings.depth} / MVP max 3`} />
                 <SettingRow label="Node limit" value={String(settings.nodeLimit)} />
                 <SettingRow label="Edge limit" value={String(settings.edgeLimit)} />
+                <SettingRow label="Physics" value={settings.physicsEnabled ? "on" : "off"} />
                 <SettingRow label="Cache entries" value={String(cacheRef.current.size)} />
               </div>
             </div>
