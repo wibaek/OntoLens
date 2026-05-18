@@ -1,0 +1,239 @@
+@import "tailwindcss";
+
+:root {
+  color-scheme: light;
+  font-family:
+    "IBM Plex Sans KR", "Pretendard", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+    "Segoe UI", sans-serif;
+  background: #f8fafc;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-width: 1180px;
+  min-height: 100vh;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: not-allowed;
+}
+
+.graph-grid {
+  background-image:
+    radial-gradient(circle at 16% 20%, rgba(37, 99, 235, 0.08), transparent 24%),
+    radial-gradient(circle at 82% 78%, rgba(16, 185, 129, 0.08), transparent 25%),
+    linear-gradient(to right, rgba(15, 23, 42, 0.045) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(15, 23, 42, 0.045) 1px, transparent 1px);
+  background-color: #fbfdff;
+  background-size:
+    auto,
+    auto,
+    32px 32px,
+    32px 32px;
+}
+
+.ontolens-graph-stage {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.ontolens-graph-svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-height: 560px;
+  touch-action: none;
+  user-select: none;
+}
+
+.ontolens-pan-surface {
+  cursor: grab;
+  fill: transparent;
+  pointer-events: all;
+}
+
+.ontolens-pan-surface:active {
+  cursor: grabbing;
+}
+
+.ontolens-graph-controls {
+  position: absolute;
+  right: 18px;
+  bottom: 18px;
+  z-index: 20;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px;
+  border: 1px solid rgba(148, 163, 184, 0.32);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.86);
+  box-shadow: 0 14px 32px rgba(15, 23, 42, 0.12);
+  backdrop-filter: blur(10px);
+}
+
+.ontolens-graph-controls button,
+.ontolens-graph-controls span {
+  display: inline-grid;
+  min-width: 31px;
+  height: 30px;
+  place-items: center;
+  border: 0;
+  border-radius: 6px;
+  color: #334155;
+}
+
+.ontolens-graph-controls button {
+  background: transparent;
+}
+
+.ontolens-graph-controls button:hover {
+  background: #eef2f7;
+}
+
+.ontolens-graph-controls span {
+  min-width: 54px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+  font-size: 11px;
+  font-weight: 700;
+  color: #64748b;
+}
+
+.ontolens-graph-edge {
+  fill: none;
+  stroke: #94a3b8;
+  stroke-linecap: round;
+  stroke-width: 1.35;
+  opacity: 0.46;
+  transition:
+    opacity 160ms ease,
+    stroke 160ms ease,
+    stroke-width 160ms ease;
+}
+
+.ontolens-graph-edges .is-active .ontolens-graph-edge {
+  stroke: #2563eb;
+  stroke-width: 2.2;
+  opacity: 0.92;
+}
+
+.ontolens-graph-svg marker path {
+  fill: #94a3b8;
+}
+
+.ontolens-edge-label {
+  fill: #334155;
+  font-size: 11px;
+  font-weight: 700;
+  paint-order: stroke;
+  pointer-events: none;
+  stroke: rgba(255, 255, 255, 0.92);
+  stroke-width: 5px;
+  text-anchor: middle;
+}
+
+.ontolens-graph-node {
+  cursor: grab;
+  outline: none;
+  transition: opacity 160ms ease;
+}
+
+.ontolens-graph-node.is-muted {
+  opacity: 0.22;
+}
+
+.ontolens-graph-node.is-related {
+  opacity: 1;
+}
+
+.ontolens-graph-node.is-dragging {
+  cursor: grabbing;
+}
+
+.ontolens-node-shape {
+  fill: var(--node-color);
+  stroke: #ffffff;
+  stroke-width: 2.6;
+  filter: drop-shadow(0 10px 16px rgba(15, 23, 42, 0.16));
+  transition:
+    filter 160ms ease,
+    stroke-width 160ms ease,
+    transform 160ms ease;
+}
+
+.ontolens-graph-node.is-literal .ontolens-node-shape {
+  stroke-width: 2;
+  filter: drop-shadow(0 6px 10px rgba(245, 158, 11, 0.18));
+}
+
+.ontolens-graph-node.is-property .ontolens-node-shape {
+  filter: drop-shadow(0 8px 12px rgba(245, 158, 11, 0.2));
+}
+
+.ontolens-graph-node.is-active .ontolens-node-shape,
+.ontolens-graph-node.is-hovered .ontolens-node-shape {
+  stroke: #1d4ed8;
+  stroke-width: 4;
+  filter: drop-shadow(0 16px 28px rgba(37, 99, 235, 0.28));
+}
+
+.ontolens-node-label {
+  fill: #0f172a;
+  font-size: 12px;
+  font-weight: 750;
+  paint-order: stroke;
+  pointer-events: none;
+  stroke: rgba(255, 255, 255, 0.9);
+  stroke-width: 5px;
+}
+
+.ontolens-graph-node.is-literal .ontolens-node-label {
+  font-size: 10px;
+}
+
+.ontolens-graph-empty {
+  display: grid;
+  width: 100%;
+  height: 100%;
+  min-height: 420px;
+  place-items: center;
+  color: #64748b;
+  font-size: 14px;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border: 3px solid transparent;
+  border-radius: 999px;
+  background-clip: padding-box;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
