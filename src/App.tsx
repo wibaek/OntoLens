@@ -190,24 +190,30 @@ function App() {
           nextSummary = await fetchEndpointSummary(endpoint, graphIri);
         }
 
-        const classMapQuery = buildClassMapConstructQuery(settings.edgeLimit, graphIri);
-        setSparqlDraft(classMapQuery);
-
         const namespaceValues = [
           ...nextSummary.classes.map((item) => item.iri),
           ...nextSummary.predicates.map((item) => item.iri),
           ...nextSummary.namespaces.map((item) => item.namespace),
         ];
-        const classQuads = await executeConstruct(endpoint, classMapQuery).catch(() => []);
-        const initialGraph = buildClassMapGraph(nextSummary.classes, classQuads, namespaceValues);
+        const canLoadFullOverview =
+          (nextSummary.tripleCount ?? Number.POSITIVE_INFINITY) <= settings.edgeLimit;
+        const initialQuery = canLoadFullOverview
+          ? buildFullGraphConstructQuery(settings.edgeLimit, graphIri)
+          : buildClassMapConstructQuery(settings.edgeLimit, graphIri);
+        setSparqlDraft(initialQuery);
+
+        const initialQuads = await executeConstruct(endpoint, initialQuery).catch(() => []);
+        const initialGraph = canLoadFullOverview
+          ? quadsToGraphData(initialQuads, namespaceValues)
+          : buildClassMapGraph(nextSummary.classes, initialQuads, namespaceValues);
         const limited = enforceGraphLimits(initialGraph, settings);
 
         setSummary(nextSummary);
         setGraphData(limited.graph);
         setRawResult({
-          title: "Class map CONSTRUCT",
-          content: JSON.stringify(classQuads, null, 2),
-          meta: `${formatCount(classQuads.length)} quads`,
+          title: canLoadFullOverview ? "Overview graph CONSTRUCT" : "Class map CONSTRUCT",
+          content: JSON.stringify(initialQuads, null, 2),
+          meta: `${formatCount(initialQuads.length)} quads`,
         });
         cacheRef.current.clear();
         setStatus("ready");
@@ -215,8 +221,8 @@ function App() {
           limited.droppedNodes || limited.droppedEdges
             ? `limit 적용: node ${limited.droppedNodes}개, edge ${limited.droppedEdges}개를 제외했습니다.`
             : graphIri
-              ? `${compactIri(graphIri)} class map ready`
-              : "default class map ready",
+              ? `${compactIri(graphIri)} ${canLoadFullOverview ? "overview" : "class map"} ready`
+              : `default ${canLoadFullOverview ? "overview" : "class map"} ready`,
         );
       } catch (error) {
         setSummary(null);

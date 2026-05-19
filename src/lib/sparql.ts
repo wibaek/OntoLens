@@ -380,21 +380,55 @@ LIMIT ${limit}`;
 }
 
 export function buildFullGraphConstructQuery(limit: number, graphIri: string | null = null) {
+  const schemaLimit = Math.min(Math.max(20, Math.floor(limit * 0.18)), Math.floor(limit * 0.4));
+  const dataLimit = Math.max(1, limit - schemaLimit);
+
   return `${PREFIXES}
 CONSTRUCT {
   ?s ?p ?o .
 }
 WHERE {
-  ${graphPattern(
-    `?s ?p ?o .
+  {
+    SELECT ?s ?p ?o WHERE {
+      ${graphPattern(
+        `?s ?p ?o .
 FILTER(!isLiteral(?o) || STRLEN(STR(?o)) < 280)
-FILTER(?p NOT IN (rdfs:subClassOf, rdfs:domain, rdfs:range, rdfs:label))
-FILTER(
-  ?p != rdf:type ||
-  ?o NOT IN (owl:Class, rdfs:Class, rdf:Property, owl:ObjectProperty, owl:DatatypeProperty, owl:Ontology)
-)`,
-    graphIri,
-  )}
+FILTER NOT EXISTS { ?s a owl:Ontology . }
+FILTER NOT EXISTS { ?s a owl:Class . }
+FILTER NOT EXISTS { ?s a rdfs:Class . }
+FILTER NOT EXISTS { ?s a rdf:Property . }
+FILTER NOT EXISTS { ?s a owl:ObjectProperty . }
+FILTER NOT EXISTS { ?s a owl:DatatypeProperty . }`,
+        graphIri,
+      )}
+    }
+    LIMIT ${dataLimit}
+  }
+  UNION
+  {
+    SELECT ?s ?p ?o WHERE {
+      ${graphPattern(
+        `{
+  ?s a owl:Class .
+  ?s ?p ?o .
+  FILTER(?p IN (rdf:type, rdfs:subClassOf, rdfs:label))
+}
+UNION {
+  ?s a rdfs:Class .
+  ?s ?p ?o .
+  FILTER(?p IN (rdf:type, rdfs:subClassOf, rdfs:label))
+}
+UNION {
+  ?s a ?propertyType .
+  FILTER(?propertyType IN (rdf:Property, owl:ObjectProperty, owl:DatatypeProperty))
+  ?s ?p ?o .
+  FILTER(?p IN (rdf:type, rdfs:domain, rdfs:range, rdfs:label))
+}`,
+        graphIri,
+      )}
+    }
+    LIMIT ${schemaLimit}
+  }
 }
 LIMIT ${limit}`;
 }

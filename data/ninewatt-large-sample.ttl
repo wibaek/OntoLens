@@ -3,7 +3,7 @@
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
-@prefix kg: <https://rnd-fuseki.ninewatt.com/ds/data?graph=https://rnd-fuseki.ninewatt.com/kg/graph/large-sample#ontology/> .
+@prefix kg: <https://rnd-fuseki.ninewatt.com/ds/data?graph=https://rnd-fuseki.ninewatt.com/kg/graph/large-sample#> .
 @prefix service: <https://rnd-fuseki.ninewatt.com/ds/data?graph=https://rnd-fuseki.ninewatt.com/kg/graph/large-sample#id/service/> .
 @prefix team: <https://rnd-fuseki.ninewatt.com/ds/data?graph=https://rnd-fuseki.ninewatt.com/kg/graph/large-sample#id/team/> .
 @prefix infra: <https://rnd-fuseki.ninewatt.com/ds/data?graph=https://rnd-fuseki.ninewatt.com/kg/graph/large-sample#id/infra/> .
@@ -19,379 +19,6 @@
 @prefix gateway: <https://rnd-fuseki.ninewatt.com/ds/data?graph=https://rnd-fuseki.ninewatt.com/kg/graph/large-sample#id/gateway/> .
 @prefix vendor: <https://rnd-fuseki.ninewatt.com/ds/data?graph=https://rnd-fuseki.ninewatt.com/kg/graph/large-sample#id/vendor/> .
 @prefix policy: <https://rnd-fuseki.ninewatt.com/ds/data?graph=https://rnd-fuseki.ninewatt.com/kg/graph/large-sample#id/policy/> .
-
-<>
-    a owl:Ontology ;
-    rdfs:label "Ninewatt large sample knowledge graph" ;
-    kg:name "Ninewatt Large Sample Knowledge Graph" .
-
-kg:KnowledgeAsset
-    a owl:Class ;
-    rdfs:label "Knowledge Asset" .
-
-kg:OrganizationalUnit
-    a owl:Class ;
-    rdfs:label "Organizational Unit" ;
-    rdfs:subClassOf kg:KnowledgeAsset .
-
-kg:Team
-    a owl:Class ;
-    rdfs:label "Team" ;
-    rdfs:subClassOf kg:OrganizationalUnit .
-
-kg:OwnerGroup
-    a owl:Class ;
-    rdfs:label "Owner Group" ;
-    rdfs:subClassOf kg:OrganizationalUnit .
-
-kg:TechnologyAsset
-    a owl:Class ;
-    rdfs:label "Technology Asset" ;
-    rdfs:subClassOf kg:KnowledgeAsset .
-
-kg:ApplicationComponent
-    a owl:Class ;
-    rdfs:label "Application Component" ;
-    rdfs:subClassOf kg:TechnologyAsset .
-
-kg:Service
-    a owl:Class ;
-    rdfs:label "Service" ;
-    rdfs:subClassOf kg:ApplicationComponent .
-
-kg:BatchJob
-    a owl:Class ;
-    rdfs:label "Batch Job" ;
-    rdfs:subClassOf kg:ApplicationComponent .
-
-kg:Endpoint
-    a owl:Class ;
-    rdfs:label "Endpoint" ;
-    rdfs:subClassOf kg:ApplicationComponent .
-
-kg:InfrastructureAsset
-    a owl:Class ;
-    rdfs:label "Infrastructure Asset" ;
-    rdfs:subClassOf kg:TechnologyAsset .
-
-kg:Server
-    a owl:Class ;
-    rdfs:label "Server" ;
-    rdfs:subClassOf kg:InfrastructureAsset .
-
-kg:Cluster
-    a owl:Class ;
-    rdfs:label "Cluster" ;
-    rdfs:subClassOf kg:InfrastructureAsset .
-
-kg:Gateway
-    a owl:Class ;
-    rdfs:label "Gateway" ;
-    rdfs:subClassOf kg:InfrastructureAsset .
-
-kg:DataStore
-    a owl:Class ;
-    rdfs:label "Data Store" ;
-    rdfs:subClassOf kg:InfrastructureAsset .
-
-kg:Database
-    a owl:Class ;
-    rdfs:label "Database" ;
-    rdfs:subClassOf kg:DataStore .
-
-kg:Cache
-    a owl:Class ;
-    rdfs:label "Cache" ;
-    rdfs:subClassOf kg:DataStore .
-
-kg:Queue
-    a owl:Class ;
-    rdfs:label "Queue" ;
-    rdfs:subClassOf kg:InfrastructureAsset .
-
-kg:Topic
-    a owl:Class ;
-    rdfs:label "Topic" ;
-    rdfs:subClassOf kg:InfrastructureAsset .
-
-kg:ObservabilityAsset
-    a owl:Class ;
-    rdfs:label "Observability Asset" ;
-    rdfs:subClassOf kg:TechnologyAsset .
-
-kg:Dashboard
-    a owl:Class ;
-    rdfs:label "Dashboard" ;
-    rdfs:subClassOf kg:ObservabilityAsset .
-
-kg:Monitor
-    a owl:Class ;
-    rdfs:label "Monitor" ;
-    rdfs:subClassOf kg:ObservabilityAsset .
-
-kg:Policy
-    a owl:Class ;
-    rdfs:label "Policy" ;
-    rdfs:subClassOf kg:KnowledgeAsset .
-
-kg:Runtime
-    a owl:Class ;
-    rdfs:label "Runtime" ;
-    rdfs:subClassOf kg:TechnologyAsset .
-
-kg:Environment
-    a owl:Class ;
-    rdfs:label "Environment" ;
-    rdfs:subClassOf kg:KnowledgeAsset .
-
-kg:Domain
-    a owl:Class ;
-    rdfs:label "Business Domain" ;
-    rdfs:subClassOf kg:KnowledgeAsset .
-
-kg:DataCenter
-    a owl:Class ;
-    rdfs:label "Data Center" ;
-    rdfs:subClassOf kg:InfrastructureAsset .
-
-kg:ExternalVendor
-    a owl:Class ;
-    rdfs:label "External Vendor" ;
-    rdfs:subClassOf kg:KnowledgeAsset .
-
-kg:ownedBy
-    a owl:ObjectProperty ;
-    rdfs:label "owned by" ;
-    rdfs:domain kg:KnowledgeAsset ;
-    rdfs:range kg:OrganizationalUnit .
-
-kg:dependsOn
-    a owl:ObjectProperty ;
-    rdfs:label "depends on" ;
-    rdfs:domain kg:ApplicationComponent ;
-    rdfs:range kg:TechnologyAsset .
-
-kg:runsOn
-    a owl:ObjectProperty ;
-    rdfs:label "runs on" ;
-    rdfs:domain kg:ApplicationComponent ;
-    rdfs:range kg:InfrastructureAsset .
-
-kg:locatedIn
-    a owl:ObjectProperty ;
-    rdfs:label "located in" ;
-    rdfs:domain kg:InfrastructureAsset ;
-    rdfs:range kg:DataCenter .
-
-kg:partOfDomain
-    a owl:ObjectProperty ;
-    rdfs:label "part of domain" ;
-    rdfs:domain kg:KnowledgeAsset ;
-    rdfs:range kg:Domain .
-
-kg:deployedIn
-    a owl:ObjectProperty ;
-    rdfs:label "deployed in" ;
-    rdfs:domain kg:ApplicationComponent ;
-    rdfs:range kg:Environment .
-
-kg:partOfCluster
-    a owl:ObjectProperty ;
-    rdfs:label "part of cluster" ;
-    rdfs:domain kg:InfrastructureAsset ;
-    rdfs:range kg:Cluster .
-
-kg:hasRuntime
-    a owl:ObjectProperty ;
-    rdfs:label "has runtime" ;
-    rdfs:domain kg:ApplicationComponent ;
-    rdfs:range kg:Runtime .
-
-kg:readsFrom
-    a owl:ObjectProperty ;
-    rdfs:label "reads from" ;
-    rdfs:domain kg:ApplicationComponent ;
-    rdfs:range kg:DataStore .
-
-kg:writesTo
-    a owl:ObjectProperty ;
-    rdfs:label "writes to" ;
-    rdfs:domain kg:ApplicationComponent ;
-    rdfs:range kg:DataStore .
-
-kg:usesCache
-    a owl:ObjectProperty ;
-    rdfs:label "uses cache" ;
-    rdfs:domain kg:ApplicationComponent ;
-    rdfs:range kg:Cache .
-
-kg:publishesTo
-    a owl:ObjectProperty ;
-    rdfs:label "publishes to" ;
-    rdfs:domain kg:ApplicationComponent ;
-    rdfs:range kg:Topic .
-
-kg:consumesFrom
-    a owl:ObjectProperty ;
-    rdfs:label "consumes from" ;
-    rdfs:domain kg:ApplicationComponent ;
-    rdfs:range kg:Queue .
-
-kg:emitsTelemetryTo
-    a owl:ObjectProperty ;
-    rdfs:label "emits telemetry to" ;
-    rdfs:domain kg:ApplicationComponent ;
-    rdfs:range kg:Topic .
-
-kg:exposesEndpoint
-    a owl:ObjectProperty ;
-    rdfs:label "exposes endpoint" ;
-    rdfs:domain kg:Service ;
-    rdfs:range kg:Endpoint .
-
-kg:exposedBy
-    a owl:ObjectProperty ;
-    rdfs:label "exposed by" ;
-    rdfs:domain kg:Endpoint ;
-    rdfs:range kg:Gateway .
-
-kg:routesTo
-    a owl:ObjectProperty ;
-    rdfs:label "routes to" ;
-    rdfs:domain kg:Gateway ;
-    rdfs:range kg:Service .
-
-kg:monitoredBy
-    a owl:ObjectProperty ;
-    rdfs:label "monitored by" ;
-    rdfs:domain kg:TechnologyAsset ;
-    rdfs:range kg:Monitor .
-
-kg:shownOn
-    a owl:ObjectProperty ;
-    rdfs:label "shown on" ;
-    rdfs:domain kg:TechnologyAsset ;
-    rdfs:range kg:Dashboard .
-
-kg:alertsTo
-    a owl:ObjectProperty ;
-    rdfs:label "alerts to" ;
-    rdfs:domain kg:Monitor ;
-    rdfs:range kg:Team .
-
-kg:coveredByPolicy
-    a owl:ObjectProperty ;
-    rdfs:label "covered by policy" ;
-    rdfs:domain kg:KnowledgeAsset ;
-    rdfs:range kg:Policy .
-
-kg:integratesWith
-    a owl:ObjectProperty ;
-    rdfs:label "integrates with" ;
-    rdfs:domain kg:ApplicationComponent ;
-    rdfs:range kg:ExternalVendor .
-
-kg:replicatesTo
-    a owl:ObjectProperty ;
-    rdfs:label "replicates to" ;
-    rdfs:domain kg:DataStore ;
-    rdfs:range kg:DataStore .
-
-kg:backsUpTo
-    a owl:ObjectProperty ;
-    rdfs:label "backs up to" ;
-    rdfs:domain kg:DataStore ;
-    rdfs:range kg:DataCenter .
-
-kg:synchronizesWith
-    a owl:ObjectProperty ;
-    rdfs:label "synchronizes with" ;
-    rdfs:domain kg:ApplicationComponent ;
-    rdfs:range kg:ApplicationComponent .
-
-kg:name
-    a owl:DatatypeProperty ;
-    rdfs:label "name" ;
-    rdfs:domain kg:KnowledgeAsset ;
-    rdfs:range xsd:string .
-
-kg:description
-    a owl:DatatypeProperty ;
-    rdfs:label "description" ;
-    rdfs:domain kg:KnowledgeAsset ;
-    rdfs:range xsd:string .
-
-kg:country
-    a owl:DatatypeProperty ;
-    rdfs:label "country" ;
-    rdfs:domain kg:DataCenter ;
-    rdfs:range xsd:string .
-
-kg:engine
-    a owl:DatatypeProperty ;
-    rdfs:label "engine" ;
-    rdfs:domain kg:DataStore ;
-    rdfs:range xsd:string .
-
-kg:httpMethod
-    a owl:DatatypeProperty ;
-    rdfs:label "HTTP method" ;
-    rdfs:domain kg:Endpoint ;
-    rdfs:range xsd:string .
-
-kg:path
-    a owl:DatatypeProperty ;
-    rdfs:label "path" ;
-    rdfs:domain kg:Endpoint ;
-    rdfs:range xsd:string .
-
-kg:criticality
-    a owl:DatatypeProperty ;
-    rdfs:label "criticality" ;
-    rdfs:domain kg:TechnologyAsset ;
-    rdfs:range xsd:string .
-
-kg:tier
-    a owl:DatatypeProperty ;
-    rdfs:label "tier" ;
-    rdfs:domain kg:TechnologyAsset ;
-    rdfs:range xsd:string .
-
-kg:schedule
-    a owl:DatatypeProperty ;
-    rdfs:label "schedule" ;
-    rdfs:domain kg:BatchJob ;
-    rdfs:range xsd:string .
-
-kg:monthlyCostUSD
-    a owl:DatatypeProperty ;
-    rdfs:label "monthly cost USD" ;
-    rdfs:domain kg:Service ;
-    rdfs:range xsd:decimal .
-
-kg:cpuCore
-    a owl:DatatypeProperty ;
-    rdfs:label "CPU core count" ;
-    rdfs:domain kg:Server ;
-    rdfs:range xsd:integer .
-
-kg:memoryGB
-    a owl:DatatypeProperty ;
-    rdfs:label "memory GB" ;
-    rdfs:domain kg:Server ;
-    rdfs:range xsd:integer .
-
-kg:sloAvailability
-    a owl:DatatypeProperty ;
-    rdfs:label "SLO availability" ;
-    rdfs:domain kg:Service ;
-    rdfs:range xsd:decimal .
-
-kg:retentionDays
-    a owl:DatatypeProperty ;
-    rdfs:label "retention days" ;
-    rdfs:domain kg:DataStore ;
-    rdfs:range xsd:integer .
 
 team:data-platform
     a kg:Team ;
@@ -4401,3 +4028,376 @@ job:vulnerability-feed-import
     kg:shownOn dashboard:analytics-usage-dashboard ;
     kg:schedule "*/30 * * * *" ;
     kg:criticality "medium" .
+
+<>
+    a owl:Ontology ;
+    rdfs:label "Ninewatt large sample knowledge graph" ;
+    kg:name "Ninewatt Large Sample Knowledge Graph" .
+
+kg:KnowledgeAsset
+    a owl:Class ;
+    rdfs:label "Knowledge Asset" .
+
+kg:OrganizationalUnit
+    a owl:Class ;
+    rdfs:label "Organizational Unit" ;
+    rdfs:subClassOf kg:KnowledgeAsset .
+
+kg:Team
+    a owl:Class ;
+    rdfs:label "Team" ;
+    rdfs:subClassOf kg:OrganizationalUnit .
+
+kg:OwnerGroup
+    a owl:Class ;
+    rdfs:label "Owner Group" ;
+    rdfs:subClassOf kg:OrganizationalUnit .
+
+kg:TechnologyAsset
+    a owl:Class ;
+    rdfs:label "Technology Asset" ;
+    rdfs:subClassOf kg:KnowledgeAsset .
+
+kg:ApplicationComponent
+    a owl:Class ;
+    rdfs:label "Application Component" ;
+    rdfs:subClassOf kg:TechnologyAsset .
+
+kg:Service
+    a owl:Class ;
+    rdfs:label "Service" ;
+    rdfs:subClassOf kg:ApplicationComponent .
+
+kg:BatchJob
+    a owl:Class ;
+    rdfs:label "Batch Job" ;
+    rdfs:subClassOf kg:ApplicationComponent .
+
+kg:Endpoint
+    a owl:Class ;
+    rdfs:label "Endpoint" ;
+    rdfs:subClassOf kg:ApplicationComponent .
+
+kg:InfrastructureAsset
+    a owl:Class ;
+    rdfs:label "Infrastructure Asset" ;
+    rdfs:subClassOf kg:TechnologyAsset .
+
+kg:Server
+    a owl:Class ;
+    rdfs:label "Server" ;
+    rdfs:subClassOf kg:InfrastructureAsset .
+
+kg:Cluster
+    a owl:Class ;
+    rdfs:label "Cluster" ;
+    rdfs:subClassOf kg:InfrastructureAsset .
+
+kg:Gateway
+    a owl:Class ;
+    rdfs:label "Gateway" ;
+    rdfs:subClassOf kg:InfrastructureAsset .
+
+kg:DataStore
+    a owl:Class ;
+    rdfs:label "Data Store" ;
+    rdfs:subClassOf kg:InfrastructureAsset .
+
+kg:Database
+    a owl:Class ;
+    rdfs:label "Database" ;
+    rdfs:subClassOf kg:DataStore .
+
+kg:Cache
+    a owl:Class ;
+    rdfs:label "Cache" ;
+    rdfs:subClassOf kg:DataStore .
+
+kg:Queue
+    a owl:Class ;
+    rdfs:label "Queue" ;
+    rdfs:subClassOf kg:InfrastructureAsset .
+
+kg:Topic
+    a owl:Class ;
+    rdfs:label "Topic" ;
+    rdfs:subClassOf kg:InfrastructureAsset .
+
+kg:ObservabilityAsset
+    a owl:Class ;
+    rdfs:label "Observability Asset" ;
+    rdfs:subClassOf kg:TechnologyAsset .
+
+kg:Dashboard
+    a owl:Class ;
+    rdfs:label "Dashboard" ;
+    rdfs:subClassOf kg:ObservabilityAsset .
+
+kg:Monitor
+    a owl:Class ;
+    rdfs:label "Monitor" ;
+    rdfs:subClassOf kg:ObservabilityAsset .
+
+kg:Policy
+    a owl:Class ;
+    rdfs:label "Policy" ;
+    rdfs:subClassOf kg:KnowledgeAsset .
+
+kg:Runtime
+    a owl:Class ;
+    rdfs:label "Runtime" ;
+    rdfs:subClassOf kg:TechnologyAsset .
+
+kg:Environment
+    a owl:Class ;
+    rdfs:label "Environment" ;
+    rdfs:subClassOf kg:KnowledgeAsset .
+
+kg:Domain
+    a owl:Class ;
+    rdfs:label "Business Domain" ;
+    rdfs:subClassOf kg:KnowledgeAsset .
+
+kg:DataCenter
+    a owl:Class ;
+    rdfs:label "Data Center" ;
+    rdfs:subClassOf kg:InfrastructureAsset .
+
+kg:ExternalVendor
+    a owl:Class ;
+    rdfs:label "External Vendor" ;
+    rdfs:subClassOf kg:KnowledgeAsset .
+
+kg:ownedBy
+    a owl:ObjectProperty ;
+    rdfs:label "owned by" ;
+    rdfs:domain kg:KnowledgeAsset ;
+    rdfs:range kg:OrganizationalUnit .
+
+kg:dependsOn
+    a owl:ObjectProperty ;
+    rdfs:label "depends on" ;
+    rdfs:domain kg:ApplicationComponent ;
+    rdfs:range kg:TechnologyAsset .
+
+kg:runsOn
+    a owl:ObjectProperty ;
+    rdfs:label "runs on" ;
+    rdfs:domain kg:ApplicationComponent ;
+    rdfs:range kg:InfrastructureAsset .
+
+kg:locatedIn
+    a owl:ObjectProperty ;
+    rdfs:label "located in" ;
+    rdfs:domain kg:InfrastructureAsset ;
+    rdfs:range kg:DataCenter .
+
+kg:partOfDomain
+    a owl:ObjectProperty ;
+    rdfs:label "part of domain" ;
+    rdfs:domain kg:KnowledgeAsset ;
+    rdfs:range kg:Domain .
+
+kg:deployedIn
+    a owl:ObjectProperty ;
+    rdfs:label "deployed in" ;
+    rdfs:domain kg:ApplicationComponent ;
+    rdfs:range kg:Environment .
+
+kg:partOfCluster
+    a owl:ObjectProperty ;
+    rdfs:label "part of cluster" ;
+    rdfs:domain kg:InfrastructureAsset ;
+    rdfs:range kg:Cluster .
+
+kg:hasRuntime
+    a owl:ObjectProperty ;
+    rdfs:label "has runtime" ;
+    rdfs:domain kg:ApplicationComponent ;
+    rdfs:range kg:Runtime .
+
+kg:readsFrom
+    a owl:ObjectProperty ;
+    rdfs:label "reads from" ;
+    rdfs:domain kg:ApplicationComponent ;
+    rdfs:range kg:DataStore .
+
+kg:writesTo
+    a owl:ObjectProperty ;
+    rdfs:label "writes to" ;
+    rdfs:domain kg:ApplicationComponent ;
+    rdfs:range kg:DataStore .
+
+kg:usesCache
+    a owl:ObjectProperty ;
+    rdfs:label "uses cache" ;
+    rdfs:domain kg:ApplicationComponent ;
+    rdfs:range kg:Cache .
+
+kg:publishesTo
+    a owl:ObjectProperty ;
+    rdfs:label "publishes to" ;
+    rdfs:domain kg:ApplicationComponent ;
+    rdfs:range kg:Topic .
+
+kg:consumesFrom
+    a owl:ObjectProperty ;
+    rdfs:label "consumes from" ;
+    rdfs:domain kg:ApplicationComponent ;
+    rdfs:range kg:Queue .
+
+kg:emitsTelemetryTo
+    a owl:ObjectProperty ;
+    rdfs:label "emits telemetry to" ;
+    rdfs:domain kg:ApplicationComponent ;
+    rdfs:range kg:Topic .
+
+kg:exposesEndpoint
+    a owl:ObjectProperty ;
+    rdfs:label "exposes endpoint" ;
+    rdfs:domain kg:Service ;
+    rdfs:range kg:Endpoint .
+
+kg:exposedBy
+    a owl:ObjectProperty ;
+    rdfs:label "exposed by" ;
+    rdfs:domain kg:Endpoint ;
+    rdfs:range kg:Gateway .
+
+kg:routesTo
+    a owl:ObjectProperty ;
+    rdfs:label "routes to" ;
+    rdfs:domain kg:Gateway ;
+    rdfs:range kg:Service .
+
+kg:monitoredBy
+    a owl:ObjectProperty ;
+    rdfs:label "monitored by" ;
+    rdfs:domain kg:TechnologyAsset ;
+    rdfs:range kg:Monitor .
+
+kg:shownOn
+    a owl:ObjectProperty ;
+    rdfs:label "shown on" ;
+    rdfs:domain kg:TechnologyAsset ;
+    rdfs:range kg:Dashboard .
+
+kg:alertsTo
+    a owl:ObjectProperty ;
+    rdfs:label "alerts to" ;
+    rdfs:domain kg:Monitor ;
+    rdfs:range kg:Team .
+
+kg:coveredByPolicy
+    a owl:ObjectProperty ;
+    rdfs:label "covered by policy" ;
+    rdfs:domain kg:KnowledgeAsset ;
+    rdfs:range kg:Policy .
+
+kg:integratesWith
+    a owl:ObjectProperty ;
+    rdfs:label "integrates with" ;
+    rdfs:domain kg:ApplicationComponent ;
+    rdfs:range kg:ExternalVendor .
+
+kg:replicatesTo
+    a owl:ObjectProperty ;
+    rdfs:label "replicates to" ;
+    rdfs:domain kg:DataStore ;
+    rdfs:range kg:DataStore .
+
+kg:backsUpTo
+    a owl:ObjectProperty ;
+    rdfs:label "backs up to" ;
+    rdfs:domain kg:DataStore ;
+    rdfs:range kg:DataCenter .
+
+kg:synchronizesWith
+    a owl:ObjectProperty ;
+    rdfs:label "synchronizes with" ;
+    rdfs:domain kg:ApplicationComponent ;
+    rdfs:range kg:ApplicationComponent .
+
+kg:name
+    a owl:DatatypeProperty ;
+    rdfs:label "name" ;
+    rdfs:domain kg:KnowledgeAsset ;
+    rdfs:range xsd:string .
+
+kg:description
+    a owl:DatatypeProperty ;
+    rdfs:label "description" ;
+    rdfs:domain kg:KnowledgeAsset ;
+    rdfs:range xsd:string .
+
+kg:country
+    a owl:DatatypeProperty ;
+    rdfs:label "country" ;
+    rdfs:domain kg:DataCenter ;
+    rdfs:range xsd:string .
+
+kg:engine
+    a owl:DatatypeProperty ;
+    rdfs:label "engine" ;
+    rdfs:domain kg:DataStore ;
+    rdfs:range xsd:string .
+
+kg:httpMethod
+    a owl:DatatypeProperty ;
+    rdfs:label "HTTP method" ;
+    rdfs:domain kg:Endpoint ;
+    rdfs:range xsd:string .
+
+kg:path
+    a owl:DatatypeProperty ;
+    rdfs:label "path" ;
+    rdfs:domain kg:Endpoint ;
+    rdfs:range xsd:string .
+
+kg:criticality
+    a owl:DatatypeProperty ;
+    rdfs:label "criticality" ;
+    rdfs:domain kg:TechnologyAsset ;
+    rdfs:range xsd:string .
+
+kg:tier
+    a owl:DatatypeProperty ;
+    rdfs:label "tier" ;
+    rdfs:domain kg:TechnologyAsset ;
+    rdfs:range xsd:string .
+
+kg:schedule
+    a owl:DatatypeProperty ;
+    rdfs:label "schedule" ;
+    rdfs:domain kg:BatchJob ;
+    rdfs:range xsd:string .
+
+kg:monthlyCostUSD
+    a owl:DatatypeProperty ;
+    rdfs:label "monthly cost USD" ;
+    rdfs:domain kg:Service ;
+    rdfs:range xsd:decimal .
+
+kg:cpuCore
+    a owl:DatatypeProperty ;
+    rdfs:label "CPU core count" ;
+    rdfs:domain kg:Server ;
+    rdfs:range xsd:integer .
+
+kg:memoryGB
+    a owl:DatatypeProperty ;
+    rdfs:label "memory GB" ;
+    rdfs:domain kg:Server ;
+    rdfs:range xsd:integer .
+
+kg:sloAvailability
+    a owl:DatatypeProperty ;
+    rdfs:label "SLO availability" ;
+    rdfs:domain kg:Service ;
+    rdfs:range xsd:decimal .
+
+kg:retentionDays
+    a owl:DatatypeProperty ;
+    rdfs:label "retention days" ;
+    rdfs:domain kg:DataStore ;
+    rdfs:range xsd:integer .

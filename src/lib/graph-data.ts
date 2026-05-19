@@ -339,7 +339,7 @@ function upgradeKind(node: GraphNode, kind: NodeKind) {
     return;
   }
 
-  if (kind === "class" || node.kind === "unknown" || node.kind === "literal") {
+  if (rankKind(kind) > rankKind(node.kind)) {
     node.kind = kind;
   }
 }
@@ -361,8 +361,8 @@ function rankKind(kind: NodeKind) {
     unknown: 0,
     external: 1,
     literal: 2,
-    property: 3,
-    instance: 4,
+    instance: 3,
+    property: 4,
     class: 5,
   };
   return ranks[kind];

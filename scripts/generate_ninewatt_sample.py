@@ -31,7 +31,7 @@ PREFIXES = {
     "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
     "owl": "http://www.w3.org/2002/07/owl#",
     "xsd": "http://www.w3.org/2001/XMLSchema#",
-    KG: f"{DOCUMENT_IRI}#ontology/",
+    KG: f"{DOCUMENT_IRI}#",
     SERVICE: f"{DOCUMENT_IRI}#id/service/",
     TEAM: f"{DOCUMENT_IRI}#id/team/",
     INFRA: f"{DOCUMENT_IRI}#id/infra/",
@@ -2313,12 +2313,12 @@ def serialize_turtle(builder: GraphBuilder) -> str:
 
 def build_graph() -> GraphBuilder:
     builder = GraphBuilder()
-    add_ontology(builder)
     add_reference_data(builder)
     add_infrastructure(builder)
     add_observability(builder)
     add_services(builder)
     add_jobs(builder)
+    add_ontology(builder)
     return builder
 
 
