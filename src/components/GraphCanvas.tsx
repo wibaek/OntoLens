@@ -37,6 +37,7 @@ const nodeColors: Record<NodeKind, string> = {
   external: "#ef4444",
   unknown: "#64748b",
 };
+const rdfTypePredicate = "http://www.w3.org/1999/02/22-rdf-syntax-ns#type";
 
 type ViewBox = typeof defaultViewBox;
 
@@ -65,6 +66,7 @@ type GraphCanvasProps = {
   filters: GraphFilters;
   selectedNodeId: string | null;
   showEdgeLabels: boolean;
+  compactRdfType: boolean;
   physicsEnabled: boolean;
   focusToken: number;
   onNodeSelect: (nodeId: string) => void;
@@ -76,6 +78,7 @@ export function GraphCanvas({
   filters,
   selectedNodeId,
   showEdgeLabels,
+  compactRdfType,
   physicsEnabled,
   focusToken,
   onNodeSelect,
@@ -430,12 +433,14 @@ export function GraphCanvas({
                 Math.abs((source.y ?? 0) - (target.y ?? 0)) >
                 62;
             const mid = midpoint(source, target, edge);
+            const edgeLabel =
+              compactRdfType && edge.predicate === rdfTypePredicate ? "a" : edge.label;
 
             return (
               <g key={edge.id} className={active ? "is-active" : undefined}>
                 {/* biome-ignore lint/a11y/useSemanticElements: SVG graph edges cannot be native buttons. */}
                 <path
-                  aria-label={`${edge.label} edge`}
+                  aria-label={`${edgeLabel} edge`}
                   className="ontolens-graph-edge"
                   d={edgePath(source, target, edge)}
                   markerEnd="url(#ontolens-arrow)"
@@ -447,7 +452,7 @@ export function GraphCanvas({
                 />
                 {showLabel ? (
                   <text className="ontolens-edge-label" x={mid.x} y={mid.y}>
-                    {edge.label}
+                    {edgeLabel}
                   </text>
                 ) : null}
               </g>

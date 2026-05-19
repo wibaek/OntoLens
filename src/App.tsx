@@ -64,6 +64,7 @@ const defaultSettings: ExplorerSettings = {
   nodeLimit: 500,
   edgeLimit: 5000,
   showEdgeLabels: false,
+  compactRdfType: true,
   physicsEnabled: true,
 };
 
@@ -570,6 +571,14 @@ function App() {
           )}
           탐색 시작
         </button>
+        <button
+          type="button"
+          onClick={() => setSettingsOpen((value) => !value)}
+          className="rounded-md border border-slate-200 bg-white p-2 text-slate-700 shadow-sm hover:bg-slate-50"
+          title="설정"
+        >
+          <Settings className="h-5 w-5" aria-hidden="true" />
+        </button>
       </header>
 
       <main className="grid min-h-0 flex-1 grid-cols-[280px_minmax(0,1fr)_360px]">
@@ -792,14 +801,6 @@ function App() {
                 </button>
               </>
             ) : null}
-            <button
-              type="button"
-              onClick={() => setSettingsOpen((value) => !value)}
-              className="rounded-md border border-slate-200 bg-white p-2 text-slate-700 shadow-sm hover:bg-slate-50"
-              title="설정"
-            >
-              <Settings className="h-4 w-4" aria-hidden="true" />
-            </button>
           </div>
 
           {activeView === "graph" ? (
@@ -811,6 +812,7 @@ function App() {
                 filters={graphFilters}
                 selectedNodeId={selectedNodeId}
                 showEdgeLabels={settings.showEdgeLabels}
+                compactRdfType={settings.compactRdfType}
                 physicsEnabled={settings.physicsEnabled}
                 focusToken={focusToken}
                 onNodeSelect={selectGraphNode}
@@ -853,7 +855,7 @@ function App() {
           ) : null}
 
           {settingsOpen ? (
-            <div className="absolute right-4 top-16 z-30 w-72 rounded-md border border-slate-200 bg-white p-4 shadow-xl">
+            <div className="absolute right-4 top-4 z-30 w-72 rounded-md border border-slate-200 bg-white p-4 shadow-xl">
               <div className="mb-3 flex items-center justify-between">
                 <h2 className="text-sm font-semibold">Graph settings</h2>
                 <button type="button" onClick={() => setSettingsOpen(false)} className="p-1">
@@ -865,6 +867,20 @@ function App() {
                 <SettingRow label="Node limit" value={String(settings.nodeLimit)} />
                 <SettingRow label="Edge limit" value={String(settings.edgeLimit)} />
                 <SettingRow label="Physics" value={settings.physicsEnabled ? "on" : "off"} />
+                <label className="flex items-center justify-between border-b border-slate-100 pb-2">
+                  <span className="text-slate-500">rdf:type label</span>
+                  <span className="flex items-center gap-2">
+                    <span className="font-mono text-xs font-semibold text-slate-900">
+                      {settings.compactRdfType ? "a" : "rdf:type"}
+                    </span>
+                    <input
+                      type="checkbox"
+                      checked={settings.compactRdfType}
+                      onChange={() => updateSetting("compactRdfType", !settings.compactRdfType)}
+                      className="h-4 w-4 rounded border-slate-300 text-blue-600"
+                    />
+                  </span>
+                </label>
                 <SettingRow label="Cache entries" value={String(cacheRef.current.size)} />
               </div>
             </div>

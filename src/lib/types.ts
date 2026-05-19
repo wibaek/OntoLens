@@ -105,6 +105,7 @@ export type GraphLimits = {
 export type ExplorerSettings = GraphLimits & {
   depth: number;
   showEdgeLabels: boolean;
+  compactRdfType: boolean;
   physicsEnabled: boolean;
 };
 
