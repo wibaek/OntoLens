@@ -53,6 +53,7 @@ import type {
   LiteralProperty,
   LoadState,
   NamespaceFilters,
+  NeighborLink,
   SearchResult,
   SparqlSelectResult,
 } from "./lib/types";
@@ -957,20 +958,16 @@ function App() {
                     이웃 노드
                   </h3>
                   <div className="max-h-56 overflow-auto border-y border-slate-200">
-                    {selectedDetails.neighbors.length ? (
-                      selectedDetails.neighbors.slice(0, 60).map((neighbor) => (
-                        <button
-                          key={neighbor.id}
-                          type="button"
-                          onClick={() => selectGraphNode(neighbor.id)}
-                          className="flex w-full items-center justify-between gap-3 border-b border-slate-100 py-2 text-left text-sm last:border-0 hover:bg-slate-50"
-                        >
-                          <span className="truncate text-slate-800">{neighbor.label}</span>
-                          <span className="shrink-0 rounded bg-slate-100 px-1.5 py-0.5 text-[11px] text-slate-500">
-                            {neighbor.kind}
-                          </span>
-                        </button>
-                      ))
+                    {selectedDetails.neighborLinks.length ? (
+                      selectedDetails.neighborLinks
+                        .slice(0, 80)
+                        .map((link) => (
+                          <NeighborLinkButton
+                            key={`${link.direction}|${link.predicate}|${link.node.id}`}
+                            link={link}
+                            onClick={() => selectGraphNode(link.node.id)}
+                          />
+                        ))
                     ) : (
                       <p className="py-4 text-sm text-slate-500">이웃 노드 없음</p>
                     )}
@@ -1263,6 +1260,40 @@ function LiteralProperties({ properties }: { properties: LiteralProperty[] }) {
         ))}
       </div>
     </div>
+  );
+}
+
+function NeighborLinkButton({ link, onClick }: { link: NeighborLink; onClick: () => void }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="flex w-full flex-col gap-1 border-b border-slate-100 py-2 text-left text-sm last:border-0 hover:bg-slate-50"
+    >
+      <div className="flex items-center justify-between gap-3">
+        <span className="truncate text-slate-800">{link.node.label}</span>
+        <span className="shrink-0 rounded bg-slate-100 px-1.5 py-0.5 text-[11px] text-slate-500">
+          {link.node.kind}
+        </span>
+      </div>
+      <div className="flex items-center gap-1.5 text-xs">
+        <span
+          className={`rounded px-1.5 py-0.5 font-mono font-semibold ${
+            link.direction === "outgoing"
+              ? "bg-blue-50 text-blue-700"
+              : "bg-emerald-50 text-emerald-700"
+          }`}
+        >
+          {link.direction === "outgoing" ? "out" : "in"}
+        </span>
+        <span className="truncate font-mono text-slate-500">{link.label}</span>
+        {link.count > 1 ? (
+          <span className="rounded bg-slate-100 px-1.5 py-0.5 font-mono text-[10px] text-slate-500">
+            x{link.count}
+          </span>
+        ) : null}
+      </div>
+    </button>
   );
 }
 

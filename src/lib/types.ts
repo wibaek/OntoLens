@@ -124,11 +124,19 @@ export type LiteralProperty = {
   count: number;
 };
 
+export type NeighborLink = {
+  node: GraphNode;
+  direction: "incoming" | "outgoing";
+  predicate: string;
+  label: string;
+  count: number;
+};
+
 export type NodeDetails = {
   node: GraphNode;
   incoming: number;
   outgoing: number;
-  neighbors: GraphNode[];
+  neighborLinks: NeighborLink[];
   literalProperties: LiteralProperty[];
   predicates: string[];
 };

@@ -164,7 +164,6 @@ export function getNodeDetails(graph: GraphData, nodeId: string | null): NodeDet
   const nodeMap = new Map(graph.nodes.map((item) => [item.id, item]));
   const incomingEdges = graph.edges.filter((edge) => edge.target === nodeId);
   const outgoingEdges = graph.edges.filter((edge) => edge.source === nodeId);
-  const neighborIds = new Set<string>();
   const literalProperties = outgoingEdges
     .map((edge) => {
       const target = nodeMap.get(edge.target);
@@ -182,23 +181,39 @@ export function getNodeDetails(graph: GraphData, nodeId: string | null): NodeDet
       };
     })
     .filter((item): item is NonNullable<typeof item> => !!item);
+  const neighborLinks = [
+    ...incomingEdges.map((edge) => ({
+      edge,
+      direction: "incoming" as const,
+      neighborId: edge.source,
+    })),
+    ...outgoingEdges.map((edge) => ({
+      edge,
+      direction: "outgoing" as const,
+      neighborId: edge.target,
+    })),
+  ]
+    .map(({ edge, direction, neighborId }) => {
+      const neighbor = nodeMap.get(neighborId);
+      if (!neighbor || neighbor.kind === "literal") {
+        return null;
+      }
 
-  for (const edge of [...incomingEdges, ...outgoingEdges]) {
-    if (edge.source !== nodeId) {
-      neighborIds.add(edge.source);
-    }
-    if (edge.target !== nodeId) {
-      neighborIds.add(edge.target);
-    }
-  }
+      return {
+        node: neighbor,
+        direction,
+        predicate: edge.predicate,
+        label: edge.label,
+        count: edge.count,
+      };
+    })
+    .filter((item): item is NonNullable<typeof item> => !!item);
 
   return {
     node,
     incoming: incomingEdges.length,
     outgoing: outgoingEdges.length,
-    neighbors: [...neighborIds]
-      .map((id) => nodeMap.get(id))
-      .filter((item): item is GraphNode => !!item && item.kind !== "literal"),
+    neighborLinks,
     literalProperties,
     predicates: [...new Set([...incomingEdges, ...outgoingEdges].map((edge) => edge.label))],
   };
