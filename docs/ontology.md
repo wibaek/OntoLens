@@ -42,6 +42,26 @@ OntoLens 입장에서는 RDF 데이터 전체를 그래프로 보고, 그중 클
 | Vocabulary | 특정 도메인에서 재사용하는 IRI 묶음 | 표준/외부/local namespace 구분 기준 |
 | Ontology | 클래스, 속성, 제약, 의미 관계를 설명하는 vocabulary/모델 | class map과 계층 탐색의 대상 |
 
+## RDF와 RDFS 차이
+
+RDF는 그래프 데이터 모델 자체다. 어떤 리소스가 있고, 그 리소스들이 어떤 predicate로 연결되는지를 triple로 표현한다. `rdf:type`도 RDF vocabulary에 속하며, 리소스가 어떤 클래스의 인스턴스인지 말할 때 쓴다. Turtle에서는 `rdf:type`만 특별히 `a`로 줄여 쓸 수 있다.
+
+```turtle
+ex:sensor-1 rdf:type ex:TemperatureSensor .
+ex:sensor-1 a ex:TemperatureSensor .
+```
+
+RDFS는 RDF 위에서 클래스, 클래스 계층, 속성의 의미를 설명하는 vocabulary다. `rdfs:Class`, `rdfs:subClassOf`, `rdfs:domain`, `rdfs:range`, `rdfs:label` 같은 용어가 여기에 속한다. 즉 RDF가 "그래프를 어떻게 적는가"에 가깝다면, RDFS는 "그 그래프의 리소스와 관계가 어떤 의미 구조를 갖는가"를 설명한다.
+
+```turtle
+ex:TemperatureSensor a rdfs:Class .
+ex:TemperatureSensor rdfs:subClassOf ex:Sensor .
+ex:observes rdfs:domain ex:Sensor ;
+    rdfs:range ex:ObservableProperty .
+```
+
+주의할 점은 `a`처럼 정해진 Turtle 축약어는 `rdf:type`에만 있다는 것이다. `rdfs:subClassOf`에는 별도 예약 축약어가 없으므로 온톨로지 문서에서는 보통 그대로 `rdfs:subClassOf`를 쓴다.
+
 ## RDFS와 OWL
 
 RDFS와 OWL은 RDF 위에 의미를 더하는 vocabulary다.

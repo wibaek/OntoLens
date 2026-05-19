@@ -387,7 +387,12 @@ CONSTRUCT {
 WHERE {
   ${graphPattern(
     `?s ?p ?o .
-FILTER(!isLiteral(?o) || STRLEN(STR(?o)) < 280)`,
+FILTER(!isLiteral(?o) || STRLEN(STR(?o)) < 280)
+FILTER(?p NOT IN (rdfs:subClassOf, rdfs:domain, rdfs:range, rdfs:label))
+FILTER(
+  ?p != rdf:type ||
+  ?o NOT IN (owl:Class, rdfs:Class, rdf:Property, owl:ObjectProperty, owl:DatatypeProperty, owl:Ontology)
+)`,
     graphIri,
   )}
 }

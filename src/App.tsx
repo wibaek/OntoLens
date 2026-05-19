@@ -334,7 +334,7 @@ function App() {
     setStatus("loading");
     setLastError(null);
     setActiveView("graph");
-    setMessage("작은 전체 그래프를 가져오는 중입니다.");
+    setMessage("전체 그래프를 가져오는 중입니다.");
     neighborhoodRequestRef.current += 1;
 
     try {
@@ -669,7 +669,7 @@ function App() {
                 type="button"
                 onClick={() => void loadFullGraph()}
                 className="inline-flex items-center gap-1.5 rounded-md border border-slate-200 px-2 py-1.5 text-xs font-semibold text-slate-600 hover:bg-slate-50"
-                title="작은 전체 그래프"
+                title="전체 그래프"
               >
                 <Maximize2 className="h-4 w-4" aria-hidden="true" />
                 전체 그래프
@@ -892,7 +892,7 @@ function App() {
             <div className="flex items-start justify-between gap-3">
               <div>
                 <h2 className="text-sm font-semibold text-slate-900">선택 노드</h2>
-                <p className="mt-1 text-xs text-slate-500">
+                <p className="mt-1 break-all text-xs leading-5 text-slate-500">
                   {selectedDetails ? selectedDetails.node.label : "선택 없음"}
                 </p>
               </div>
@@ -999,7 +999,7 @@ function App() {
                     {selectedDetails.predicates.slice(0, 18).map((predicate) => (
                       <span
                         key={predicate}
-                        className="rounded bg-amber-100 px-2 py-1 text-xs font-medium text-amber-800"
+                        className="min-w-0 break-all rounded bg-amber-100 px-2 py-1 text-xs font-medium leading-5 text-amber-800"
                       >
                         {predicate}
                       </span>
@@ -1247,7 +1247,7 @@ function LiteralProperties({ properties }: { properties: LiteralProperty[] }) {
             className="border-b border-slate-100 py-2 last:border-0"
           >
             <div className="flex items-center justify-between gap-3">
-              <span className="truncate text-xs font-semibold text-amber-700">
+              <span className="min-w-0 break-all text-xs font-semibold leading-5 text-amber-700">
                 {property.label}
               </span>
               {property.count > 1 ? (
@@ -1296,14 +1296,17 @@ function NeighborLinkButton({
       className="flex w-full flex-col gap-2 border-b border-slate-100 py-2 text-left text-sm last:border-0 hover:bg-slate-50"
     >
       <div className="flex items-center justify-between gap-3">
-        <span className="truncate text-slate-800">{link.node.label}</span>
+        <span className="min-w-0 break-all leading-5 text-slate-800">{link.node.label}</span>
         <span className="shrink-0 rounded bg-slate-100 px-1.5 py-0.5 text-[11px] text-slate-500">
           {link.node.kind}
         </span>
       </div>
-      <div className="grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-1.5 text-xs">
+      <div className="grid gap-1.5 rounded-md bg-slate-50 p-2 text-xs">
         <TripleTerm node={link.subject} selected={link.subject.id === selectedNodeId} />
-        <span className="truncate rounded bg-slate-100 px-1.5 py-1 font-mono font-semibold text-slate-600">
+        <span
+          className="block min-w-0 max-w-full break-all rounded bg-amber-100 px-1.5 py-1 font-mono font-semibold leading-5 text-amber-800"
+          title={link.predicate}
+        >
           {link.label}
         </span>
         <TripleTerm node={link.object} selected={link.object.id === selectedNodeId} />
@@ -1322,7 +1325,7 @@ function NeighborLinkButton({
 function TripleTerm({ node, selected }: { node: NeighborLink["node"]; selected: boolean }) {
   return (
     <span
-      className={`truncate rounded px-1.5 py-1 font-mono font-semibold ${
+      className={`block min-w-0 max-w-full break-all rounded px-1.5 py-1 font-mono font-semibold leading-5 ${
         selected ? "bg-slate-950 text-white" : "bg-white text-slate-500"
       }`}
       title={node.iri}

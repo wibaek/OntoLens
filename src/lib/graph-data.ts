@@ -72,16 +72,23 @@ export function buildClassMapGraph(
 }
 
 export function quadsToGraphData(quads: RdfQuad[], localNamespaces: string[]): GraphData {
+  const iriValues = quads.flatMap((quad) =>
+    [quad.subject, quad.predicate, quad.object]
+      .filter((term) => term.termType === "iri")
+      .map((term) => term.value),
+  );
+  const inferred = inferNamespaceCandidates(iriValues, localNamespaces);
+  const effectiveLocalNamespaces = [...new Set([...localNamespaces, ...inferred.localNamespaces])];
   const nodes = new Map<string, GraphNode>();
   const edges = new Map<string, GraphEdge>();
 
   for (const quad of quads) {
-    const subject = ensureNode(nodes, quad.subject, localNamespaces);
-    const object = ensureNode(nodes, quad.object, localNamespaces);
+    const subject = ensureNode(nodes, quad.subject, effectiveLocalNamespaces);
+    const object = ensureNode(nodes, quad.object, effectiveLocalNamespaces);
     applySemanticHints(subject, object, quad.predicate.value);
 
     const edgeId = `${subject.id}|${quad.predicate.value}|${object.id}`;
-    const edgeLabel = compactIri(quad.predicate.value, localNamespaces);
+    const edgeLabel = compactIri(quad.predicate.value, effectiveLocalNamespaces);
     const existingEdge = edges.get(edgeId);
 
     if (existingEdge) {
@@ -101,7 +108,7 @@ export function quadsToGraphData(quads: RdfQuad[], localNamespaces: string[]): G
   return {
     nodes: [...nodes.values()],
     edges: [...edges.values()],
-    localNamespaces,
+    localNamespaces: effectiveLocalNamespaces,
   };
 }
 

@@ -1,0 +1,4403 @@
+@base <https://rnd-fuseki.ninewatt.com/ds/data?graph=https://rnd-fuseki.ninewatt.com/kg/graph/large-sample> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix kg: <https://rnd-fuseki.ninewatt.com/ds/data?graph=https://rnd-fuseki.ninewatt.com/kg/graph/large-sample#ontology/> .
+@prefix service: <https://rnd-fuseki.ninewatt.com/ds/data?graph=https://rnd-fuseki.ninewatt.com/kg/graph/large-sample#id/service/> .
+@prefix team: <https://rnd-fuseki.ninewatt.com/ds/data?graph=https://rnd-fuseki.ninewatt.com/kg/graph/large-sample#id/team/> .
+@prefix infra: <https://rnd-fuseki.ninewatt.com/ds/data?graph=https://rnd-fuseki.ninewatt.com/kg/graph/large-sample#id/infra/> .
+@prefix datacenter: <https://rnd-fuseki.ninewatt.com/ds/data?graph=https://rnd-fuseki.ninewatt.com/kg/graph/large-sample#id/datacenter/> .
+@prefix endpoint: <https://rnd-fuseki.ninewatt.com/ds/data?graph=https://rnd-fuseki.ninewatt.com/kg/graph/large-sample#id/endpoint/> .
+@prefix job: <https://rnd-fuseki.ninewatt.com/ds/data?graph=https://rnd-fuseki.ninewatt.com/kg/graph/large-sample#id/job/> .
+@prefix dashboard: <https://rnd-fuseki.ninewatt.com/ds/data?graph=https://rnd-fuseki.ninewatt.com/kg/graph/large-sample#id/dashboard/> .
+@prefix monitor: <https://rnd-fuseki.ninewatt.com/ds/data?graph=https://rnd-fuseki.ninewatt.com/kg/graph/large-sample#id/monitor/> .
+@prefix domain: <https://rnd-fuseki.ninewatt.com/ds/data?graph=https://rnd-fuseki.ninewatt.com/kg/graph/large-sample#id/domain/> .
+@prefix environment: <https://rnd-fuseki.ninewatt.com/ds/data?graph=https://rnd-fuseki.ninewatt.com/kg/graph/large-sample#id/environment/> .
+@prefix runtime: <https://rnd-fuseki.ninewatt.com/ds/data?graph=https://rnd-fuseki.ninewatt.com/kg/graph/large-sample#id/runtime/> .
+@prefix cluster: <https://rnd-fuseki.ninewatt.com/ds/data?graph=https://rnd-fuseki.ninewatt.com/kg/graph/large-sample#id/cluster/> .
+@prefix gateway: <https://rnd-fuseki.ninewatt.com/ds/data?graph=https://rnd-fuseki.ninewatt.com/kg/graph/large-sample#id/gateway/> .
+@prefix vendor: <https://rnd-fuseki.ninewatt.com/ds/data?graph=https://rnd-fuseki.ninewatt.com/kg/graph/large-sample#id/vendor/> .
+@prefix policy: <https://rnd-fuseki.ninewatt.com/ds/data?graph=https://rnd-fuseki.ninewatt.com/kg/graph/large-sample#id/policy/> .
+
+<>
+    a owl:Ontology ;
+    rdfs:label "Ninewatt large sample knowledge graph" ;
+    kg:name "Ninewatt Large Sample Knowledge Graph" .
+
+kg:KnowledgeAsset
+    a owl:Class ;
+    rdfs:label "Knowledge Asset" .
+
+kg:OrganizationalUnit
+    a owl:Class ;
+    rdfs:label "Organizational Unit" ;
+    rdfs:subClassOf kg:KnowledgeAsset .
+
+kg:Team
+    a owl:Class ;
+    rdfs:label "Team" ;
+    rdfs:subClassOf kg:OrganizationalUnit .
+
+kg:OwnerGroup
+    a owl:Class ;
+    rdfs:label "Owner Group" ;
+    rdfs:subClassOf kg:OrganizationalUnit .
+
+kg:TechnologyAsset
+    a owl:Class ;
+    rdfs:label "Technology Asset" ;
+    rdfs:subClassOf kg:KnowledgeAsset .
+
+kg:ApplicationComponent
+    a owl:Class ;
+    rdfs:label "Application Component" ;
+    rdfs:subClassOf kg:TechnologyAsset .
+
+kg:Service
+    a owl:Class ;
+    rdfs:label "Service" ;
+    rdfs:subClassOf kg:ApplicationComponent .
+
+kg:BatchJob
+    a owl:Class ;
+    rdfs:label "Batch Job" ;
+    rdfs:subClassOf kg:ApplicationComponent .
+
+kg:Endpoint
+    a owl:Class ;
+    rdfs:label "Endpoint" ;
+    rdfs:subClassOf kg:ApplicationComponent .
+
+kg:InfrastructureAsset
+    a owl:Class ;
+    rdfs:label "Infrastructure Asset" ;
+    rdfs:subClassOf kg:TechnologyAsset .
+
+kg:Server
+    a owl:Class ;
+    rdfs:label "Server" ;
+    rdfs:subClassOf kg:InfrastructureAsset .
+
+kg:Cluster
+    a owl:Class ;
+    rdfs:label "Cluster" ;
+    rdfs:subClassOf kg:InfrastructureAsset .
+
+kg:Gateway
+    a owl:Class ;
+    rdfs:label "Gateway" ;
+    rdfs:subClassOf kg:InfrastructureAsset .
+
+kg:DataStore
+    a owl:Class ;
+    rdfs:label "Data Store" ;
+    rdfs:subClassOf kg:InfrastructureAsset .
+
+kg:Database
+    a owl:Class ;
+    rdfs:label "Database" ;
+    rdfs:subClassOf kg:DataStore .
+
+kg:Cache
+    a owl:Class ;
+    rdfs:label "Cache" ;
+    rdfs:subClassOf kg:DataStore .
+
+kg:Queue
+    a owl:Class ;
+    rdfs:label "Queue" ;
+    rdfs:subClassOf kg:InfrastructureAsset .
+
+kg:Topic
+    a owl:Class ;
+    rdfs:label "Topic" ;
+    rdfs:subClassOf kg:InfrastructureAsset .
+
+kg:ObservabilityAsset
+    a owl:Class ;
+    rdfs:label "Observability Asset" ;
+    rdfs:subClassOf kg:TechnologyAsset .
+
+kg:Dashboard
+    a owl:Class ;
+    rdfs:label "Dashboard" ;
+    rdfs:subClassOf kg:ObservabilityAsset .
+
+kg:Monitor
+    a owl:Class ;
+    rdfs:label "Monitor" ;
+    rdfs:subClassOf kg:ObservabilityAsset .
+
+kg:Policy
+    a owl:Class ;
+    rdfs:label "Policy" ;
+    rdfs:subClassOf kg:KnowledgeAsset .
+
+kg:Runtime
+    a owl:Class ;
+    rdfs:label "Runtime" ;
+    rdfs:subClassOf kg:TechnologyAsset .
+
+kg:Environment
+    a owl:Class ;
+    rdfs:label "Environment" ;
+    rdfs:subClassOf kg:KnowledgeAsset .
+
+kg:Domain
+    a owl:Class ;
+    rdfs:label "Business Domain" ;
+    rdfs:subClassOf kg:KnowledgeAsset .
+
+kg:DataCenter
+    a owl:Class ;
+    rdfs:label "Data Center" ;
+    rdfs:subClassOf kg:InfrastructureAsset .
+
+kg:ExternalVendor
+    a owl:Class ;
+    rdfs:label "External Vendor" ;
+    rdfs:subClassOf kg:KnowledgeAsset .
+
+kg:ownedBy
+    a owl:ObjectProperty ;
+    rdfs:label "owned by" ;
+    rdfs:domain kg:KnowledgeAsset ;
+    rdfs:range kg:OrganizationalUnit .
+
+kg:dependsOn
+    a owl:ObjectProperty ;
+    rdfs:label "depends on" ;
+    rdfs:domain kg:ApplicationComponent ;
+    rdfs:range kg:TechnologyAsset .
+
+kg:runsOn
+    a owl:ObjectProperty ;
+    rdfs:label "runs on" ;
+    rdfs:domain kg:ApplicationComponent ;
+    rdfs:range kg:InfrastructureAsset .
+
+kg:locatedIn
+    a owl:ObjectProperty ;
+    rdfs:label "located in" ;
+    rdfs:domain kg:InfrastructureAsset ;
+    rdfs:range kg:DataCenter .
+
+kg:partOfDomain
+    a owl:ObjectProperty ;
+    rdfs:label "part of domain" ;
+    rdfs:domain kg:KnowledgeAsset ;
+    rdfs:range kg:Domain .
+
+kg:deployedIn
+    a owl:ObjectProperty ;
+    rdfs:label "deployed in" ;
+    rdfs:domain kg:ApplicationComponent ;
+    rdfs:range kg:Environment .
+
+kg:partOfCluster
+    a owl:ObjectProperty ;
+    rdfs:label "part of cluster" ;
+    rdfs:domain kg:InfrastructureAsset ;
+    rdfs:range kg:Cluster .
+
+kg:hasRuntime
+    a owl:ObjectProperty ;
+    rdfs:label "has runtime" ;
+    rdfs:domain kg:ApplicationComponent ;
+    rdfs:range kg:Runtime .
+
+kg:readsFrom
+    a owl:ObjectProperty ;
+    rdfs:label "reads from" ;
+    rdfs:domain kg:ApplicationComponent ;
+    rdfs:range kg:DataStore .
+
+kg:writesTo
+    a owl:ObjectProperty ;
+    rdfs:label "writes to" ;
+    rdfs:domain kg:ApplicationComponent ;
+    rdfs:range kg:DataStore .
+
+kg:usesCache
+    a owl:ObjectProperty ;
+    rdfs:label "uses cache" ;
+    rdfs:domain kg:ApplicationComponent ;
+    rdfs:range kg:Cache .
+
+kg:publishesTo
+    a owl:ObjectProperty ;
+    rdfs:label "publishes to" ;
+    rdfs:domain kg:ApplicationComponent ;
+    rdfs:range kg:Topic .
+
+kg:consumesFrom
+    a owl:ObjectProperty ;
+    rdfs:label "consumes from" ;
+    rdfs:domain kg:ApplicationComponent ;
+    rdfs:range kg:Queue .
+
+kg:emitsTelemetryTo
+    a owl:ObjectProperty ;
+    rdfs:label "emits telemetry to" ;
+    rdfs:domain kg:ApplicationComponent ;
+    rdfs:range kg:Topic .
+
+kg:exposesEndpoint
+    a owl:ObjectProperty ;
+    rdfs:label "exposes endpoint" ;
+    rdfs:domain kg:Service ;
+    rdfs:range kg:Endpoint .
+
+kg:exposedBy
+    a owl:ObjectProperty ;
+    rdfs:label "exposed by" ;
+    rdfs:domain kg:Endpoint ;
+    rdfs:range kg:Gateway .
+
+kg:routesTo
+    a owl:ObjectProperty ;
+    rdfs:label "routes to" ;
+    rdfs:domain kg:Gateway ;
+    rdfs:range kg:Service .
+
+kg:monitoredBy
+    a owl:ObjectProperty ;
+    rdfs:label "monitored by" ;
+    rdfs:domain kg:TechnologyAsset ;
+    rdfs:range kg:Monitor .
+
+kg:shownOn
+    a owl:ObjectProperty ;
+    rdfs:label "shown on" ;
+    rdfs:domain kg:TechnologyAsset ;
+    rdfs:range kg:Dashboard .
+
+kg:alertsTo
+    a owl:ObjectProperty ;
+    rdfs:label "alerts to" ;
+    rdfs:domain kg:Monitor ;
+    rdfs:range kg:Team .
+
+kg:coveredByPolicy
+    a owl:ObjectProperty ;
+    rdfs:label "covered by policy" ;
+    rdfs:domain kg:KnowledgeAsset ;
+    rdfs:range kg:Policy .
+
+kg:integratesWith
+    a owl:ObjectProperty ;
+    rdfs:label "integrates with" ;
+    rdfs:domain kg:ApplicationComponent ;
+    rdfs:range kg:ExternalVendor .
+
+kg:replicatesTo
+    a owl:ObjectProperty ;
+    rdfs:label "replicates to" ;
+    rdfs:domain kg:DataStore ;
+    rdfs:range kg:DataStore .
+
+kg:backsUpTo
+    a owl:ObjectProperty ;
+    rdfs:label "backs up to" ;
+    rdfs:domain kg:DataStore ;
+    rdfs:range kg:DataCenter .
+
+kg:synchronizesWith
+    a owl:ObjectProperty ;
+    rdfs:label "synchronizes with" ;
+    rdfs:domain kg:ApplicationComponent ;
+    rdfs:range kg:ApplicationComponent .
+
+kg:name
+    a owl:DatatypeProperty ;
+    rdfs:label "name" ;
+    rdfs:domain kg:KnowledgeAsset ;
+    rdfs:range xsd:string .
+
+kg:description
+    a owl:DatatypeProperty ;
+    rdfs:label "description" ;
+    rdfs:domain kg:KnowledgeAsset ;
+    rdfs:range xsd:string .
+
+kg:country
+    a owl:DatatypeProperty ;
+    rdfs:label "country" ;
+    rdfs:domain kg:DataCenter ;
+    rdfs:range xsd:string .
+
+kg:engine
+    a owl:DatatypeProperty ;
+    rdfs:label "engine" ;
+    rdfs:domain kg:DataStore ;
+    rdfs:range xsd:string .
+
+kg:httpMethod
+    a owl:DatatypeProperty ;
+    rdfs:label "HTTP method" ;
+    rdfs:domain kg:Endpoint ;
+    rdfs:range xsd:string .
+
+kg:path
+    a owl:DatatypeProperty ;
+    rdfs:label "path" ;
+    rdfs:domain kg:Endpoint ;
+    rdfs:range xsd:string .
+
+kg:criticality
+    a owl:DatatypeProperty ;
+    rdfs:label "criticality" ;
+    rdfs:domain kg:TechnologyAsset ;
+    rdfs:range xsd:string .
+
+kg:tier
+    a owl:DatatypeProperty ;
+    rdfs:label "tier" ;
+    rdfs:domain kg:TechnologyAsset ;
+    rdfs:range xsd:string .
+
+kg:schedule
+    a owl:DatatypeProperty ;
+    rdfs:label "schedule" ;
+    rdfs:domain kg:BatchJob ;
+    rdfs:range xsd:string .
+
+kg:monthlyCostUSD
+    a owl:DatatypeProperty ;
+    rdfs:label "monthly cost USD" ;
+    rdfs:domain kg:Service ;
+    rdfs:range xsd:decimal .
+
+kg:cpuCore
+    a owl:DatatypeProperty ;
+    rdfs:label "CPU core count" ;
+    rdfs:domain kg:Server ;
+    rdfs:range xsd:integer .
+
+kg:memoryGB
+    a owl:DatatypeProperty ;
+    rdfs:label "memory GB" ;
+    rdfs:domain kg:Server ;
+    rdfs:range xsd:integer .
+
+kg:sloAvailability
+    a owl:DatatypeProperty ;
+    rdfs:label "SLO availability" ;
+    rdfs:domain kg:Service ;
+    rdfs:range xsd:decimal .
+
+kg:retentionDays
+    a owl:DatatypeProperty ;
+    rdfs:label "retention days" ;
+    rdfs:domain kg:DataStore ;
+    rdfs:range xsd:integer .
+
+team:data-platform
+    a kg:Team ;
+    kg:name "Data Platform Team" .
+
+team:backend
+    a kg:Team ;
+    kg:name "Backend Team" .
+
+team:payments
+    a kg:Team ;
+    kg:name "Payments Platform Team" .
+
+team:identity-access
+    a kg:Team ;
+    kg:name "Identity and Access Team" .
+
+team:commerce-platform
+    a kg:Team ;
+    kg:name "Commerce Platform Team" .
+
+team:fulfillment-ops
+    a kg:Team ;
+    kg:name "Fulfillment Operations Team" .
+
+team:growth-platform
+    a kg:Team ;
+    kg:name "Growth Platform Team" .
+
+team:analytics-engineering
+    a kg:Team ;
+    kg:name "Analytics Engineering Team" .
+
+team:ml-platform
+    a kg:Team ;
+    kg:name "ML Platform Team" .
+
+team:security
+    a kg:Team ;
+    kg:name "Security Engineering Team" .
+
+team:reliability
+    a kg:Team ;
+    kg:name "Reliability Engineering Team" .
+
+team:support-ops
+    a kg:Team ;
+    kg:name "Support Operations Team" .
+
+team:partner-engineering
+    a kg:Team ;
+    kg:name "Partner Engineering Team" .
+
+team:media-platform
+    a kg:Team ;
+    kg:name "Media Platform Team" .
+
+team:governance-risk
+    a kg:Team ;
+    kg:name "Governance and Risk Team" .
+
+team:frontend-platform
+    a kg:Team ;
+    kg:name "Frontend Platform Team" .
+
+domain:finance
+    a kg:Domain ;
+    kg:name "Finance" .
+
+domain:identity
+    a kg:Domain ;
+    kg:name "Identity" .
+
+domain:commerce
+    a kg:Domain ;
+    kg:name "Commerce" .
+
+domain:operations
+    a kg:Domain ;
+    kg:name "Operations" .
+
+domain:risk
+    a kg:Domain ;
+    kg:name "Risk" .
+
+domain:loyalty
+    a kg:Domain ;
+    kg:name "Loyalty" .
+
+domain:growth
+    a kg:Domain ;
+    kg:name "Growth" .
+
+domain:discovery
+    a kg:Domain ;
+    kg:name "Discovery" .
+
+domain:platform
+    a kg:Domain ;
+    kg:name "Platform" .
+
+domain:data
+    a kg:Domain ;
+    kg:name "Data" .
+
+domain:analytics
+    a kg:Domain ;
+    kg:name "Analytics" .
+
+domain:machine-learning
+    a kg:Domain ;
+    kg:name "Machine Learning" .
+
+domain:privacy-governance
+    a kg:Domain ;
+    kg:name "Privacy Governance" .
+
+domain:experience
+    a kg:Domain ;
+    kg:name "Experience" .
+
+domain:support
+    a kg:Domain ;
+    kg:name "Support" .
+
+domain:security
+    a kg:Domain ;
+    kg:name "Security" .
+
+domain:reliability
+    a kg:Domain ;
+    kg:name "Reliability" .
+
+domain:media
+    a kg:Domain ;
+    kg:name "Media" .
+
+environment:prod
+    a kg:Environment ;
+    kg:name "Production" .
+
+environment:staging
+    a kg:Environment ;
+    kg:name "Staging" .
+
+environment:dr
+    a kg:Environment ;
+    kg:name "Disaster Recovery" .
+
+environment:sandbox
+    a kg:Environment ;
+    kg:name "Sandbox" .
+
+datacenter:seoul-idc
+    a kg:DataCenter ;
+    kg:name "Seoul IDC" ;
+    kg:country "KR" .
+
+datacenter:busan-dr-idc
+    a kg:DataCenter ;
+    kg:name "Busan DR IDC" ;
+    kg:country "KR" .
+
+datacenter:singapore-edge
+    a kg:DataCenter ;
+    kg:name "Singapore Edge" ;
+    kg:country "SG" .
+
+datacenter:tokyo-edge
+    a kg:DataCenter ;
+    kg:name "Tokyo Edge" ;
+    kg:country "JP" .
+
+datacenter:frankfurt-backup
+    a kg:DataCenter ;
+    kg:name "Frankfurt Backup" ;
+    kg:country "DE" .
+
+runtime:nodejs-22
+    a kg:Runtime ;
+    kg:name "Node.js 22" .
+
+runtime:java-21
+    a kg:Runtime ;
+    kg:name "Java 21" .
+
+runtime:python-3-12
+    a kg:Runtime ;
+    kg:name "Python 3.12" .
+
+runtime:go-1-23
+    a kg:Runtime ;
+    kg:name "Go 1.23" .
+
+runtime:rust-1-82
+    a kg:Runtime ;
+    kg:name "Rust 1.82" .
+
+runtime:nginx-1-27
+    a kg:Runtime ;
+    kg:name "NGINX 1.27" .
+
+runtime:flink-1-19
+    a kg:Runtime ;
+    kg:name "Apache Flink 1.19" .
+
+runtime:spark-3-5
+    a kg:Runtime ;
+    kg:name "Apache Spark 3.5" .
+
+cluster:seoul-prod-core
+    a kg:Cluster ;
+    kg:name "Seoul Production Core Cluster" ;
+    kg:locatedIn datacenter:seoul-idc .
+
+cluster:seoul-prod-data
+    a kg:Cluster ;
+    kg:name "Seoul Production Data Cluster" ;
+    kg:locatedIn datacenter:seoul-idc .
+
+cluster:seoul-prod-edge
+    a kg:Cluster ;
+    kg:name "Seoul Production Edge Cluster" ;
+    kg:locatedIn datacenter:seoul-idc .
+
+cluster:busan-dr-core
+    a kg:Cluster ;
+    kg:name "Busan Disaster Recovery Core Cluster" ;
+    kg:locatedIn datacenter:busan-dr-idc .
+
+cluster:singapore-edge-cluster
+    a kg:Cluster ;
+    kg:name "Singapore Edge Cluster" ;
+    kg:locatedIn datacenter:singapore-edge .
+
+cluster:tokyo-edge-cluster
+    a kg:Cluster ;
+    kg:name "Tokyo Edge Cluster" ;
+    kg:locatedIn datacenter:tokyo-edge .
+
+cluster:analytics-prod
+    a kg:Cluster ;
+    kg:name "Analytics Production Cluster" ;
+    kg:locatedIn datacenter:seoul-idc .
+
+cluster:ml-prod
+    a kg:Cluster ;
+    kg:name "ML Production Cluster" ;
+    kg:locatedIn datacenter:seoul-idc .
+
+gateway:public-api-gateway
+    a kg:Gateway ;
+    kg:name "Public API Gateway" ;
+    kg:partOfCluster cluster:seoul-prod-edge ;
+    kg:locatedIn datacenter:seoul-idc ;
+    kg:routesTo service:payment-api ;
+    kg:routesTo service:subscription-api ;
+    kg:routesTo service:pricing-api ;
+    kg:routesTo service:identity-api ;
+    kg:routesTo service:session-api ;
+    kg:routesTo service:customer-profile-api ;
+    kg:routesTo service:push-notification-api ;
+    kg:routesTo service:order-api ;
+    kg:routesTo service:cart-api ;
+    kg:routesTo service:checkout-api ;
+    kg:routesTo service:catalog-api ;
+    kg:routesTo service:returns-api ;
+    kg:routesTo service:rewards-api ;
+    kg:routesTo service:loyalty-api ;
+    kg:routesTo service:campaign-api ;
+    kg:routesTo service:recommendation-api ;
+    kg:routesTo service:search-api ;
+    kg:routesTo service:experimentation-api ;
+    kg:routesTo service:api-gateway ;
+    kg:routesTo service:mobile-bff ;
+    kg:routesTo service:web-bff ;
+    kg:routesTo service:review-api .
+
+gateway:partner-api-gateway
+    a kg:Gateway ;
+    kg:name "Partner API Gateway" ;
+    kg:partOfCluster cluster:seoul-prod-edge ;
+    kg:locatedIn datacenter:seoul-idc ;
+    kg:routesTo service:shipment-api ;
+    kg:routesTo service:developer-portal-api ;
+    kg:routesTo service:partner-api ;
+    kg:routesTo service:webhook-dispatcher .
+
+gateway:internal-api-gateway
+    a kg:Gateway ;
+    kg:name "Internal API Gateway" ;
+    kg:partOfCluster cluster:seoul-prod-core ;
+    kg:locatedIn datacenter:seoul-idc ;
+    kg:routesTo service:billing-api ;
+    kg:routesTo service:invoice-api ;
+    kg:routesTo service:settlement-api ;
+    kg:routesTo service:ledger-api ;
+    kg:routesTo service:tax-api ;
+    kg:routesTo service:revenue-recognition-api ;
+    kg:routesTo service:cost-allocation-api ;
+    kg:routesTo service:access-policy-api ;
+    kg:routesTo service:consent-api ;
+    kg:routesTo service:privacy-request-api ;
+    kg:routesTo service:audit-log-api ;
+    kg:routesTo service:compliance-reporting-api ;
+    kg:routesTo service:notification-api ;
+    kg:routesTo service:email-dispatcher ;
+    kg:routesTo service:sms-gateway-adapter ;
+    kg:routesTo service:inventory-api ;
+    kg:routesTo service:fulfillment-api ;
+    kg:routesTo service:fraud-screening-api ;
+    kg:routesTo service:risk-scoring-api ;
+    kg:routesTo service:chargeback-api ;
+    kg:routesTo service:product-graph-api ;
+    kg:routesTo service:data-ingestion-api ;
+    kg:routesTo service:event-router ;
+    kg:routesTo service:analytics-query-api ;
+    kg:routesTo service:feature-store-api ;
+    kg:routesTo service:admin-console-api ;
+    kg:routesTo service:file-export-api ;
+    kg:routesTo service:media-metadata-api ;
+    kg:routesTo service:support-case-api ;
+    kg:routesTo service:ticket-sync-worker ;
+    kg:routesTo service:crm-sync-api ;
+    kg:routesTo service:reporting-api ;
+    kg:routesTo service:ml-inference-api ;
+    kg:routesTo service:model-registry-api ;
+    kg:routesTo service:content-moderation-api ;
+    kg:routesTo service:warehouse-sync-worker ;
+    kg:routesTo service:data-quality-api ;
+    kg:routesTo service:observability-api ;
+    kg:routesTo service:incident-routing-api ;
+    kg:routesTo service:capacity-planner-api ;
+    kg:routesTo service:secret-rotation-worker ;
+    kg:routesTo service:vulnerability-intake-api ;
+    kg:routesTo service:rate-limit-api .
+
+gateway:edge-content-gateway
+    a kg:Gateway ;
+    kg:name "Edge Content Gateway" ;
+    kg:partOfCluster cluster:singapore-edge-cluster ;
+    kg:locatedIn datacenter:singapore-edge ;
+    kg:routesTo service:asset-delivery-api .
+
+vendor:stripe
+    a kg:ExternalVendor ;
+    kg:name "Stripe" .
+
+vendor:sendgrid
+    a kg:ExternalVendor ;
+    kg:name "Sendgrid" .
+
+vendor:twilio
+    a kg:ExternalVendor ;
+    kg:name "Twilio" .
+
+vendor:salesforce
+    a kg:ExternalVendor ;
+    kg:name "Salesforce" .
+
+vendor:sentry
+    a kg:ExternalVendor ;
+    kg:name "Sentry" .
+
+policy:pci-dss-payment-data
+    a kg:Policy ;
+    kg:name "Pci Dss Payment Data" .
+
+policy:pii-data-retention
+    a kg:Policy ;
+    kg:name "Pii Data Retention" .
+
+policy:customer-erasure-sla
+    a kg:Policy ;
+    kg:name "Customer Erasure Sla" .
+
+policy:production-change-approval
+    a kg:Policy ;
+    kg:name "Production Change Approval" .
+
+policy:incident-severity-routing
+    a kg:Policy ;
+    kg:name "Incident Severity Routing" .
+
+policy:model-risk-review
+    a kg:Policy ;
+    kg:name "Model Risk Review" .
+
+policy:audit-log-immutability
+    a kg:Policy ;
+    kg:name "Audit Log Immutability" .
+
+policy:third-party-data-processing
+    a kg:Policy ;
+    kg:name "Third Party Data Processing" .
+
+infra:server-a
+    a kg:Server ;
+    kg:name "server-a" ;
+    kg:cpuCore "16"^^xsd:integer ;
+    kg:memoryGB "64"^^xsd:integer ;
+    kg:locatedIn datacenter:seoul-idc ;
+    kg:partOfCluster cluster:seoul-prod-core .
+
+infra:server-b
+    a kg:Server ;
+    kg:name "server-b" ;
+    kg:cpuCore "8"^^xsd:integer ;
+    kg:memoryGB "32"^^xsd:integer ;
+    kg:locatedIn datacenter:seoul-idc ;
+    kg:partOfCluster cluster:seoul-prod-core .
+
+infra:kr-api-node-01
+    a kg:Server ;
+    kg:name "KR API Node 01" ;
+    kg:cpuCore "16"^^xsd:integer ;
+    kg:memoryGB "64"^^xsd:integer ;
+    kg:locatedIn datacenter:seoul-idc ;
+    kg:partOfCluster cluster:seoul-prod-core .
+
+infra:kr-api-node-02
+    a kg:Server ;
+    kg:name "KR API Node 02" ;
+    kg:cpuCore "16"^^xsd:integer ;
+    kg:memoryGB "64"^^xsd:integer ;
+    kg:locatedIn datacenter:seoul-idc ;
+    kg:partOfCluster cluster:seoul-prod-core .
+
+infra:kr-api-node-03
+    a kg:Server ;
+    kg:name "KR API Node 03" ;
+    kg:cpuCore "16"^^xsd:integer ;
+    kg:memoryGB "64"^^xsd:integer ;
+    kg:locatedIn datacenter:seoul-idc ;
+    kg:partOfCluster cluster:seoul-prod-core .
+
+infra:kr-api-node-04
+    a kg:Server ;
+    kg:name "KR API Node 04" ;
+    kg:cpuCore "16"^^xsd:integer ;
+    kg:memoryGB "64"^^xsd:integer ;
+    kg:locatedIn datacenter:seoul-idc ;
+    kg:partOfCluster cluster:seoul-prod-core .
+
+infra:kr-data-node-01
+    a kg:Server ;
+    kg:name "KR Data Node 01" ;
+    kg:cpuCore "32"^^xsd:integer ;
+    kg:memoryGB "128"^^xsd:integer ;
+    kg:locatedIn datacenter:seoul-idc ;
+    kg:partOfCluster cluster:seoul-prod-data .
+
+infra:kr-data-node-02
+    a kg:Server ;
+    kg:name "KR Data Node 02" ;
+    kg:cpuCore "32"^^xsd:integer ;
+    kg:memoryGB "128"^^xsd:integer ;
+    kg:locatedIn datacenter:seoul-idc ;
+    kg:partOfCluster cluster:seoul-prod-data .
+
+infra:kr-data-node-03
+    a kg:Server ;
+    kg:name "KR Data Node 03" ;
+    kg:cpuCore "32"^^xsd:integer ;
+    kg:memoryGB "128"^^xsd:integer ;
+    kg:locatedIn datacenter:seoul-idc ;
+    kg:partOfCluster cluster:analytics-prod .
+
+infra:kr-data-node-04
+    a kg:Server ;
+    kg:name "KR Data Node 04" ;
+    kg:cpuCore "32"^^xsd:integer ;
+    kg:memoryGB "128"^^xsd:integer ;
+    kg:locatedIn datacenter:seoul-idc ;
+    kg:partOfCluster cluster:analytics-prod .
+
+infra:kr-ml-node-01
+    a kg:Server ;
+    kg:name "KR ML Node 01" ;
+    kg:cpuCore "48"^^xsd:integer ;
+    kg:memoryGB "192"^^xsd:integer ;
+    kg:locatedIn datacenter:seoul-idc ;
+    kg:partOfCluster cluster:ml-prod .
+
+infra:kr-ml-node-02
+    a kg:Server ;
+    kg:name "KR ML Node 02" ;
+    kg:cpuCore "48"^^xsd:integer ;
+    kg:memoryGB "192"^^xsd:integer ;
+    kg:locatedIn datacenter:seoul-idc ;
+    kg:partOfCluster cluster:ml-prod .
+
+infra:kr-edge-node-01
+    a kg:Server ;
+    kg:name "KR Edge Node 01" ;
+    kg:cpuCore "16"^^xsd:integer ;
+    kg:memoryGB "64"^^xsd:integer ;
+    kg:locatedIn datacenter:seoul-idc ;
+    kg:partOfCluster cluster:seoul-prod-edge .
+
+infra:kr-edge-node-02
+    a kg:Server ;
+    kg:name "KR Edge Node 02" ;
+    kg:cpuCore "16"^^xsd:integer ;
+    kg:memoryGB "64"^^xsd:integer ;
+    kg:locatedIn datacenter:seoul-idc ;
+    kg:partOfCluster cluster:seoul-prod-edge .
+
+infra:busan-core-node-01
+    a kg:Server ;
+    kg:name "Busan Core Node 01" ;
+    kg:cpuCore "16"^^xsd:integer ;
+    kg:memoryGB "64"^^xsd:integer ;
+    kg:locatedIn datacenter:busan-dr-idc ;
+    kg:partOfCluster cluster:busan-dr-core .
+
+infra:busan-core-node-02
+    a kg:Server ;
+    kg:name "Busan Core Node 02" ;
+    kg:cpuCore "16"^^xsd:integer ;
+    kg:memoryGB "64"^^xsd:integer ;
+    kg:locatedIn datacenter:busan-dr-idc ;
+    kg:partOfCluster cluster:busan-dr-core .
+
+infra:sg-edge-node-01
+    a kg:Server ;
+    kg:name "Singapore Edge Node 01" ;
+    kg:cpuCore "16"^^xsd:integer ;
+    kg:memoryGB "64"^^xsd:integer ;
+    kg:locatedIn datacenter:singapore-edge ;
+    kg:partOfCluster cluster:singapore-edge-cluster .
+
+infra:sg-edge-node-02
+    a kg:Server ;
+    kg:name "Singapore Edge Node 02" ;
+    kg:cpuCore "16"^^xsd:integer ;
+    kg:memoryGB "64"^^xsd:integer ;
+    kg:locatedIn datacenter:singapore-edge ;
+    kg:partOfCluster cluster:singapore-edge-cluster .
+
+infra:tokyo-edge-node-01
+    a kg:Server ;
+    kg:name "Tokyo Edge Node 01" ;
+    kg:cpuCore "16"^^xsd:integer ;
+    kg:memoryGB "64"^^xsd:integer ;
+    kg:locatedIn datacenter:tokyo-edge ;
+    kg:partOfCluster cluster:tokyo-edge-cluster .
+
+infra:tokyo-edge-node-02
+    a kg:Server ;
+    kg:name "Tokyo Edge Node 02" ;
+    kg:cpuCore "16"^^xsd:integer ;
+    kg:memoryGB "64"^^xsd:integer ;
+    kg:locatedIn datacenter:tokyo-edge ;
+    kg:partOfCluster cluster:tokyo-edge-cluster .
+
+infra:worker-node-01
+    a kg:Server ;
+    kg:name "Worker Node 01" ;
+    kg:cpuCore "16"^^xsd:integer ;
+    kg:memoryGB "64"^^xsd:integer ;
+    kg:locatedIn datacenter:seoul-idc ;
+    kg:partOfCluster cluster:seoul-prod-core .
+
+infra:worker-node-02
+    a kg:Server ;
+    kg:name "Worker Node 02" ;
+    kg:cpuCore "16"^^xsd:integer ;
+    kg:memoryGB "64"^^xsd:integer ;
+    kg:locatedIn datacenter:seoul-idc ;
+    kg:partOfCluster cluster:seoul-prod-core .
+
+infra:worker-node-03
+    a kg:Server ;
+    kg:name "Worker Node 03" ;
+    kg:cpuCore "16"^^xsd:integer ;
+    kg:memoryGB "64"^^xsd:integer ;
+    kg:locatedIn datacenter:seoul-idc ;
+    kg:partOfCluster cluster:seoul-prod-core .
+
+infra:worker-node-04
+    a kg:Server ;
+    kg:name "Worker Node 04" ;
+    kg:cpuCore "16"^^xsd:integer ;
+    kg:memoryGB "64"^^xsd:integer ;
+    kg:locatedIn datacenter:seoul-idc ;
+    kg:partOfCluster cluster:seoul-prod-core .
+
+infra:stream-node-01
+    a kg:Server ;
+    kg:name "Stream Node 01" ;
+    kg:cpuCore "24"^^xsd:integer ;
+    kg:memoryGB "96"^^xsd:integer ;
+    kg:locatedIn datacenter:seoul-idc ;
+    kg:partOfCluster cluster:seoul-prod-data .
+
+infra:stream-node-02
+    a kg:Server ;
+    kg:name "Stream Node 02" ;
+    kg:cpuCore "24"^^xsd:integer ;
+    kg:memoryGB "96"^^xsd:integer ;
+    kg:locatedIn datacenter:seoul-idc ;
+    kg:partOfCluster cluster:seoul-prod-data .
+
+infra:audit-node-01
+    a kg:Server ;
+    kg:name "Audit Node 01" ;
+    kg:cpuCore "16"^^xsd:integer ;
+    kg:memoryGB "64"^^xsd:integer ;
+    kg:locatedIn datacenter:seoul-idc ;
+    kg:partOfCluster cluster:seoul-prod-data .
+
+infra:audit-node-02
+    a kg:Server ;
+    kg:name "Audit Node 02" ;
+    kg:cpuCore "16"^^xsd:integer ;
+    kg:memoryGB "64"^^xsd:integer ;
+    kg:locatedIn datacenter:busan-dr-idc ;
+    kg:partOfCluster cluster:busan-dr-core .
+
+infra:postgres-prod
+    a kg:Database ;
+    kg:name "postgres-prod" ;
+    kg:engine "PostgreSQL" ;
+    kg:retentionDays "35"^^xsd:integer ;
+    kg:locatedIn datacenter:seoul-idc ;
+    kg:replicatesTo infra:postgres-prod-replica ;
+    kg:backsUpTo datacenter:busan-dr-idc .
+
+infra:postgres-prod-replica
+    a kg:Database ;
+    kg:name "postgres-prod-replica" ;
+    kg:engine "PostgreSQL" ;
+    kg:retentionDays "35"^^xsd:integer ;
+    kg:locatedIn datacenter:busan-dr-idc .
+
+infra:billing-ledger-postgres
+    a kg:Database ;
+    kg:name "Billing Ledger PostgreSQL" ;
+    kg:engine "PostgreSQL" ;
+    kg:retentionDays "2555"^^xsd:integer ;
+    kg:locatedIn datacenter:seoul-idc ;
+    kg:replicatesTo infra:billing-ledger-postgres-replica ;
+    kg:backsUpTo datacenter:busan-dr-idc .
+
+infra:billing-ledger-postgres-replica
+    a kg:Database ;
+    kg:name "Billing Ledger PostgreSQL Replica" ;
+    kg:engine "PostgreSQL" ;
+    kg:retentionDays "2555"^^xsd:integer ;
+    kg:locatedIn datacenter:busan-dr-idc .
+
+infra:identity-postgres
+    a kg:Database ;
+    kg:name "Identity PostgreSQL" ;
+    kg:engine "PostgreSQL" ;
+    kg:retentionDays "730"^^xsd:integer ;
+    kg:locatedIn datacenter:seoul-idc ;
+    kg:replicatesTo infra:identity-postgres-replica ;
+    kg:backsUpTo datacenter:busan-dr-idc .
+
+infra:identity-postgres-replica
+    a kg:Database ;
+    kg:name "Identity PostgreSQL Replica" ;
+    kg:engine "PostgreSQL" ;
+    kg:retentionDays "730"^^xsd:integer ;
+    kg:locatedIn datacenter:busan-dr-idc .
+
+infra:order-postgres
+    a kg:Database ;
+    kg:name "Order PostgreSQL" ;
+    kg:engine "PostgreSQL" ;
+    kg:retentionDays "1095"^^xsd:integer ;
+    kg:locatedIn datacenter:seoul-idc ;
+    kg:replicatesTo infra:order-postgres-replica ;
+    kg:backsUpTo datacenter:busan-dr-idc .
+
+infra:order-postgres-replica
+    a kg:Database ;
+    kg:name "Order PostgreSQL Replica" ;
+    kg:engine "PostgreSQL" ;
+    kg:retentionDays "1095"^^xsd:integer ;
+    kg:locatedIn datacenter:busan-dr-idc .
+
+infra:catalog-postgres
+    a kg:Database ;
+    kg:name "Catalog PostgreSQL" ;
+    kg:engine "PostgreSQL" ;
+    kg:retentionDays "365"^^xsd:integer ;
+    kg:locatedIn datacenter:seoul-idc ;
+    kg:backsUpTo datacenter:busan-dr-idc .
+
+infra:inventory-postgres
+    a kg:Database ;
+    kg:name "Inventory PostgreSQL" ;
+    kg:engine "PostgreSQL" ;
+    kg:retentionDays "365"^^xsd:integer ;
+    kg:locatedIn datacenter:seoul-idc ;
+    kg:backsUpTo datacenter:busan-dr-idc .
+
+infra:customer-postgres
+    a kg:Database ;
+    kg:name "Customer PostgreSQL" ;
+    kg:engine "PostgreSQL" ;
+    kg:retentionDays "1095"^^xsd:integer ;
+    kg:locatedIn datacenter:seoul-idc ;
+    kg:replicatesTo infra:customer-postgres-replica ;
+    kg:backsUpTo datacenter:busan-dr-idc .
+
+infra:customer-postgres-replica
+    a kg:Database ;
+    kg:name "Customer PostgreSQL Replica" ;
+    kg:engine "PostgreSQL" ;
+    kg:retentionDays "1095"^^xsd:integer ;
+    kg:locatedIn datacenter:busan-dr-idc .
+
+infra:notification-postgres
+    a kg:Database ;
+    kg:name "Notification PostgreSQL" ;
+    kg:engine "PostgreSQL" ;
+    kg:retentionDays "180"^^xsd:integer ;
+    kg:locatedIn datacenter:seoul-idc ;
+    kg:backsUpTo datacenter:busan-dr-idc .
+
+infra:audit-postgres
+    a kg:Database ;
+    kg:name "Audit PostgreSQL" ;
+    kg:engine "PostgreSQL" ;
+    kg:retentionDays "2555"^^xsd:integer ;
+    kg:locatedIn datacenter:seoul-idc ;
+    kg:replicatesTo infra:audit-postgres-replica ;
+    kg:backsUpTo datacenter:busan-dr-idc .
+
+infra:audit-postgres-replica
+    a kg:Database ;
+    kg:name "Audit PostgreSQL Replica" ;
+    kg:engine "PostgreSQL" ;
+    kg:retentionDays "2555"^^xsd:integer ;
+    kg:locatedIn datacenter:frankfurt-backup ;
+    kg:backsUpTo datacenter:busan-dr-idc .
+
+infra:consent-postgres
+    a kg:Database ;
+    kg:name "Consent PostgreSQL" ;
+    kg:engine "PostgreSQL" ;
+    kg:retentionDays "2555"^^xsd:integer ;
+    kg:locatedIn datacenter:seoul-idc ;
+    kg:replicatesTo infra:consent-postgres-replica ;
+    kg:backsUpTo datacenter:busan-dr-idc .
+
+infra:consent-postgres-replica
+    a kg:Database ;
+    kg:name "Consent PostgreSQL Replica" ;
+    kg:engine "PostgreSQL" ;
+    kg:retentionDays "2555"^^xsd:integer ;
+    kg:locatedIn datacenter:busan-dr-idc .
+
+infra:analytics-clickhouse
+    a kg:Database ;
+    kg:name "Analytics ClickHouse" ;
+    kg:engine "ClickHouse" ;
+    kg:retentionDays "545"^^xsd:integer ;
+    kg:locatedIn datacenter:seoul-idc ;
+    kg:backsUpTo datacenter:busan-dr-idc .
+
+infra:warehouse-bigquery
+    a kg:Database ;
+    kg:name "Warehouse BigQuery" ;
+    kg:engine "BigQuery" ;
+    kg:retentionDays "2555"^^xsd:integer ;
+    kg:locatedIn datacenter:frankfurt-backup ;
+    kg:backsUpTo datacenter:busan-dr-idc .
+
+infra:feature-store-postgres
+    a kg:Database ;
+    kg:name "Feature Store PostgreSQL" ;
+    kg:engine "PostgreSQL" ;
+    kg:retentionDays "365"^^xsd:integer ;
+    kg:locatedIn datacenter:seoul-idc ;
+    kg:backsUpTo datacenter:busan-dr-idc .
+
+infra:model-registry-postgres
+    a kg:Database ;
+    kg:name "Model Registry PostgreSQL" ;
+    kg:engine "PostgreSQL" ;
+    kg:retentionDays "1095"^^xsd:integer ;
+    kg:locatedIn datacenter:seoul-idc ;
+    kg:backsUpTo datacenter:busan-dr-idc .
+
+infra:support-postgres
+    a kg:Database ;
+    kg:name "Support PostgreSQL" ;
+    kg:engine "PostgreSQL" ;
+    kg:retentionDays "730"^^xsd:integer ;
+    kg:locatedIn datacenter:seoul-idc ;
+    kg:backsUpTo datacenter:busan-dr-idc .
+
+infra:media-metadata-postgres
+    a kg:Database ;
+    kg:name "Media Metadata PostgreSQL" ;
+    kg:engine "PostgreSQL" ;
+    kg:retentionDays "365"^^xsd:integer ;
+    kg:locatedIn datacenter:seoul-idc ;
+    kg:backsUpTo datacenter:busan-dr-idc .
+
+infra:risk-postgres
+    a kg:Database ;
+    kg:name "Risk PostgreSQL" ;
+    kg:engine "PostgreSQL" ;
+    kg:retentionDays "1095"^^xsd:integer ;
+    kg:locatedIn datacenter:seoul-idc ;
+    kg:backsUpTo datacenter:busan-dr-idc .
+
+infra:cost-allocation-postgres
+    a kg:Database ;
+    kg:name "Cost Allocation PostgreSQL" ;
+    kg:engine "PostgreSQL" ;
+    kg:retentionDays "1095"^^xsd:integer ;
+    kg:locatedIn datacenter:seoul-idc ;
+    kg:backsUpTo datacenter:busan-dr-idc .
+
+infra:redis-prod
+    a kg:Cache ;
+    kg:name "Redis Prod" ;
+    kg:engine "Redis" ;
+    kg:locatedIn datacenter:seoul-idc ;
+    kg:partOfCluster cluster:seoul-prod-data .
+
+infra:session-redis
+    a kg:Cache ;
+    kg:name "Session Redis" ;
+    kg:engine "Redis" ;
+    kg:locatedIn datacenter:seoul-idc ;
+    kg:partOfCluster cluster:seoul-prod-data .
+
+infra:catalog-redis
+    a kg:Cache ;
+    kg:name "Catalog Redis" ;
+    kg:engine "Redis" ;
+    kg:locatedIn datacenter:seoul-idc ;
+    kg:partOfCluster cluster:seoul-prod-data .
+
+infra:pricing-redis
+    a kg:Cache ;
+    kg:name "Pricing Redis" ;
+    kg:engine "Redis" ;
+    kg:locatedIn datacenter:seoul-idc ;
+    kg:partOfCluster cluster:seoul-prod-data .
+
+infra:order-redis
+    a kg:Cache ;
+    kg:name "Order Redis" ;
+    kg:engine "Redis" ;
+    kg:locatedIn datacenter:seoul-idc ;
+    kg:partOfCluster cluster:seoul-prod-data .
+
+infra:search-redis
+    a kg:Cache ;
+    kg:name "Search Redis" ;
+    kg:engine "Redis" ;
+    kg:locatedIn datacenter:seoul-idc ;
+    kg:partOfCluster cluster:seoul-prod-data .
+
+infra:feature-redis
+    a kg:Cache ;
+    kg:name "Feature Redis" ;
+    kg:engine "Redis" ;
+    kg:locatedIn datacenter:seoul-idc ;
+    kg:partOfCluster cluster:seoul-prod-core .
+
+infra:recommendation-redis
+    a kg:Cache ;
+    kg:name "Recommendation Redis" ;
+    kg:engine "Redis" ;
+    kg:locatedIn datacenter:seoul-idc ;
+    kg:partOfCluster cluster:seoul-prod-core .
+
+infra:rate-limit-redis
+    a kg:Cache ;
+    kg:name "Rate Limit Redis" ;
+    kg:engine "Redis" ;
+    kg:locatedIn datacenter:seoul-idc ;
+    kg:partOfCluster cluster:seoul-prod-core .
+
+infra:partner-redis
+    a kg:Cache ;
+    kg:name "Partner Redis" ;
+    kg:engine "Redis" ;
+    kg:locatedIn datacenter:seoul-idc ;
+    kg:partOfCluster cluster:seoul-prod-core .
+
+infra:payment-command-queue
+    a kg:Queue ;
+    kg:name "Payment Command Queue" ;
+    kg:engine "Kafka" ;
+    kg:locatedIn datacenter:seoul-idc .
+
+infra:billing-command-queue
+    a kg:Queue ;
+    kg:name "Billing Command Queue" ;
+    kg:engine "Kafka" ;
+    kg:locatedIn datacenter:seoul-idc .
+
+infra:fulfillment-command-queue
+    a kg:Queue ;
+    kg:name "Fulfillment Command Queue" ;
+    kg:engine "Kafka" ;
+    kg:locatedIn datacenter:seoul-idc .
+
+infra:notification-command-queue
+    a kg:Queue ;
+    kg:name "Notification Command Queue" ;
+    kg:engine "Kafka" ;
+    kg:locatedIn datacenter:seoul-idc .
+
+infra:export-command-queue
+    a kg:Queue ;
+    kg:name "Export Command Queue" ;
+    kg:engine "Kafka" ;
+    kg:locatedIn datacenter:seoul-idc .
+
+infra:security-work-queue
+    a kg:Queue ;
+    kg:name "Security Work Queue" ;
+    kg:engine "Kafka" ;
+    kg:locatedIn datacenter:seoul-idc .
+
+infra:support-sync-queue
+    a kg:Queue ;
+    kg:name "Support Sync Queue" ;
+    kg:engine "Kafka" ;
+    kg:locatedIn datacenter:seoul-idc .
+
+infra:ml-training-queue
+    a kg:Queue ;
+    kg:name "ML Training Queue" ;
+    kg:engine "Kafka" ;
+    kg:locatedIn datacenter:seoul-idc .
+
+infra:billing-events
+    a kg:Topic ;
+    kg:name "Billing Events" ;
+    kg:engine "Kafka" ;
+    kg:locatedIn datacenter:seoul-idc .
+
+infra:payment-events
+    a kg:Topic ;
+    kg:name "Payment Events" ;
+    kg:engine "Kafka" ;
+    kg:locatedIn datacenter:seoul-idc .
+
+infra:order-events
+    a kg:Topic ;
+    kg:name "Order Events" ;
+    kg:engine "Kafka" ;
+    kg:locatedIn datacenter:seoul-idc .
+
+infra:inventory-events
+    a kg:Topic ;
+    kg:name "Inventory Events" ;
+    kg:engine "Kafka" ;
+    kg:locatedIn datacenter:seoul-idc .
+
+infra:customer-events
+    a kg:Topic ;
+    kg:name "Customer Events" ;
+    kg:engine "Kafka" ;
+    kg:locatedIn datacenter:seoul-idc .
+
+infra:shipment-events
+    a kg:Topic ;
+    kg:name "Shipment Events" ;
+    kg:engine "Kafka" ;
+    kg:locatedIn datacenter:seoul-idc .
+
+infra:notification-events
+    a kg:Topic ;
+    kg:name "Notification Events" ;
+    kg:engine "Kafka" ;
+    kg:locatedIn datacenter:seoul-idc .
+
+infra:audit-events
+    a kg:Topic ;
+    kg:name "Audit Events" ;
+    kg:engine "Kafka" ;
+    kg:locatedIn datacenter:seoul-idc .
+
+infra:experiment-events
+    a kg:Topic ;
+    kg:name "Experiment Events" ;
+    kg:engine "Kafka" ;
+    kg:locatedIn datacenter:seoul-idc .
+
+infra:feature-events
+    a kg:Topic ;
+    kg:name "Feature Events" ;
+    kg:engine "Kafka" ;
+    kg:locatedIn datacenter:seoul-idc .
+
+infra:risk-events
+    a kg:Topic ;
+    kg:name "Risk Events" ;
+    kg:engine "Kafka" ;
+    kg:locatedIn datacenter:seoul-idc .
+
+infra:support-events
+    a kg:Topic ;
+    kg:name "Support Events" ;
+    kg:engine "Kafka" ;
+    kg:locatedIn datacenter:seoul-idc .
+
+infra:media-events
+    a kg:Topic ;
+    kg:name "Media Events" ;
+    kg:engine "Kafka" ;
+    kg:locatedIn datacenter:seoul-idc .
+
+infra:observability-events
+    a kg:Topic ;
+    kg:name "Observability Events" ;
+    kg:engine "Kafka" ;
+    kg:locatedIn datacenter:seoul-idc .
+
+dashboard:finance-ops-dashboard
+    a kg:Dashboard ;
+    kg:name "Finance Ops Dashboard" ;
+    kg:ownedBy team:payments .
+
+dashboard:payments-slo-dashboard
+    a kg:Dashboard ;
+    kg:name "Payments SLO Dashboard" ;
+    kg:ownedBy team:payments .
+
+dashboard:identity-risk-dashboard
+    a kg:Dashboard ;
+    kg:name "Identity Risk Dashboard" ;
+    kg:ownedBy team:identity-access .
+
+dashboard:commerce-order-dashboard
+    a kg:Dashboard ;
+    kg:name "Commerce Order Dashboard" ;
+    kg:ownedBy team:commerce-platform .
+
+dashboard:fulfillment-control-dashboard
+    a kg:Dashboard ;
+    kg:name "Fulfillment Control Dashboard" ;
+    kg:ownedBy team:fulfillment-ops .
+
+dashboard:growth-campaign-dashboard
+    a kg:Dashboard ;
+    kg:name "Growth Campaign Dashboard" ;
+    kg:ownedBy team:growth-platform .
+
+dashboard:search-quality-dashboard
+    a kg:Dashboard ;
+    kg:name "Search Quality Dashboard" ;
+    kg:ownedBy team:commerce-platform .
+
+dashboard:data-platform-pipeline-dashboard
+    a kg:Dashboard ;
+    kg:name "Data Platform Pipeline Dashboard" ;
+    kg:ownedBy team:data-platform .
+
+dashboard:analytics-usage-dashboard
+    a kg:Dashboard ;
+    kg:name "Analytics Usage Dashboard" ;
+    kg:ownedBy team:analytics-engineering .
+
+dashboard:ml-model-health-dashboard
+    a kg:Dashboard ;
+    kg:name "ML Model Health Dashboard" ;
+    kg:ownedBy team:ml-platform .
+
+dashboard:privacy-governance-dashboard
+    a kg:Dashboard ;
+    kg:name "Privacy Governance Dashboard" ;
+    kg:ownedBy team:governance-risk .
+
+dashboard:partner-api-dashboard
+    a kg:Dashboard ;
+    kg:name "Partner API Dashboard" ;
+    kg:ownedBy team:partner-engineering .
+
+dashboard:media-delivery-dashboard
+    a kg:Dashboard ;
+    kg:name "Media Delivery Dashboard" ;
+    kg:ownedBy team:media-platform .
+
+dashboard:support-ops-dashboard
+    a kg:Dashboard ;
+    kg:name "Support Ops Dashboard" ;
+    kg:ownedBy team:support-ops .
+
+dashboard:security-posture-dashboard
+    a kg:Dashboard ;
+    kg:name "Security Posture Dashboard" ;
+    kg:ownedBy team:security .
+
+dashboard:reliability-command-dashboard
+    a kg:Dashboard ;
+    kg:name "Reliability Command Dashboard" ;
+    kg:ownedBy team:reliability .
+
+monitor:billing-api-slo-monitor
+    a kg:Monitor ;
+    kg:name "Billing API SLO Monitor" ;
+    kg:alertsTo team:payments ;
+    kg:shownOn dashboard:finance-ops-dashboard .
+
+monitor:payment-latency-monitor
+    a kg:Monitor ;
+    kg:name "Payment Latency Monitor" ;
+    kg:alertsTo team:payments ;
+    kg:shownOn dashboard:payments-slo-dashboard .
+
+monitor:identity-auth-monitor
+    a kg:Monitor ;
+    kg:name "Identity Auth Monitor" ;
+    kg:alertsTo team:identity-access ;
+    kg:shownOn dashboard:identity-risk-dashboard .
+
+monitor:order-funnel-monitor
+    a kg:Monitor ;
+    kg:name "Order Funnel Monitor" ;
+    kg:alertsTo team:commerce-platform ;
+    kg:shownOn dashboard:commerce-order-dashboard .
+
+monitor:inventory-freshness-monitor
+    a kg:Monitor ;
+    kg:name "Inventory Freshness Monitor" ;
+    kg:alertsTo team:fulfillment-ops ;
+    kg:shownOn dashboard:fulfillment-control-dashboard .
+
+monitor:fraud-decision-monitor
+    a kg:Monitor ;
+    kg:name "Fraud Decision Monitor" ;
+    kg:alertsTo team:governance-risk ;
+    kg:shownOn dashboard:identity-risk-dashboard .
+
+monitor:notification-delivery-monitor
+    a kg:Monitor ;
+    kg:name "Notification Delivery Monitor" ;
+    kg:alertsTo team:backend ;
+    kg:shownOn dashboard:reliability-command-dashboard .
+
+monitor:event-router-lag-monitor
+    a kg:Monitor ;
+    kg:name "Event Router Lag Monitor" ;
+    kg:alertsTo team:data-platform ;
+    kg:shownOn dashboard:data-platform-pipeline-dashboard .
+
+monitor:analytics-query-monitor
+    a kg:Monitor ;
+    kg:name "Analytics Query Monitor" ;
+    kg:alertsTo team:analytics-engineering ;
+    kg:shownOn dashboard:analytics-usage-dashboard .
+
+monitor:feature-store-freshness-monitor
+    a kg:Monitor ;
+    kg:name "Feature Store Freshness Monitor" ;
+    kg:alertsTo team:ml-platform ;
+    kg:shownOn dashboard:ml-model-health-dashboard .
+
+monitor:privacy-request-monitor
+    a kg:Monitor ;
+    kg:name "Privacy Request Monitor" ;
+    kg:alertsTo team:governance-risk ;
+    kg:shownOn dashboard:privacy-governance-dashboard .
+
+monitor:partner-webhook-monitor
+    a kg:Monitor ;
+    kg:name "Partner Webhook Monitor" ;
+    kg:alertsTo team:partner-engineering ;
+    kg:shownOn dashboard:partner-api-dashboard .
+
+monitor:media-cache-hit-monitor
+    a kg:Monitor ;
+    kg:name "Media Cache Hit Monitor" ;
+    kg:alertsTo team:media-platform ;
+    kg:shownOn dashboard:media-delivery-dashboard .
+
+monitor:support-sync-monitor
+    a kg:Monitor ;
+    kg:name "Support Sync Monitor" ;
+    kg:alertsTo team:support-ops ;
+    kg:shownOn dashboard:support-ops-dashboard .
+
+monitor:security-feed-monitor
+    a kg:Monitor ;
+    kg:name "Security Feed Monitor" ;
+    kg:alertsTo team:security ;
+    kg:shownOn dashboard:security-posture-dashboard .
+
+monitor:capacity-forecast-monitor
+    a kg:Monitor ;
+    kg:name "Capacity Forecast Monitor" ;
+    kg:alertsTo team:reliability ;
+    kg:shownOn dashboard:reliability-command-dashboard .
+
+service:billing-api
+    a kg:Service ;
+    kg:name "Billing API" ;
+    kg:ownedBy team:data-platform ;
+    kg:partOfDomain domain:finance ;
+    kg:deployedIn environment:prod ;
+    kg:hasRuntime runtime:java-21 ;
+    kg:runsOn infra:server-a ;
+    kg:readsFrom infra:postgres-prod ;
+    kg:writesTo infra:postgres-prod ;
+    kg:usesCache infra:redis-prod ;
+    kg:dependsOn infra:postgres-prod ;
+    kg:dependsOn infra:redis-prod ;
+    kg:publishesTo infra:billing-events ;
+    kg:emitsTelemetryTo infra:observability-events ;
+    kg:consumesFrom infra:billing-command-queue ;
+    kg:exposesEndpoint endpoint:billing-api ;
+    kg:monitoredBy monitor:billing-api-slo-monitor ;
+    kg:shownOn dashboard:finance-ops-dashboard ;
+    kg:coveredByPolicy policy:pci-dss-payment-data ;
+    kg:monthlyCostUSD "420.5"^^xsd:decimal ;
+    kg:criticality "critical" ;
+    kg:tier "tier-1" ;
+    kg:sloAvailability "99.95"^^xsd:decimal ;
+    kg:dependsOn service:payment-api .
+
+endpoint:billing-api
+    a kg:Endpoint ;
+    kg:name "Billing API Endpoint" ;
+    kg:httpMethod "GET" ;
+    kg:path "/v1/billing" ;
+    kg:exposedBy gateway:internal-api-gateway .
+
+service:payment-api
+    a kg:Service ;
+    kg:name "Payment API" ;
+    kg:ownedBy team:backend ;
+    kg:partOfDomain domain:finance ;
+    kg:deployedIn environment:prod ;
+    kg:hasRuntime runtime:java-21 ;
+    kg:runsOn infra:server-b ;
+    kg:readsFrom infra:billing-ledger-postgres ;
+    kg:writesTo infra:billing-ledger-postgres ;
+    kg:usesCache infra:redis-prod ;
+    kg:dependsOn infra:billing-ledger-postgres ;
+    kg:dependsOn infra:redis-prod ;
+    kg:publishesTo infra:payment-events ;
+    kg:emitsTelemetryTo infra:observability-events ;
+    kg:consumesFrom infra:payment-command-queue ;
+    kg:exposesEndpoint endpoint:payment-api ;
+    kg:monitoredBy monitor:payment-latency-monitor ;
+    kg:shownOn dashboard:payments-slo-dashboard ;
+    kg:coveredByPolicy policy:pci-dss-payment-data ;
+    kg:monthlyCostUSD "210.0"^^xsd:decimal ;
+    kg:criticality "critical" ;
+    kg:tier "tier-1" ;
+    kg:sloAvailability "99.95"^^xsd:decimal ;
+    kg:integratesWith vendor:stripe .
+
+endpoint:payment-api
+    a kg:Endpoint ;
+    kg:name "Payment API Endpoint" ;
+    kg:httpMethod "GET" ;
+    kg:path "/v1/payment" ;
+    kg:exposedBy gateway:public-api-gateway .
+
+service:invoice-api
+    a kg:Service ;
+    kg:name "Invoice API" ;
+    kg:ownedBy team:payments ;
+    kg:partOfDomain domain:finance ;
+    kg:deployedIn environment:prod ;
+    kg:hasRuntime runtime:java-21 ;
+    kg:runsOn infra:kr-api-node-01 ;
+    kg:readsFrom infra:billing-ledger-postgres ;
+    kg:writesTo infra:billing-ledger-postgres ;
+    kg:usesCache infra:pricing-redis ;
+    kg:dependsOn infra:billing-ledger-postgres ;
+    kg:dependsOn infra:pricing-redis ;
+    kg:publishesTo infra:billing-events ;
+    kg:emitsTelemetryTo infra:observability-events ;
+    kg:consumesFrom infra:billing-command-queue ;
+    kg:exposesEndpoint endpoint:invoice-api ;
+    kg:monitoredBy monitor:identity-auth-monitor ;
+    kg:shownOn dashboard:identity-risk-dashboard ;
+    kg:coveredByPolicy policy:pci-dss-payment-data ;
+    kg:monthlyCostUSD "178.25"^^xsd:decimal ;
+    kg:criticality "high" ;
+    kg:tier "tier-2" ;
+    kg:sloAvailability "99.9"^^xsd:decimal ;
+    kg:dependsOn service:billing-api ;
+    kg:dependsOn service:customer-profile-api .
+
+endpoint:invoice-api
+    a kg:Endpoint ;
+    kg:name "Invoice API Endpoint" ;
+    kg:httpMethod "GET" ;
+    kg:path "/v1/invoice" ;
+    kg:exposedBy gateway:internal-api-gateway .
+
+service:subscription-api
+    a kg:Service ;
+    kg:name "Subscription API" ;
+    kg:ownedBy team:payments ;
+    kg:partOfDomain domain:finance ;
+    kg:deployedIn environment:prod ;
+    kg:hasRuntime runtime:java-21 ;
+    kg:runsOn infra:kr-api-node-02 ;
+    kg:readsFrom infra:billing-ledger-postgres ;
+    kg:writesTo infra:billing-ledger-postgres ;
+    kg:usesCache infra:pricing-redis ;
+    kg:dependsOn infra:billing-ledger-postgres ;
+    kg:dependsOn infra:pricing-redis ;
+    kg:publishesTo infra:billing-events ;
+    kg:emitsTelemetryTo infra:observability-events ;
+    kg:consumesFrom infra:billing-command-queue ;
+    kg:exposesEndpoint endpoint:subscription-api ;
+    kg:monitoredBy monitor:order-funnel-monitor ;
+    kg:shownOn dashboard:commerce-order-dashboard ;
+    kg:coveredByPolicy policy:pci-dss-payment-data ;
+    kg:monthlyCostUSD "232.75"^^xsd:decimal ;
+    kg:criticality "critical" ;
+    kg:tier "tier-1" ;
+    kg:sloAvailability "99.95"^^xsd:decimal ;
+    kg:dependsOn service:payment-api ;
+    kg:dependsOn service:pricing-api ;
+    kg:dependsOn service:billing-api .
+
+endpoint:subscription-api
+    a kg:Endpoint ;
+    kg:name "Subscription API Endpoint" ;
+    kg:httpMethod "GET" ;
+    kg:path "/v1/subscription" ;
+    kg:exposedBy gateway:public-api-gateway .
+
+service:settlement-api
+    a kg:Service ;
+    kg:name "Settlement API" ;
+    kg:ownedBy team:payments ;
+    kg:partOfDomain domain:finance ;
+    kg:deployedIn environment:prod ;
+    kg:hasRuntime runtime:go-1-23 ;
+    kg:runsOn infra:kr-api-node-03 ;
+    kg:readsFrom infra:billing-ledger-postgres ;
+    kg:writesTo infra:billing-ledger-postgres ;
+    kg:usesCache infra:redis-prod ;
+    kg:dependsOn infra:billing-ledger-postgres ;
+    kg:dependsOn infra:redis-prod ;
+    kg:publishesTo infra:payment-events ;
+    kg:emitsTelemetryTo infra:observability-events ;
+    kg:consumesFrom infra:payment-command-queue ;
+    kg:exposesEndpoint endpoint:settlement-api ;
+    kg:monitoredBy monitor:inventory-freshness-monitor ;
+    kg:shownOn dashboard:fulfillment-control-dashboard ;
+    kg:coveredByPolicy policy:pci-dss-payment-data ;
+    kg:monthlyCostUSD "264.4"^^xsd:decimal ;
+    kg:criticality "critical" ;
+    kg:tier "tier-1" ;
+    kg:sloAvailability "99.95"^^xsd:decimal ;
+    kg:dependsOn service:payment-api ;
+    kg:dependsOn service:ledger-api .
+
+endpoint:settlement-api
+    a kg:Endpoint ;
+    kg:name "Settlement API Endpoint" ;
+    kg:httpMethod "GET" ;
+    kg:path "/v1/settlement" ;
+    kg:exposedBy gateway:internal-api-gateway .
+
+service:ledger-api
+    a kg:Service ;
+    kg:name "Ledger API" ;
+    kg:ownedBy team:payments ;
+    kg:partOfDomain domain:finance ;
+    kg:deployedIn environment:prod ;
+    kg:hasRuntime runtime:java-21 ;
+    kg:runsOn infra:kr-api-node-04 ;
+    kg:readsFrom infra:billing-ledger-postgres ;
+    kg:writesTo infra:billing-ledger-postgres ;
+    kg:usesCache infra:redis-prod ;
+    kg:dependsOn infra:billing-ledger-postgres ;
+    kg:dependsOn infra:redis-prod ;
+    kg:publishesTo infra:audit-events ;
+    kg:emitsTelemetryTo infra:observability-events ;
+    kg:consumesFrom infra:billing-command-queue ;
+    kg:exposesEndpoint endpoint:ledger-api ;
+    kg:monitoredBy monitor:fraud-decision-monitor ;
+    kg:shownOn dashboard:growth-campaign-dashboard ;
+    kg:coveredByPolicy policy:pci-dss-payment-data ;
+    kg:monthlyCostUSD "310.1"^^xsd:decimal ;
+    kg:criticality "critical" ;
+    kg:tier "tier-1" ;
+    kg:sloAvailability "99.95"^^xsd:decimal ;
+    kg:dependsOn service:audit-log-api ;
+    kg:dependsOn service:invoice-api ;
+    kg:synchronizesWith service:settlement-api .
+
+endpoint:ledger-api
+    a kg:Endpoint ;
+    kg:name "Ledger API Endpoint" ;
+    kg:httpMethod "GET" ;
+    kg:path "/v1/ledger" ;
+    kg:exposedBy gateway:internal-api-gateway .
+
+service:pricing-api
+    a kg:Service ;
+    kg:name "Pricing API" ;
+    kg:ownedBy team:commerce-platform ;
+    kg:partOfDomain domain:commerce ;
+    kg:deployedIn environment:prod ;
+    kg:hasRuntime runtime:go-1-23 ;
+    kg:runsOn infra:worker-node-01 ;
+    kg:readsFrom infra:catalog-postgres ;
+    kg:writesTo infra:catalog-postgres ;
+    kg:usesCache infra:pricing-redis ;
+    kg:dependsOn infra:catalog-postgres ;
+    kg:dependsOn infra:pricing-redis ;
+    kg:publishesTo infra:order-events ;
+    kg:emitsTelemetryTo infra:observability-events ;
+    kg:consumesFrom infra:payment-command-queue ;
+    kg:exposesEndpoint endpoint:pricing-api ;
+    kg:monitoredBy monitor:notification-delivery-monitor ;
+    kg:shownOn dashboard:search-quality-dashboard ;
+    kg:coveredByPolicy policy:production-change-approval ;
+    kg:monthlyCostUSD "120.25"^^xsd:decimal ;
+    kg:criticality "high" ;
+    kg:tier "tier-2" ;
+    kg:sloAvailability "99.9"^^xsd:decimal ;
+    kg:dependsOn service:catalog-api ;
+    kg:dependsOn service:subscription-api .
+
+endpoint:pricing-api
+    a kg:Endpoint ;
+    kg:name "Pricing API Endpoint" ;
+    kg:httpMethod "GET" ;
+    kg:path "/v1/pricing" ;
+    kg:exposedBy gateway:public-api-gateway .
+
+service:tax-api
+    a kg:Service ;
+    kg:name "Tax API" ;
+    kg:ownedBy team:payments ;
+    kg:partOfDomain domain:finance ;
+    kg:deployedIn environment:prod ;
+    kg:hasRuntime runtime:python-3-12 ;
+    kg:runsOn infra:worker-node-02 ;
+    kg:readsFrom infra:billing-ledger-postgres ;
+    kg:writesTo infra:billing-ledger-postgres ;
+    kg:usesCache infra:pricing-redis ;
+    kg:dependsOn infra:billing-ledger-postgres ;
+    kg:dependsOn infra:pricing-redis ;
+    kg:publishesTo infra:billing-events ;
+    kg:emitsTelemetryTo infra:observability-events ;
+    kg:consumesFrom infra:export-command-queue ;
+    kg:exposesEndpoint endpoint:tax-api ;
+    kg:monitoredBy monitor:event-router-lag-monitor ;
+    kg:shownOn dashboard:data-platform-pipeline-dashboard ;
+    kg:coveredByPolicy policy:pci-dss-payment-data ;
+    kg:monthlyCostUSD "96.35"^^xsd:decimal ;
+    kg:criticality "high" ;
+    kg:tier "tier-2" ;
+    kg:sloAvailability "99.9"^^xsd:decimal ;
+    kg:dependsOn service:pricing-api ;
+    kg:dependsOn service:settlement-api .
+
+endpoint:tax-api
+    a kg:Endpoint ;
+    kg:name "Tax API Endpoint" ;
+    kg:httpMethod "GET" ;
+    kg:path "/v1/tax" ;
+    kg:exposedBy gateway:internal-api-gateway .
+
+service:revenue-recognition-api
+    a kg:Service ;
+    kg:name "Revenue Recognition API" ;
+    kg:ownedBy team:payments ;
+    kg:partOfDomain domain:finance ;
+    kg:deployedIn environment:prod ;
+    kg:hasRuntime runtime:python-3-12 ;
+    kg:runsOn infra:worker-node-03 ;
+    kg:readsFrom infra:cost-allocation-postgres ;
+    kg:writesTo infra:cost-allocation-postgres ;
+    kg:usesCache infra:redis-prod ;
+    kg:dependsOn infra:cost-allocation-postgres ;
+    kg:dependsOn infra:redis-prod ;
+    kg:publishesTo infra:billing-events ;
+    kg:emitsTelemetryTo infra:observability-events ;
+    kg:consumesFrom infra:export-command-queue ;
+    kg:exposesEndpoint endpoint:revenue-recognition-api ;
+    kg:monitoredBy monitor:analytics-query-monitor ;
+    kg:shownOn dashboard:analytics-usage-dashboard ;
+    kg:coveredByPolicy policy:pci-dss-payment-data ;
+    kg:monthlyCostUSD "188.6"^^xsd:decimal ;
+    kg:criticality "high" ;
+    kg:tier "tier-2" ;
+    kg:sloAvailability "99.9"^^xsd:decimal ;
+    kg:dependsOn service:ledger-api ;
+    kg:dependsOn service:settlement-api .
+
+endpoint:revenue-recognition-api
+    a kg:Endpoint ;
+    kg:name "Revenue Recognition API Endpoint" ;
+    kg:httpMethod "GET" ;
+    kg:path "/v1/revenue-recognition" ;
+    kg:exposedBy gateway:internal-api-gateway .
+
+service:cost-allocation-api
+    a kg:Service ;
+    kg:name "Cost Allocation API" ;
+    kg:ownedBy team:data-platform ;
+    kg:partOfDomain domain:finance ;
+    kg:deployedIn environment:prod ;
+    kg:hasRuntime runtime:python-3-12 ;
+    kg:runsOn infra:worker-node-04 ;
+    kg:readsFrom infra:cost-allocation-postgres ;
+    kg:writesTo infra:cost-allocation-postgres ;
+    kg:usesCache infra:redis-prod ;
+    kg:dependsOn infra:cost-allocation-postgres ;
+    kg:dependsOn infra:redis-prod ;
+    kg:publishesTo infra:billing-events ;
+    kg:emitsTelemetryTo infra:observability-events ;
+    kg:consumesFrom infra:export-command-queue ;
+    kg:exposesEndpoint endpoint:cost-allocation-api ;
+    kg:monitoredBy monitor:feature-store-freshness-monitor ;
+    kg:shownOn dashboard:ml-model-health-dashboard ;
+    kg:coveredByPolicy policy:pci-dss-payment-data ;
+    kg:monthlyCostUSD "149.8"^^xsd:decimal ;
+    kg:criticality "medium" ;
+    kg:tier "tier-2" ;
+    kg:sloAvailability "99.9"^^xsd:decimal ;
+    kg:dependsOn service:billing-api ;
+    kg:dependsOn service:analytics-query-api ;
+    kg:dependsOn service:pricing-api .
+
+endpoint:cost-allocation-api
+    a kg:Endpoint ;
+    kg:name "Cost Allocation API Endpoint" ;
+    kg:httpMethod "GET" ;
+    kg:path "/v1/cost-allocation" ;
+    kg:exposedBy gateway:internal-api-gateway .
+
+service:identity-api
+    a kg:Service ;
+    kg:name "Identity API" ;
+    kg:ownedBy team:identity-access ;
+    kg:partOfDomain domain:identity ;
+    kg:deployedIn environment:prod ;
+    kg:hasRuntime runtime:go-1-23 ;
+    kg:runsOn infra:kr-data-node-01 ;
+    kg:readsFrom infra:identity-postgres ;
+    kg:writesTo infra:identity-postgres ;
+    kg:usesCache infra:session-redis ;
+    kg:dependsOn infra:identity-postgres ;
+    kg:dependsOn infra:session-redis ;
+    kg:publishesTo infra:customer-events ;
+    kg:emitsTelemetryTo infra:observability-events ;
+    kg:consumesFrom infra:security-work-queue ;
+    kg:exposesEndpoint endpoint:identity-api ;
+    kg:monitoredBy monitor:privacy-request-monitor ;
+    kg:shownOn dashboard:privacy-governance-dashboard ;
+    kg:coveredByPolicy policy:customer-erasure-sla ;
+    kg:monthlyCostUSD "244.0"^^xsd:decimal ;
+    kg:criticality "critical" ;
+    kg:tier "tier-1" ;
+    kg:sloAvailability "99.95"^^xsd:decimal ;
+    kg:dependsOn service:tax-api ;
+    kg:synchronizesWith service:cost-allocation-api .
+
+endpoint:identity-api
+    a kg:Endpoint ;
+    kg:name "Identity API Endpoint" ;
+    kg:httpMethod "GET" ;
+    kg:path "/v1/identity" ;
+    kg:exposedBy gateway:public-api-gateway .
+
+service:access-policy-api
+    a kg:Service ;
+    kg:name "Access Policy API" ;
+    kg:ownedBy team:identity-access ;
+    kg:partOfDomain domain:identity ;
+    kg:deployedIn environment:prod ;
+    kg:hasRuntime runtime:go-1-23 ;
+    kg:runsOn infra:kr-data-node-02 ;
+    kg:readsFrom infra:identity-postgres ;
+    kg:writesTo infra:identity-postgres ;
+    kg:usesCache infra:session-redis ;
+    kg:dependsOn infra:identity-postgres ;
+    kg:dependsOn infra:session-redis ;
+    kg:publishesTo infra:audit-events ;
+    kg:emitsTelemetryTo infra:observability-events ;
+    kg:consumesFrom infra:security-work-queue ;
+    kg:exposesEndpoint endpoint:access-policy-api ;
+    kg:monitoredBy monitor:partner-webhook-monitor ;
+    kg:shownOn dashboard:partner-api-dashboard ;
+    kg:coveredByPolicy policy:customer-erasure-sla ;
+    kg:monthlyCostUSD "155.4"^^xsd:decimal ;
+    kg:criticality "critical" ;
+    kg:tier "tier-1" ;
+    kg:sloAvailability "99.95"^^xsd:decimal ;
+    kg:dependsOn service:identity-api ;
+    kg:dependsOn service:revenue-recognition-api .
+
+endpoint:access-policy-api
+    a kg:Endpoint ;
+    kg:name "Access Policy API Endpoint" ;
+    kg:httpMethod "GET" ;
+    kg:path "/v1/access-policy" ;
+    kg:exposedBy gateway:internal-api-gateway .
+
+service:session-api
+    a kg:Service ;
+    kg:name "Session API" ;
+    kg:ownedBy team:identity-access ;
+    kg:partOfDomain domain:identity ;
+    kg:deployedIn environment:prod ;
+    kg:hasRuntime runtime:go-1-23 ;
+    kg:runsOn infra:kr-ml-node-01 ;
+    kg:readsFrom infra:identity-postgres ;
+    kg:writesTo infra:identity-postgres ;
+    kg:usesCache infra:session-redis ;
+    kg:dependsOn infra:identity-postgres ;
+    kg:dependsOn infra:session-redis ;
+    kg:publishesTo infra:customer-events ;
+    kg:emitsTelemetryTo infra:observability-events ;
+    kg:consumesFrom infra:security-work-queue ;
+    kg:exposesEndpoint endpoint:session-api ;
+    kg:monitoredBy monitor:media-cache-hit-monitor ;
+    kg:shownOn dashboard:media-delivery-dashboard ;
+    kg:coveredByPolicy policy:customer-erasure-sla ;
+    kg:monthlyCostUSD "132.2"^^xsd:decimal ;
+    kg:criticality "high" ;
+    kg:tier "tier-2" ;
+    kg:sloAvailability "99.9"^^xsd:decimal ;
+    kg:dependsOn service:identity-api ;
+    kg:dependsOn service:rate-limit-api ;
+    kg:dependsOn service:cost-allocation-api .
+
+endpoint:session-api
+    a kg:Endpoint ;
+    kg:name "Session API Endpoint" ;
+    kg:httpMethod "GET" ;
+    kg:path "/v1/session" ;
+    kg:exposedBy gateway:public-api-gateway .
+
+service:customer-profile-api
+    a kg:Service ;
+    kg:name "Customer Profile API" ;
+    kg:ownedBy team:backend ;
+    kg:partOfDomain domain:experience ;
+    kg:deployedIn environment:prod ;
+    kg:hasRuntime runtime:nodejs-22 ;
+    kg:runsOn infra:kr-ml-node-02 ;
+    kg:readsFrom infra:customer-postgres ;
+    kg:writesTo infra:customer-postgres ;
+    kg:usesCache infra:session-redis ;
+    kg:dependsOn infra:customer-postgres ;
+    kg:dependsOn infra:session-redis ;
+    kg:publishesTo infra:customer-events ;
+    kg:emitsTelemetryTo infra:observability-events ;
+    kg:consumesFrom infra:support-sync-queue ;
+    kg:exposesEndpoint endpoint:customer-profile-api ;
+    kg:monitoredBy monitor:support-sync-monitor ;
+    kg:shownOn dashboard:support-ops-dashboard ;
+    kg:coveredByPolicy policy:production-change-approval ;
+    kg:monthlyCostUSD "168.7"^^xsd:decimal ;
+    kg:criticality "high" ;
+    kg:tier "tier-2" ;
+    kg:sloAvailability "99.9"^^xsd:decimal ;
+    kg:dependsOn service:identity-api .
+
+endpoint:customer-profile-api
+    a kg:Endpoint ;
+    kg:name "Customer Profile API Endpoint" ;
+    kg:httpMethod "GET" ;
+    kg:path "/v1/customer-profile" ;
+    kg:exposedBy gateway:public-api-gateway .
+
+service:consent-api
+    a kg:Service ;
+    kg:name "Consent API" ;
+    kg:ownedBy team:governance-risk ;
+    kg:partOfDomain domain:privacy-governance ;
+    kg:deployedIn environment:prod ;
+    kg:hasRuntime runtime:java-21 ;
+    kg:runsOn infra:kr-edge-node-01 ;
+    kg:readsFrom infra:consent-postgres ;
+    kg:writesTo infra:consent-postgres ;
+    kg:usesCache infra:session-redis ;
+    kg:dependsOn infra:consent-postgres ;
+    kg:dependsOn infra:session-redis ;
+    kg:publishesTo infra:audit-events ;
+    kg:emitsTelemetryTo infra:observability-events ;
+    kg:consumesFrom infra:security-work-queue ;
+    kg:exposesEndpoint endpoint:consent-api ;
+    kg:monitoredBy monitor:security-feed-monitor ;
+    kg:shownOn dashboard:security-posture-dashboard ;
+    kg:coveredByPolicy policy:pii-data-retention ;
+    kg:monthlyCostUSD "142.45"^^xsd:decimal ;
+    kg:criticality "critical" ;
+    kg:tier "tier-1" ;
+    kg:sloAvailability "99.95"^^xsd:decimal ;
+    kg:dependsOn service:identity-api ;
+    kg:dependsOn service:customer-profile-api ;
+    kg:dependsOn service:access-policy-api .
+
+endpoint:consent-api
+    a kg:Endpoint ;
+    kg:name "Consent API Endpoint" ;
+    kg:httpMethod "GET" ;
+    kg:path "/v1/consent" ;
+    kg:exposedBy gateway:internal-api-gateway .
+
+service:privacy-request-api
+    a kg:Service ;
+    kg:name "Privacy Request API" ;
+    kg:ownedBy team:governance-risk ;
+    kg:partOfDomain domain:privacy-governance ;
+    kg:deployedIn environment:prod ;
+    kg:hasRuntime runtime:python-3-12 ;
+    kg:runsOn infra:kr-edge-node-02 ;
+    kg:readsFrom infra:consent-postgres ;
+    kg:writesTo infra:consent-postgres ;
+    kg:usesCache infra:session-redis ;
+    kg:dependsOn infra:consent-postgres ;
+    kg:dependsOn infra:session-redis ;
+    kg:publishesTo infra:audit-events ;
+    kg:emitsTelemetryTo infra:observability-events ;
+    kg:consumesFrom infra:export-command-queue ;
+    kg:exposesEndpoint endpoint:privacy-request-api ;
+    kg:monitoredBy monitor:capacity-forecast-monitor ;
+    kg:shownOn dashboard:reliability-command-dashboard ;
+    kg:coveredByPolicy policy:pii-data-retention ;
+    kg:monthlyCostUSD "121.95"^^xsd:decimal ;
+    kg:criticality "critical" ;
+    kg:tier "tier-1" ;
+    kg:sloAvailability "99.95"^^xsd:decimal ;
+    kg:dependsOn service:consent-api ;
+    kg:dependsOn service:customer-profile-api ;
+    kg:dependsOn service:session-api ;
+    kg:synchronizesWith service:consent-api .
+
+endpoint:privacy-request-api
+    a kg:Endpoint ;
+    kg:name "Privacy Request API Endpoint" ;
+    kg:httpMethod "GET" ;
+    kg:path "/v1/privacy-request" ;
+    kg:exposedBy gateway:internal-api-gateway .
+
+service:audit-log-api
+    a kg:Service ;
+    kg:name "Audit Log API" ;
+    kg:ownedBy team:governance-risk ;
+    kg:partOfDomain domain:privacy-governance ;
+    kg:deployedIn environment:prod ;
+    kg:hasRuntime runtime:java-21 ;
+    kg:runsOn infra:server-a ;
+    kg:readsFrom infra:audit-postgres ;
+    kg:writesTo infra:audit-postgres ;
+    kg:usesCache infra:redis-prod ;
+    kg:dependsOn infra:audit-postgres ;
+    kg:dependsOn infra:redis-prod ;
+    kg:publishesTo infra:audit-events ;
+    kg:emitsTelemetryTo infra:observability-events ;
+    kg:consumesFrom infra:security-work-queue ;
+    kg:exposesEndpoint endpoint:audit-log-api ;
+    kg:monitoredBy monitor:billing-api-slo-monitor ;
+    kg:shownOn dashboard:finance-ops-dashboard ;
+    kg:coveredByPolicy policy:pii-data-retention ;
+    kg:monthlyCostUSD "202.3"^^xsd:decimal ;
+    kg:criticality "critical" ;
+    kg:tier "tier-1" ;
+    kg:sloAvailability "99.95"^^xsd:decimal ;
+    kg:dependsOn service:identity-api ;
+    kg:dependsOn service:customer-profile-api .
+
+endpoint:audit-log-api
+    a kg:Endpoint ;
+    kg:name "Audit Log API Endpoint" ;
+    kg:httpMethod "GET" ;
+    kg:path "/v1/audit-log" ;
+    kg:exposedBy gateway:internal-api-gateway .
+
+service:compliance-reporting-api
+    a kg:Service ;
+    kg:name "Compliance Reporting API" ;
+    kg:ownedBy team:governance-risk ;
+    kg:partOfDomain domain:privacy-governance ;
+    kg:deployedIn environment:prod ;
+    kg:hasRuntime runtime:python-3-12 ;
+    kg:runsOn infra:server-b ;
+    kg:readsFrom infra:audit-postgres ;
+    kg:writesTo infra:audit-postgres ;
+    kg:usesCache infra:redis-prod ;
+    kg:dependsOn infra:audit-postgres ;
+    kg:dependsOn infra:redis-prod ;
+    kg:publishesTo infra:audit-events ;
+    kg:emitsTelemetryTo infra:observability-events ;
+    kg:consumesFrom infra:export-command-queue ;
+    kg:exposesEndpoint endpoint:compliance-reporting-api ;
+    kg:monitoredBy monitor:payment-latency-monitor ;
+    kg:shownOn dashboard:payments-slo-dashboard ;
+    kg:coveredByPolicy policy:pii-data-retention ;
+    kg:monthlyCostUSD "176.55"^^xsd:decimal ;
+    kg:criticality "high" ;
+    kg:tier "tier-2" ;
+    kg:sloAvailability "99.9"^^xsd:decimal ;
+    kg:dependsOn service:audit-log-api ;
+    kg:dependsOn service:privacy-request-api ;
+    kg:dependsOn service:consent-api .
+
+endpoint:compliance-reporting-api
+    a kg:Endpoint ;
+    kg:name "Compliance Reporting API Endpoint" ;
+    kg:httpMethod "GET" ;
+    kg:path "/v1/compliance-reporting" ;
+    kg:exposedBy gateway:internal-api-gateway .
+
+service:notification-api
+    a kg:Service ;
+    kg:name "Notification API" ;
+    kg:ownedBy team:backend ;
+    kg:partOfDomain domain:platform ;
+    kg:deployedIn environment:prod ;
+    kg:hasRuntime runtime:nodejs-22 ;
+    kg:runsOn infra:kr-api-node-01 ;
+    kg:readsFrom infra:notification-postgres ;
+    kg:writesTo infra:notification-postgres ;
+    kg:usesCache infra:redis-prod ;
+    kg:dependsOn infra:notification-postgres ;
+    kg:dependsOn infra:redis-prod ;
+    kg:publishesTo infra:notification-events ;
+    kg:emitsTelemetryTo infra:observability-events ;
+    kg:consumesFrom infra:notification-command-queue ;
+    kg:exposesEndpoint endpoint:notification-api ;
+    kg:monitoredBy monitor:identity-auth-monitor ;
+    kg:shownOn dashboard:identity-risk-dashboard ;
+    kg:coveredByPolicy policy:production-change-approval ;
+    kg:monthlyCostUSD "130.0"^^xsd:decimal ;
+    kg:criticality "high" ;
+    kg:tier "tier-2" ;
+    kg:sloAvailability "99.9"^^xsd:decimal ;
+    kg:dependsOn service:customer-profile-api ;
+    kg:dependsOn service:privacy-request-api .
+
+endpoint:notification-api
+    a kg:Endpoint ;
+    kg:name "Notification API Endpoint" ;
+    kg:httpMethod "GET" ;
+    kg:path "/v1/notification" ;
+    kg:exposedBy gateway:internal-api-gateway .
+
+service:email-dispatcher
+    a kg:Service ;
+    kg:name "Email Dispatcher" ;
+    kg:ownedBy team:backend ;
+    kg:partOfDomain domain:platform ;
+    kg:deployedIn environment:prod ;
+    kg:hasRuntime runtime:nodejs-22 ;
+    kg:runsOn infra:kr-api-node-02 ;
+    kg:readsFrom infra:notification-postgres ;
+    kg:writesTo infra:notification-postgres ;
+    kg:usesCache infra:redis-prod ;
+    kg:dependsOn infra:notification-postgres ;
+    kg:dependsOn infra:redis-prod ;
+    kg:publishesTo infra:notification-events ;
+    kg:emitsTelemetryTo infra:observability-events ;
+    kg:consumesFrom infra:notification-command-queue ;
+    kg:exposesEndpoint endpoint:email-dispatcher ;
+    kg:monitoredBy monitor:order-funnel-monitor ;
+    kg:shownOn dashboard:commerce-order-dashboard ;
+    kg:coveredByPolicy policy:production-change-approval ;
+    kg:monthlyCostUSD "88.35"^^xsd:decimal ;
+    kg:criticality "medium" ;
+    kg:tier "tier-2" ;
+    kg:sloAvailability "99.9"^^xsd:decimal ;
+    kg:dependsOn service:notification-api ;
+    kg:dependsOn service:audit-log-api ;
+    kg:integratesWith vendor:sendgrid .
+
+endpoint:email-dispatcher
+    a kg:Endpoint ;
+    kg:name "Email Dispatcher Endpoint" ;
+    kg:httpMethod "GET" ;
+    kg:path "/v1/email-dispatcher" ;
+    kg:exposedBy gateway:internal-api-gateway .
+
+service:sms-gateway-adapter
+    a kg:Service ;
+    kg:name "SMS Gateway Adapter" ;
+    kg:ownedBy team:backend ;
+    kg:partOfDomain domain:platform ;
+    kg:deployedIn environment:prod ;
+    kg:hasRuntime runtime:nodejs-22 ;
+    kg:runsOn infra:kr-api-node-03 ;
+    kg:readsFrom infra:notification-postgres ;
+    kg:writesTo infra:notification-postgres ;
+    kg:usesCache infra:redis-prod ;
+    kg:dependsOn infra:notification-postgres ;
+    kg:dependsOn infra:redis-prod ;
+    kg:publishesTo infra:notification-events ;
+    kg:emitsTelemetryTo infra:observability-events ;
+    kg:consumesFrom infra:notification-command-queue ;
+    kg:exposesEndpoint endpoint:sms-gateway-adapter ;
+    kg:monitoredBy monitor:inventory-freshness-monitor ;
+    kg:shownOn dashboard:fulfillment-control-dashboard ;
+    kg:coveredByPolicy policy:production-change-approval ;
+    kg:monthlyCostUSD "92.75"^^xsd:decimal ;
+    kg:criticality "medium" ;
+    kg:tier "tier-2" ;
+    kg:sloAvailability "99.9"^^xsd:decimal ;
+    kg:dependsOn service:notification-api ;
+    kg:dependsOn service:compliance-reporting-api ;
+    kg:synchronizesWith service:email-dispatcher ;
+    kg:integratesWith vendor:twilio .
+
+endpoint:sms-gateway-adapter
+    a kg:Endpoint ;
+    kg:name "SMS Gateway Adapter Endpoint" ;
+    kg:httpMethod "GET" ;
+    kg:path "/v1/sms-gateway-adapter" ;
+    kg:exposedBy gateway:internal-api-gateway .
+
+service:push-notification-api
+    a kg:Service ;
+    kg:name "Push Notification API" ;
+    kg:ownedBy team:backend ;
+    kg:partOfDomain domain:platform ;
+    kg:deployedIn environment:prod ;
+    kg:hasRuntime runtime:go-1-23 ;
+    kg:runsOn infra:kr-api-node-04 ;
+    kg:readsFrom infra:notification-postgres ;
+    kg:writesTo infra:notification-postgres ;
+    kg:usesCache infra:redis-prod ;
+    kg:dependsOn infra:notification-postgres ;
+    kg:dependsOn infra:redis-prod ;
+    kg:publishesTo infra:notification-events ;
+    kg:emitsTelemetryTo infra:observability-events ;
+    kg:consumesFrom infra:notification-command-queue ;
+    kg:exposesEndpoint endpoint:push-notification-api ;
+    kg:monitoredBy monitor:fraud-decision-monitor ;
+    kg:shownOn dashboard:growth-campaign-dashboard ;
+    kg:coveredByPolicy policy:production-change-approval ;
+    kg:monthlyCostUSD "102.1"^^xsd:decimal ;
+    kg:criticality "medium" ;
+    kg:tier "tier-2" ;
+    kg:sloAvailability "99.9"^^xsd:decimal ;
+    kg:dependsOn service:notification-api .
+
+endpoint:push-notification-api
+    a kg:Endpoint ;
+    kg:name "Push Notification API Endpoint" ;
+    kg:httpMethod "GET" ;
+    kg:path "/v1/push-notification" ;
+    kg:exposedBy gateway:public-api-gateway .
+
+service:order-api
+    a kg:Service ;
+    kg:name "Order API" ;
+    kg:ownedBy team:commerce-platform ;
+    kg:partOfDomain domain:commerce ;
+    kg:deployedIn environment:prod ;
+    kg:hasRuntime runtime:java-21 ;
+    kg:runsOn infra:worker-node-01 ;
+    kg:readsFrom infra:order-postgres ;
+    kg:writesTo infra:order-postgres ;
+    kg:usesCache infra:order-redis ;
+    kg:dependsOn infra:order-postgres ;
+    kg:dependsOn infra:order-redis ;
+    kg:publishesTo infra:order-events ;
+    kg:emitsTelemetryTo infra:observability-events ;
+    kg:consumesFrom infra:payment-command-queue ;
+    kg:exposesEndpoint endpoint:order-api ;
+    kg:monitoredBy monitor:notification-delivery-monitor ;
+    kg:shownOn dashboard:search-quality-dashboard ;
+    kg:coveredByPolicy policy:production-change-approval ;
+    kg:monthlyCostUSD "255.9"^^xsd:decimal ;
+    kg:criticality "critical" ;
+    kg:tier "tier-1" ;
+    kg:sloAvailability "99.95"^^xsd:decimal ;
+    kg:dependsOn service:cart-api ;
+    kg:dependsOn service:payment-api ;
+    kg:dependsOn service:email-dispatcher .
+
+endpoint:order-api
+    a kg:Endpoint ;
+    kg:name "Order API Endpoint" ;
+    kg:httpMethod "GET" ;
+    kg:path "/v1/order" ;
+    kg:exposedBy gateway:public-api-gateway .
+
+service:cart-api
+    a kg:Service ;
+    kg:name "Cart API" ;
+    kg:ownedBy team:commerce-platform ;
+    kg:partOfDomain domain:commerce ;
+    kg:deployedIn environment:prod ;
+    kg:hasRuntime runtime:nodejs-22 ;
+    kg:runsOn infra:worker-node-02 ;
+    kg:readsFrom infra:order-postgres ;
+    kg:writesTo infra:order-postgres ;
+    kg:usesCache infra:order-redis ;
+    kg:dependsOn infra:order-postgres ;
+    kg:dependsOn infra:order-redis ;
+    kg:publishesTo infra:order-events ;
+    kg:emitsTelemetryTo infra:observability-events ;
+    kg:consumesFrom infra:payment-command-queue ;
+    kg:exposesEndpoint endpoint:cart-api ;
+    kg:monitoredBy monitor:event-router-lag-monitor ;
+    kg:shownOn dashboard:data-platform-pipeline-dashboard ;
+    kg:coveredByPolicy policy:production-change-approval ;
+    kg:monthlyCostUSD "118.2"^^xsd:decimal ;
+    kg:criticality "high" ;
+    kg:tier "tier-2" ;
+    kg:sloAvailability "99.9"^^xsd:decimal ;
+    kg:dependsOn service:catalog-api ;
+    kg:dependsOn service:pricing-api ;
+    kg:dependsOn service:sms-gateway-adapter .
+
+endpoint:cart-api
+    a kg:Endpoint ;
+    kg:name "Cart API Endpoint" ;
+    kg:httpMethod "GET" ;
+    kg:path "/v1/cart" ;
+    kg:exposedBy gateway:public-api-gateway .
+
+service:checkout-api
+    a kg:Service ;
+    kg:name "Checkout API" ;
+    kg:ownedBy team:commerce-platform ;
+    kg:partOfDomain domain:commerce ;
+    kg:deployedIn environment:prod ;
+    kg:hasRuntime runtime:nodejs-22 ;
+    kg:runsOn infra:worker-node-03 ;
+    kg:readsFrom infra:order-postgres ;
+    kg:writesTo infra:order-postgres ;
+    kg:usesCache infra:order-redis ;
+    kg:dependsOn infra:order-postgres ;
+    kg:dependsOn infra:order-redis ;
+    kg:publishesTo infra:order-events ;
+    kg:emitsTelemetryTo infra:observability-events ;
+    kg:consumesFrom infra:payment-command-queue ;
+    kg:exposesEndpoint endpoint:checkout-api ;
+    kg:monitoredBy monitor:analytics-query-monitor ;
+    kg:shownOn dashboard:analytics-usage-dashboard ;
+    kg:coveredByPolicy policy:production-change-approval ;
+    kg:monthlyCostUSD "179.45"^^xsd:decimal ;
+    kg:criticality "critical" ;
+    kg:tier "tier-1" ;
+    kg:sloAvailability "99.95"^^xsd:decimal ;
+    kg:dependsOn service:cart-api ;
+    kg:dependsOn service:payment-api ;
+    kg:dependsOn service:fraud-screening-api ;
+    kg:dependsOn service:push-notification-api .
+
+endpoint:checkout-api
+    a kg:Endpoint ;
+    kg:name "Checkout API Endpoint" ;
+    kg:httpMethod "GET" ;
+    kg:path "/v1/checkout" ;
+    kg:exposedBy gateway:public-api-gateway .
+
+service:catalog-api
+    a kg:Service ;
+    kg:name "Catalog API" ;
+    kg:ownedBy team:commerce-platform ;
+    kg:partOfDomain domain:commerce ;
+    kg:deployedIn environment:prod ;
+    kg:hasRuntime runtime:nodejs-22 ;
+    kg:runsOn infra:worker-node-04 ;
+    kg:readsFrom infra:catalog-postgres ;
+    kg:writesTo infra:catalog-postgres ;
+    kg:usesCache infra:catalog-redis ;
+    kg:dependsOn infra:catalog-postgres ;
+    kg:dependsOn infra:catalog-redis ;
+    kg:publishesTo infra:inventory-events ;
+    kg:emitsTelemetryTo infra:observability-events ;
+    kg:consumesFrom infra:fulfillment-command-queue ;
+    kg:exposesEndpoint endpoint:catalog-api ;
+    kg:monitoredBy monitor:feature-store-freshness-monitor ;
+    kg:shownOn dashboard:ml-model-health-dashboard ;
+    kg:coveredByPolicy policy:production-change-approval ;
+    kg:monthlyCostUSD "145.9"^^xsd:decimal ;
+    kg:criticality "high" ;
+    kg:tier "tier-2" ;
+    kg:sloAvailability "99.9"^^xsd:decimal ;
+    kg:dependsOn service:search-api ;
+    kg:dependsOn service:order-api ;
+    kg:synchronizesWith service:checkout-api .
+
+endpoint:catalog-api
+    a kg:Endpoint ;
+    kg:name "Catalog API Endpoint" ;
+    kg:httpMethod "GET" ;
+    kg:path "/v1/catalog" ;
+    kg:exposedBy gateway:public-api-gateway .
+
+service:inventory-api
+    a kg:Service ;
+    kg:name "Inventory API" ;
+    kg:ownedBy team:fulfillment-ops ;
+    kg:partOfDomain domain:operations ;
+    kg:deployedIn environment:prod ;
+    kg:hasRuntime runtime:java-21 ;
+    kg:runsOn infra:kr-data-node-01 ;
+    kg:readsFrom infra:inventory-postgres ;
+    kg:writesTo infra:inventory-postgres ;
+    kg:usesCache infra:catalog-redis ;
+    kg:dependsOn infra:inventory-postgres ;
+    kg:dependsOn infra:catalog-redis ;
+    kg:publishesTo infra:inventory-events ;
+    kg:emitsTelemetryTo infra:observability-events ;
+    kg:consumesFrom infra:fulfillment-command-queue ;
+    kg:exposesEndpoint endpoint:inventory-api ;
+    kg:monitoredBy monitor:privacy-request-monitor ;
+    kg:shownOn dashboard:privacy-governance-dashboard ;
+    kg:coveredByPolicy policy:production-change-approval ;
+    kg:monthlyCostUSD "181.3"^^xsd:decimal ;
+    kg:criticality "high" ;
+    kg:tier "tier-2" ;
+    kg:sloAvailability "99.9"^^xsd:decimal ;
+    kg:dependsOn service:catalog-api ;
+    kg:dependsOn service:cart-api .
+
+endpoint:inventory-api
+    a kg:Endpoint ;
+    kg:name "Inventory API Endpoint" ;
+    kg:httpMethod "GET" ;
+    kg:path "/v1/inventory" ;
+    kg:exposedBy gateway:internal-api-gateway .
+
+service:fulfillment-api
+    a kg:Service ;
+    kg:name "Fulfillment API" ;
+    kg:ownedBy team:fulfillment-ops ;
+    kg:partOfDomain domain:operations ;
+    kg:deployedIn environment:prod ;
+    kg:hasRuntime runtime:java-21 ;
+    kg:runsOn infra:kr-data-node-02 ;
+    kg:readsFrom infra:inventory-postgres ;
+    kg:writesTo infra:inventory-postgres ;
+    kg:usesCache infra:order-redis ;
+    kg:dependsOn infra:inventory-postgres ;
+    kg:dependsOn infra:order-redis ;
+    kg:publishesTo infra:shipment-events ;
+    kg:emitsTelemetryTo infra:observability-events ;
+    kg:consumesFrom infra:fulfillment-command-queue ;
+    kg:exposesEndpoint endpoint:fulfillment-api ;
+    kg:monitoredBy monitor:partner-webhook-monitor ;
+    kg:shownOn dashboard:partner-api-dashboard ;
+    kg:coveredByPolicy policy:production-change-approval ;
+    kg:monthlyCostUSD "199.6"^^xsd:decimal ;
+    kg:criticality "critical" ;
+    kg:tier "tier-1" ;
+    kg:sloAvailability "99.95"^^xsd:decimal ;
+    kg:dependsOn service:order-api ;
+    kg:dependsOn service:inventory-api ;
+    kg:dependsOn service:checkout-api .
+
+endpoint:fulfillment-api
+    a kg:Endpoint ;
+    kg:name "Fulfillment API Endpoint" ;
+    kg:httpMethod "GET" ;
+    kg:path "/v1/fulfillment" ;
+    kg:exposedBy gateway:internal-api-gateway .
+
+service:shipment-api
+    a kg:Service ;
+    kg:name "Shipment API" ;
+    kg:ownedBy team:fulfillment-ops ;
+    kg:partOfDomain domain:operations ;
+    kg:deployedIn environment:prod ;
+    kg:hasRuntime runtime:go-1-23 ;
+    kg:runsOn infra:kr-ml-node-01 ;
+    kg:readsFrom infra:inventory-postgres ;
+    kg:writesTo infra:inventory-postgres ;
+    kg:usesCache infra:order-redis ;
+    kg:dependsOn infra:inventory-postgres ;
+    kg:dependsOn infra:order-redis ;
+    kg:publishesTo infra:shipment-events ;
+    kg:emitsTelemetryTo infra:observability-events ;
+    kg:consumesFrom infra:fulfillment-command-queue ;
+    kg:exposesEndpoint endpoint:shipment-api ;
+    kg:monitoredBy monitor:media-cache-hit-monitor ;
+    kg:shownOn dashboard:media-delivery-dashboard ;
+    kg:coveredByPolicy policy:production-change-approval ;
+    kg:monthlyCostUSD "138.75"^^xsd:decimal ;
+    kg:criticality "high" ;
+    kg:tier "tier-2" ;
+    kg:sloAvailability "99.9"^^xsd:decimal ;
+    kg:dependsOn service:fulfillment-api ;
+    kg:dependsOn service:catalog-api .
+
+endpoint:shipment-api
+    a kg:Endpoint ;
+    kg:name "Shipment API Endpoint" ;
+    kg:httpMethod "GET" ;
+    kg:path "/v1/shipment" ;
+    kg:exposedBy gateway:partner-api-gateway .
+
+service:returns-api
+    a kg:Service ;
+    kg:name "Returns API" ;
+    kg:ownedBy team:fulfillment-ops ;
+    kg:partOfDomain domain:operations ;
+    kg:deployedIn environment:prod ;
+    kg:hasRuntime runtime:java-21 ;
+    kg:runsOn infra:kr-ml-node-02 ;
+    kg:readsFrom infra:order-postgres ;
+    kg:writesTo infra:order-postgres ;
+    kg:usesCache infra:order-redis ;
+    kg:dependsOn infra:order-postgres ;
+    kg:dependsOn infra:order-redis ;
+    kg:publishesTo infra:shipment-events ;
+    kg:emitsTelemetryTo infra:observability-events ;
+    kg:consumesFrom infra:fulfillment-command-queue ;
+    kg:exposesEndpoint endpoint:returns-api ;
+    kg:monitoredBy monitor:support-sync-monitor ;
+    kg:shownOn dashboard:support-ops-dashboard ;
+    kg:coveredByPolicy policy:production-change-approval ;
+    kg:monthlyCostUSD "126.4"^^xsd:decimal ;
+    kg:criticality "high" ;
+    kg:tier "tier-2" ;
+    kg:sloAvailability "99.9"^^xsd:decimal ;
+    kg:dependsOn service:order-api ;
+    kg:dependsOn service:payment-api ;
+    kg:dependsOn service:inventory-api .
+
+endpoint:returns-api
+    a kg:Endpoint ;
+    kg:name "Returns API Endpoint" ;
+    kg:httpMethod "GET" ;
+    kg:path "/v1/returns" ;
+    kg:exposedBy gateway:public-api-gateway .
+
+service:fraud-screening-api
+    a kg:Service ;
+    kg:name "Fraud Screening API" ;
+    kg:ownedBy team:governance-risk ;
+    kg:partOfDomain domain:risk ;
+    kg:deployedIn environment:prod ;
+    kg:hasRuntime runtime:python-3-12 ;
+    kg:runsOn infra:kr-edge-node-01 ;
+    kg:readsFrom infra:risk-postgres ;
+    kg:writesTo infra:risk-postgres ;
+    kg:usesCache infra:feature-redis ;
+    kg:dependsOn infra:risk-postgres ;
+    kg:dependsOn infra:feature-redis ;
+    kg:publishesTo infra:risk-events ;
+    kg:emitsTelemetryTo infra:observability-events ;
+    kg:consumesFrom infra:payment-command-queue ;
+    kg:exposesEndpoint endpoint:fraud-screening-api ;
+    kg:monitoredBy monitor:security-feed-monitor ;
+    kg:shownOn dashboard:security-posture-dashboard ;
+    kg:coveredByPolicy policy:model-risk-review ;
+    kg:monthlyCostUSD "214.7"^^xsd:decimal ;
+    kg:criticality "critical" ;
+    kg:tier "tier-1" ;
+    kg:sloAvailability "99.95"^^xsd:decimal ;
+    kg:dependsOn service:risk-scoring-api ;
+    kg:dependsOn service:identity-api ;
+    kg:dependsOn service:fulfillment-api ;
+    kg:synchronizesWith service:returns-api .
+
+endpoint:fraud-screening-api
+    a kg:Endpoint ;
+    kg:name "Fraud Screening API Endpoint" ;
+    kg:httpMethod "GET" ;
+    kg:path "/v1/fraud-screening" ;
+    kg:exposedBy gateway:internal-api-gateway .
+
+service:risk-scoring-api
+    a kg:Service ;
+    kg:name "Risk Scoring API" ;
+    kg:ownedBy team:governance-risk ;
+    kg:partOfDomain domain:risk ;
+    kg:deployedIn environment:prod ;
+    kg:hasRuntime runtime:python-3-12 ;
+    kg:runsOn infra:kr-edge-node-02 ;
+    kg:readsFrom infra:risk-postgres ;
+    kg:writesTo infra:risk-postgres ;
+    kg:usesCache infra:feature-redis ;
+    kg:dependsOn infra:risk-postgres ;
+    kg:dependsOn infra:feature-redis ;
+    kg:publishesTo infra:risk-events ;
+    kg:emitsTelemetryTo infra:observability-events ;
+    kg:consumesFrom infra:ml-training-queue ;
+    kg:exposesEndpoint endpoint:risk-scoring-api ;
+    kg:monitoredBy monitor:capacity-forecast-monitor ;
+    kg:shownOn dashboard:reliability-command-dashboard ;
+    kg:coveredByPolicy policy:model-risk-review ;
+    kg:monthlyCostUSD "194.25"^^xsd:decimal ;
+    kg:criticality "critical" ;
+    kg:tier "tier-1" ;
+    kg:sloAvailability "99.95"^^xsd:decimal ;
+    kg:dependsOn service:feature-store-api ;
+    kg:dependsOn service:ml-inference-api ;
+    kg:dependsOn service:shipment-api .
+
+endpoint:risk-scoring-api
+    a kg:Endpoint ;
+    kg:name "Risk Scoring API Endpoint" ;
+    kg:httpMethod "GET" ;
+    kg:path "/v1/risk-scoring" ;
+    kg:exposedBy gateway:internal-api-gateway .
+
+service:chargeback-api
+    a kg:Service ;
+    kg:name "Chargeback API" ;
+    kg:ownedBy team:payments ;
+    kg:partOfDomain domain:risk ;
+    kg:deployedIn environment:prod ;
+    kg:hasRuntime runtime:java-21 ;
+    kg:runsOn infra:server-a ;
+    kg:readsFrom infra:risk-postgres ;
+    kg:writesTo infra:risk-postgres ;
+    kg:usesCache infra:redis-prod ;
+    kg:dependsOn infra:risk-postgres ;
+    kg:dependsOn infra:redis-prod ;
+    kg:publishesTo infra:risk-events ;
+    kg:emitsTelemetryTo infra:observability-events ;
+    kg:consumesFrom infra:payment-command-queue ;
+    kg:exposesEndpoint endpoint:chargeback-api ;
+    kg:monitoredBy monitor:billing-api-slo-monitor ;
+    kg:shownOn dashboard:finance-ops-dashboard ;
+    kg:coveredByPolicy policy:model-risk-review ;
+    kg:monthlyCostUSD "158.65"^^xsd:decimal ;
+    kg:criticality "high" ;
+    kg:tier "tier-2" ;
+    kg:sloAvailability "99.9"^^xsd:decimal ;
+    kg:dependsOn service:payment-api ;
+    kg:dependsOn service:fraud-screening-api ;
+    kg:dependsOn service:returns-api .
+
+endpoint:chargeback-api
+    a kg:Endpoint ;
+    kg:name "Chargeback API Endpoint" ;
+    kg:httpMethod "GET" ;
+    kg:path "/v1/chargeback" ;
+    kg:exposedBy gateway:internal-api-gateway .
+
+service:rewards-api
+    a kg:Service ;
+    kg:name "Rewards API" ;
+    kg:ownedBy team:growth-platform ;
+    kg:partOfDomain domain:loyalty ;
+    kg:deployedIn environment:prod ;
+    kg:hasRuntime runtime:nodejs-22 ;
+    kg:runsOn infra:server-b ;
+    kg:readsFrom infra:customer-postgres ;
+    kg:writesTo infra:customer-postgres ;
+    kg:usesCache infra:recommendation-redis ;
+    kg:dependsOn infra:customer-postgres ;
+    kg:dependsOn infra:recommendation-redis ;
+    kg:publishesTo infra:customer-events ;
+    kg:emitsTelemetryTo infra:observability-events ;
+    kg:consumesFrom infra:notification-command-queue ;
+    kg:exposesEndpoint endpoint:rewards-api ;
+    kg:monitoredBy monitor:payment-latency-monitor ;
+    kg:shownOn dashboard:payments-slo-dashboard ;
+    kg:coveredByPolicy policy:production-change-approval ;
+    kg:monthlyCostUSD "113.1"^^xsd:decimal ;
+    kg:criticality "medium" ;
+    kg:tier "tier-2" ;
+    kg:sloAvailability "99.9"^^xsd:decimal ;
+    kg:dependsOn service:customer-profile-api ;
+    kg:dependsOn service:fraud-screening-api .
+
+endpoint:rewards-api
+    a kg:Endpoint ;
+    kg:name "Rewards API Endpoint" ;
+    kg:httpMethod "GET" ;
+    kg:path "/v1/rewards" ;
+    kg:exposedBy gateway:public-api-gateway .
+
+service:loyalty-api
+    a kg:Service ;
+    kg:name "Loyalty API" ;
+    kg:ownedBy team:growth-platform ;
+    kg:partOfDomain domain:loyalty ;
+    kg:deployedIn environment:prod ;
+    kg:hasRuntime runtime:nodejs-22 ;
+    kg:runsOn infra:kr-api-node-01 ;
+    kg:readsFrom infra:customer-postgres ;
+    kg:writesTo infra:customer-postgres ;
+    kg:usesCache infra:recommendation-redis ;
+    kg:dependsOn infra:customer-postgres ;
+    kg:dependsOn infra:recommendation-redis ;
+    kg:publishesTo infra:customer-events ;
+    kg:emitsTelemetryTo infra:observability-events ;
+    kg:consumesFrom infra:notification-command-queue ;
+    kg:exposesEndpoint endpoint:loyalty-api ;
+    kg:monitoredBy monitor:identity-auth-monitor ;
+    kg:shownOn dashboard:identity-risk-dashboard ;
+    kg:coveredByPolicy policy:production-change-approval ;
+    kg:monthlyCostUSD "151.0"^^xsd:decimal ;
+    kg:criticality "high" ;
+    kg:tier "tier-2" ;
+    kg:sloAvailability "99.9"^^xsd:decimal ;
+    kg:dependsOn service:rewards-api ;
+    kg:dependsOn service:campaign-api ;
+    kg:dependsOn service:risk-scoring-api .
+
+endpoint:loyalty-api
+    a kg:Endpoint ;
+    kg:name "Loyalty API Endpoint" ;
+    kg:httpMethod "GET" ;
+    kg:path "/v1/loyalty" ;
+    kg:exposedBy gateway:public-api-gateway .
+
+service:campaign-api
+    a kg:Service ;
+    kg:name "Campaign API" ;
+    kg:ownedBy team:growth-platform ;
+    kg:partOfDomain domain:growth ;
+    kg:deployedIn environment:prod ;
+    kg:hasRuntime runtime:nodejs-22 ;
+    kg:runsOn infra:kr-api-node-02 ;
+    kg:readsFrom infra:customer-postgres ;
+    kg:writesTo infra:customer-postgres ;
+    kg:usesCache infra:recommendation-redis ;
+    kg:dependsOn infra:customer-postgres ;
+    kg:dependsOn infra:recommendation-redis ;
+    kg:publishesTo infra:experiment-events ;
+    kg:emitsTelemetryTo infra:observability-events ;
+    kg:consumesFrom infra:notification-command-queue ;
+    kg:exposesEndpoint endpoint:campaign-api ;
+    kg:monitoredBy monitor:order-funnel-monitor ;
+    kg:shownOn dashboard:commerce-order-dashboard ;
+    kg:coveredByPolicy policy:production-change-approval ;
+    kg:monthlyCostUSD "137.45"^^xsd:decimal ;
+    kg:criticality "medium" ;
+    kg:tier "tier-2" ;
+    kg:sloAvailability "99.9"^^xsd:decimal ;
+    kg:dependsOn service:consent-api ;
+    kg:dependsOn service:customer-profile-api ;
+    kg:dependsOn service:chargeback-api ;
+    kg:synchronizesWith service:loyalty-api .
+
+endpoint:campaign-api
+    a kg:Endpoint ;
+    kg:name "Campaign API Endpoint" ;
+    kg:httpMethod "GET" ;
+    kg:path "/v1/campaign" ;
+    kg:exposedBy gateway:public-api-gateway .
+
+service:recommendation-api
+    a kg:Service ;
+    kg:name "Recommendation API" ;
+    kg:ownedBy team:ml-platform ;
+    kg:partOfDomain domain:growth ;
+    kg:deployedIn environment:prod ;
+    kg:hasRuntime runtime:python-3-12 ;
+    kg:runsOn infra:kr-api-node-03 ;
+    kg:readsFrom infra:feature-store-postgres ;
+    kg:writesTo infra:feature-store-postgres ;
+    kg:usesCache infra:recommendation-redis ;
+    kg:dependsOn infra:feature-store-postgres ;
+    kg:dependsOn infra:recommendation-redis ;
+    kg:publishesTo infra:feature-events ;
+    kg:emitsTelemetryTo infra:observability-events ;
+    kg:consumesFrom infra:ml-training-queue ;
+    kg:exposesEndpoint endpoint:recommendation-api ;
+    kg:monitoredBy monitor:inventory-freshness-monitor ;
+    kg:shownOn dashboard:fulfillment-control-dashboard ;
+    kg:coveredByPolicy policy:production-change-approval ;
+    kg:monthlyCostUSD "222.2"^^xsd:decimal ;
+    kg:criticality "high" ;
+    kg:tier "tier-2" ;
+    kg:sloAvailability "99.9"^^xsd:decimal ;
+    kg:dependsOn service:feature-store-api ;
+    kg:dependsOn service:ml-inference-api ;
+    kg:dependsOn service:rewards-api .
+
+endpoint:recommendation-api
+    a kg:Endpoint ;
+    kg:name "Recommendation API Endpoint" ;
+    kg:httpMethod "GET" ;
+    kg:path "/v1/recommendation" ;
+    kg:exposedBy gateway:public-api-gateway .
+
+service:search-api
+    a kg:Service ;
+    kg:name "Search API" ;
+    kg:ownedBy team:commerce-platform ;
+    kg:partOfDomain domain:discovery ;
+    kg:deployedIn environment:prod ;
+    kg:hasRuntime runtime:go-1-23 ;
+    kg:runsOn infra:kr-api-node-04 ;
+    kg:readsFrom infra:catalog-postgres ;
+    kg:writesTo infra:catalog-postgres ;
+    kg:usesCache infra:search-redis ;
+    kg:dependsOn infra:catalog-postgres ;
+    kg:dependsOn infra:search-redis ;
+    kg:publishesTo infra:inventory-events ;
+    kg:emitsTelemetryTo infra:observability-events ;
+    kg:consumesFrom infra:fulfillment-command-queue ;
+    kg:exposesEndpoint endpoint:search-api ;
+    kg:monitoredBy monitor:fraud-decision-monitor ;
+    kg:shownOn dashboard:growth-campaign-dashboard ;
+    kg:coveredByPolicy policy:production-change-approval ;
+    kg:monthlyCostUSD "171.55"^^xsd:decimal ;
+    kg:criticality "high" ;
+    kg:tier "tier-2" ;
+    kg:sloAvailability "99.9"^^xsd:decimal ;
+    kg:dependsOn service:catalog-api ;
+    kg:dependsOn service:product-graph-api ;
+    kg:dependsOn service:loyalty-api .
+
+endpoint:search-api
+    a kg:Endpoint ;
+    kg:name "Search API Endpoint" ;
+    kg:httpMethod "GET" ;
+    kg:path "/v1/search" ;
+    kg:exposedBy gateway:public-api-gateway .
+
+service:product-graph-api
+    a kg:Service ;
+    kg:name "Product Graph API" ;
+    kg:ownedBy team:commerce-platform ;
+    kg:partOfDomain domain:discovery ;
+    kg:deployedIn environment:prod ;
+    kg:hasRuntime runtime:rust-1-82 ;
+    kg:runsOn infra:worker-node-01 ;
+    kg:readsFrom infra:catalog-postgres ;
+    kg:writesTo infra:catalog-postgres ;
+    kg:usesCache infra:search-redis ;
+    kg:dependsOn infra:catalog-postgres ;
+    kg:dependsOn infra:search-redis ;
+    kg:publishesTo infra:inventory-events ;
+    kg:emitsTelemetryTo infra:observability-events ;
+    kg:consumesFrom infra:fulfillment-command-queue ;
+    kg:exposesEndpoint endpoint:product-graph-api ;
+    kg:monitoredBy monitor:notification-delivery-monitor ;
+    kg:shownOn dashboard:search-quality-dashboard ;
+    kg:coveredByPolicy policy:production-change-approval ;
+    kg:monthlyCostUSD "164.35"^^xsd:decimal ;
+    kg:criticality "medium" ;
+    kg:tier "tier-2" ;
+    kg:sloAvailability "99.9"^^xsd:decimal ;
+    kg:dependsOn service:catalog-api ;
+    kg:dependsOn service:campaign-api .
+
+endpoint:product-graph-api
+    a kg:Endpoint ;
+    kg:name "Product Graph API Endpoint" ;
+    kg:httpMethod "GET" ;
+    kg:path "/v1/product-graph" ;
+    kg:exposedBy gateway:internal-api-gateway .
+
+service:data-ingestion-api
+    a kg:Service ;
+    kg:name "Data Ingestion API" ;
+    kg:ownedBy team:data-platform ;
+    kg:partOfDomain domain:data ;
+    kg:deployedIn environment:prod ;
+    kg:hasRuntime runtime:python-3-12 ;
+    kg:runsOn infra:worker-node-02 ;
+    kg:readsFrom infra:warehouse-bigquery ;
+    kg:writesTo infra:warehouse-bigquery ;
+    kg:usesCache infra:feature-redis ;
+    kg:dependsOn infra:warehouse-bigquery ;
+    kg:dependsOn infra:feature-redis ;
+    kg:publishesTo infra:customer-events ;
+    kg:emitsTelemetryTo infra:observability-events ;
+    kg:consumesFrom infra:export-command-queue ;
+    kg:exposesEndpoint endpoint:data-ingestion-api ;
+    kg:monitoredBy monitor:event-router-lag-monitor ;
+    kg:shownOn dashboard:data-platform-pipeline-dashboard ;
+    kg:coveredByPolicy policy:production-change-approval ;
+    kg:monthlyCostUSD "198.75"^^xsd:decimal ;
+    kg:criticality "high" ;
+    kg:tier "tier-2" ;
+    kg:sloAvailability "99.9"^^xsd:decimal ;
+    kg:dependsOn service:event-router ;
+    kg:dependsOn service:recommendation-api .
+
+endpoint:data-ingestion-api
+    a kg:Endpoint ;
+    kg:name "Data Ingestion API Endpoint" ;
+    kg:httpMethod "GET" ;
+    kg:path "/v1/data-ingestion" ;
+    kg:exposedBy gateway:internal-api-gateway .
+
+service:event-router
+    a kg:Service ;
+    kg:name "Event Router" ;
+    kg:ownedBy team:data-platform ;
+    kg:partOfDomain domain:platform ;
+    kg:deployedIn environment:prod ;
+    kg:hasRuntime runtime:go-1-23 ;
+    kg:runsOn infra:worker-node-03 ;
+    kg:readsFrom infra:analytics-clickhouse ;
+    kg:writesTo infra:analytics-clickhouse ;
+    kg:usesCache infra:redis-prod ;
+    kg:dependsOn infra:analytics-clickhouse ;
+    kg:dependsOn infra:redis-prod ;
+    kg:publishesTo infra:observability-events ;
+    kg:emitsTelemetryTo infra:observability-events ;
+    kg:consumesFrom infra:export-command-queue ;
+    kg:exposesEndpoint endpoint:event-router ;
+    kg:monitoredBy monitor:analytics-query-monitor ;
+    kg:shownOn dashboard:analytics-usage-dashboard ;
+    kg:coveredByPolicy policy:production-change-approval ;
+    kg:monthlyCostUSD "240.5"^^xsd:decimal ;
+    kg:criticality "critical" ;
+    kg:tier "tier-1" ;
+    kg:sloAvailability "99.95"^^xsd:decimal ;
+    kg:dependsOn service:search-api ;
+    kg:synchronizesWith service:data-ingestion-api .
+
+endpoint:event-router
+    a kg:Endpoint ;
+    kg:name "Event Router Endpoint" ;
+    kg:httpMethod "GET" ;
+    kg:path "/v1/event-router" ;
+    kg:exposedBy gateway:internal-api-gateway .
+
+service:analytics-query-api
+    a kg:Service ;
+    kg:name "Analytics Query API" ;
+    kg:ownedBy team:analytics-engineering ;
+    kg:partOfDomain domain:analytics ;
+    kg:deployedIn environment:prod ;
+    kg:hasRuntime runtime:python-3-12 ;
+    kg:runsOn infra:worker-node-04 ;
+    kg:readsFrom infra:analytics-clickhouse ;
+    kg:writesTo infra:analytics-clickhouse ;
+    kg:usesCache infra:feature-redis ;
+    kg:dependsOn infra:analytics-clickhouse ;
+    kg:dependsOn infra:feature-redis ;
+    kg:publishesTo infra:observability-events ;
+    kg:emitsTelemetryTo infra:observability-events ;
+    kg:consumesFrom infra:export-command-queue ;
+    kg:exposesEndpoint endpoint:analytics-query-api ;
+    kg:monitoredBy monitor:feature-store-freshness-monitor ;
+    kg:shownOn dashboard:ml-model-health-dashboard ;
+    kg:coveredByPolicy policy:production-change-approval ;
+    kg:monthlyCostUSD "185.65"^^xsd:decimal ;
+    kg:criticality "high" ;
+    kg:tier "tier-2" ;
+    kg:sloAvailability "99.9"^^xsd:decimal ;
+    kg:dependsOn service:data-ingestion-api ;
+    kg:dependsOn service:product-graph-api .
+
+endpoint:analytics-query-api
+    a kg:Endpoint ;
+    kg:name "Analytics Query API Endpoint" ;
+    kg:httpMethod "GET" ;
+    kg:path "/v1/analytics-query" ;
+    kg:exposedBy gateway:internal-api-gateway .
+
+service:feature-store-api
+    a kg:Service ;
+    kg:name "Feature Store API" ;
+    kg:ownedBy team:ml-platform ;
+    kg:partOfDomain domain:machine-learning ;
+    kg:deployedIn environment:prod ;
+    kg:hasRuntime runtime:python-3-12 ;
+    kg:runsOn infra:kr-data-node-01 ;
+    kg:readsFrom infra:feature-store-postgres ;
+    kg:writesTo infra:feature-store-postgres ;
+    kg:usesCache infra:feature-redis ;
+    kg:dependsOn infra:feature-store-postgres ;
+    kg:dependsOn infra:feature-redis ;
+    kg:publishesTo infra:feature-events ;
+    kg:emitsTelemetryTo infra:observability-events ;
+    kg:consumesFrom infra:ml-training-queue ;
+    kg:exposesEndpoint endpoint:feature-store-api ;
+    kg:monitoredBy monitor:privacy-request-monitor ;
+    kg:shownOn dashboard:privacy-governance-dashboard ;
+    kg:coveredByPolicy policy:model-risk-review ;
+    kg:monthlyCostUSD "196.0"^^xsd:decimal ;
+    kg:criticality "critical" ;
+    kg:tier "tier-1" ;
+    kg:sloAvailability "99.95"^^xsd:decimal ;
+    kg:dependsOn service:data-ingestion-api .
+
+endpoint:feature-store-api
+    a kg:Endpoint ;
+    kg:name "Feature Store API Endpoint" ;
+    kg:httpMethod "GET" ;
+    kg:path "/v1/feature-store" ;
+    kg:exposedBy gateway:internal-api-gateway .
+
+service:experimentation-api
+    a kg:Service ;
+    kg:name "Experimentation API" ;
+    kg:ownedBy team:growth-platform ;
+    kg:partOfDomain domain:growth ;
+    kg:deployedIn environment:prod ;
+    kg:hasRuntime runtime:nodejs-22 ;
+    kg:runsOn infra:kr-data-node-02 ;
+    kg:readsFrom infra:analytics-clickhouse ;
+    kg:writesTo infra:analytics-clickhouse ;
+    kg:usesCache infra:feature-redis ;
+    kg:dependsOn infra:analytics-clickhouse ;
+    kg:dependsOn infra:feature-redis ;
+    kg:publishesTo infra:experiment-events ;
+    kg:emitsTelemetryTo infra:observability-events ;
+    kg:consumesFrom infra:notification-command-queue ;
+    kg:exposesEndpoint endpoint:experimentation-api ;
+    kg:monitoredBy monitor:partner-webhook-monitor ;
+    kg:shownOn dashboard:partner-api-dashboard ;
+    kg:coveredByPolicy policy:production-change-approval ;
+    kg:monthlyCostUSD "148.95"^^xsd:decimal ;
+    kg:criticality "high" ;
+    kg:tier "tier-2" ;
+    kg:sloAvailability "99.9"^^xsd:decimal ;
+    kg:dependsOn service:feature-store-api ;
+    kg:dependsOn service:consent-api ;
+    kg:dependsOn service:event-router .
+
+endpoint:experimentation-api
+    a kg:Endpoint ;
+    kg:name "Experimentation API Endpoint" ;
+    kg:httpMethod "GET" ;
+    kg:path "/v1/experimentation" ;
+    kg:exposedBy gateway:public-api-gateway .
+
+service:admin-console-api
+    a kg:Service ;
+    kg:name "Admin Console API" ;
+    kg:ownedBy team:backend ;
+    kg:partOfDomain domain:platform ;
+    kg:deployedIn environment:prod ;
+    kg:hasRuntime runtime:nodejs-22 ;
+    kg:runsOn infra:kr-ml-node-01 ;
+    kg:readsFrom infra:audit-postgres ;
+    kg:writesTo infra:audit-postgres ;
+    kg:usesCache infra:session-redis ;
+    kg:dependsOn infra:audit-postgres ;
+    kg:dependsOn infra:session-redis ;
+    kg:publishesTo infra:audit-events ;
+    kg:emitsTelemetryTo infra:observability-events ;
+    kg:consumesFrom infra:security-work-queue ;
+    kg:exposesEndpoint endpoint:admin-console-api ;
+    kg:monitoredBy monitor:media-cache-hit-monitor ;
+    kg:shownOn dashboard:media-delivery-dashboard ;
+    kg:coveredByPolicy policy:production-change-approval ;
+    kg:monthlyCostUSD "124.1"^^xsd:decimal ;
+    kg:criticality "medium" ;
+    kg:tier "tier-2" ;
+    kg:sloAvailability "99.9"^^xsd:decimal ;
+    kg:dependsOn service:identity-api ;
+    kg:dependsOn service:audit-log-api ;
+    kg:dependsOn service:analytics-query-api .
+
+endpoint:admin-console-api
+    a kg:Endpoint ;
+    kg:name "Admin Console API Endpoint" ;
+    kg:httpMethod "GET" ;
+    kg:path "/v1/admin-console" ;
+    kg:exposedBy gateway:internal-api-gateway .
+
+service:developer-portal-api
+    a kg:Service ;
+    kg:name "Developer Portal API" ;
+    kg:ownedBy team:partner-engineering ;
+    kg:partOfDomain domain:platform ;
+    kg:deployedIn environment:prod ;
+    kg:hasRuntime runtime:nodejs-22 ;
+    kg:runsOn infra:kr-ml-node-02 ;
+    kg:readsFrom infra:support-postgres ;
+    kg:writesTo infra:support-postgres ;
+    kg:usesCache infra:partner-redis ;
+    kg:dependsOn infra:support-postgres ;
+    kg:dependsOn infra:partner-redis ;
+    kg:publishesTo infra:support-events ;
+    kg:emitsTelemetryTo infra:observability-events ;
+    kg:consumesFrom infra:support-sync-queue ;
+    kg:exposesEndpoint endpoint:developer-portal-api ;
+    kg:monitoredBy monitor:support-sync-monitor ;
+    kg:shownOn dashboard:support-ops-dashboard ;
+    kg:coveredByPolicy policy:production-change-approval ;
+    kg:monthlyCostUSD "117.85"^^xsd:decimal ;
+    kg:criticality "medium" ;
+    kg:tier "tier-2" ;
+    kg:sloAvailability "99.9"^^xsd:decimal ;
+    kg:dependsOn service:identity-api ;
+    kg:dependsOn service:partner-api ;
+    kg:dependsOn service:feature-store-api ;
+    kg:synchronizesWith service:admin-console-api .
+
+endpoint:developer-portal-api
+    a kg:Endpoint ;
+    kg:name "Developer Portal API Endpoint" ;
+    kg:httpMethod "GET" ;
+    kg:path "/v1/developer-portal" ;
+    kg:exposedBy gateway:partner-api-gateway .
+
+service:api-gateway
+    a kg:Service ;
+    kg:name "API Gateway" ;
+    kg:ownedBy team:reliability ;
+    kg:partOfDomain domain:platform ;
+    kg:deployedIn environment:prod ;
+    kg:hasRuntime runtime:nginx-1-27 ;
+    kg:runsOn infra:kr-edge-node-01 ;
+    kg:readsFrom infra:audit-postgres ;
+    kg:writesTo infra:audit-postgres ;
+    kg:usesCache infra:rate-limit-redis ;
+    kg:dependsOn infra:audit-postgres ;
+    kg:dependsOn infra:rate-limit-redis ;
+    kg:publishesTo infra:observability-events ;
+    kg:emitsTelemetryTo infra:observability-events ;
+    kg:consumesFrom infra:security-work-queue ;
+    kg:exposesEndpoint endpoint:api-gateway ;
+    kg:monitoredBy monitor:security-feed-monitor ;
+    kg:shownOn dashboard:security-posture-dashboard ;
+    kg:coveredByPolicy policy:production-change-approval ;
+    kg:monthlyCostUSD "260.2"^^xsd:decimal ;
+    kg:criticality "critical" ;
+    kg:tier "tier-1" ;
+    kg:sloAvailability "99.95"^^xsd:decimal ;
+    kg:dependsOn service:identity-api ;
+    kg:dependsOn service:access-policy-api ;
+    kg:dependsOn service:experimentation-api .
+
+endpoint:api-gateway
+    a kg:Endpoint ;
+    kg:name "API Gateway Endpoint" ;
+    kg:httpMethod "GET" ;
+    kg:path "/v1/api-gateway" ;
+    kg:exposedBy gateway:public-api-gateway .
+
+service:partner-api
+    a kg:Service ;
+    kg:name "Partner API" ;
+    kg:ownedBy team:partner-engineering ;
+    kg:partOfDomain domain:platform ;
+    kg:deployedIn environment:prod ;
+    kg:hasRuntime runtime:go-1-23 ;
+    kg:runsOn infra:kr-edge-node-02 ;
+    kg:readsFrom infra:support-postgres ;
+    kg:writesTo infra:support-postgres ;
+    kg:usesCache infra:partner-redis ;
+    kg:dependsOn infra:support-postgres ;
+    kg:dependsOn infra:partner-redis ;
+    kg:publishesTo infra:support-events ;
+    kg:emitsTelemetryTo infra:observability-events ;
+    kg:consumesFrom infra:support-sync-queue ;
+    kg:exposesEndpoint endpoint:partner-api ;
+    kg:monitoredBy monitor:capacity-forecast-monitor ;
+    kg:shownOn dashboard:reliability-command-dashboard ;
+    kg:coveredByPolicy policy:production-change-approval ;
+    kg:monthlyCostUSD "175.5"^^xsd:decimal ;
+    kg:criticality "high" ;
+    kg:tier "tier-2" ;
+    kg:sloAvailability "99.9"^^xsd:decimal ;
+    kg:dependsOn service:identity-api ;
+    kg:dependsOn service:webhook-dispatcher ;
+    kg:dependsOn service:admin-console-api .
+
+endpoint:partner-api
+    a kg:Endpoint ;
+    kg:name "Partner API Endpoint" ;
+    kg:httpMethod "GET" ;
+    kg:path "/v1/partner" ;
+    kg:exposedBy gateway:partner-api-gateway .
+
+service:webhook-dispatcher
+    a kg:Service ;
+    kg:name "Webhook Dispatcher" ;
+    kg:ownedBy team:partner-engineering ;
+    kg:partOfDomain domain:platform ;
+    kg:deployedIn environment:prod ;
+    kg:hasRuntime runtime:go-1-23 ;
+    kg:runsOn infra:server-a ;
+    kg:readsFrom infra:support-postgres ;
+    kg:writesTo infra:support-postgres ;
+    kg:usesCache infra:partner-redis ;
+    kg:dependsOn infra:support-postgres ;
+    kg:dependsOn infra:partner-redis ;
+    kg:publishesTo infra:support-events ;
+    kg:emitsTelemetryTo infra:observability-events ;
+    kg:consumesFrom infra:support-sync-queue ;
+    kg:exposesEndpoint endpoint:webhook-dispatcher ;
+    kg:monitoredBy monitor:billing-api-slo-monitor ;
+    kg:shownOn dashboard:finance-ops-dashboard ;
+    kg:coveredByPolicy policy:production-change-approval ;
+    kg:monthlyCostUSD "131.7"^^xsd:decimal ;
+    kg:criticality "high" ;
+    kg:tier "tier-2" ;
+    kg:sloAvailability "99.9"^^xsd:decimal ;
+    kg:dependsOn service:partner-api ;
+    kg:dependsOn service:event-router ;
+    kg:dependsOn service:developer-portal-api .
+
+endpoint:webhook-dispatcher
+    a kg:Endpoint ;
+    kg:name "Webhook Dispatcher Endpoint" ;
+    kg:httpMethod "GET" ;
+    kg:path "/v1/webhook-dispatcher" ;
+    kg:exposedBy gateway:partner-api-gateway .
+
+service:file-export-api
+    a kg:Service ;
+    kg:name "File Export API" ;
+    kg:ownedBy team:data-platform ;
+    kg:partOfDomain domain:data ;
+    kg:deployedIn environment:prod ;
+    kg:hasRuntime runtime:python-3-12 ;
+    kg:runsOn infra:server-b ;
+    kg:readsFrom infra:warehouse-bigquery ;
+    kg:writesTo infra:warehouse-bigquery ;
+    kg:usesCache infra:redis-prod ;
+    kg:dependsOn infra:warehouse-bigquery ;
+    kg:dependsOn infra:redis-prod ;
+    kg:publishesTo infra:audit-events ;
+    kg:emitsTelemetryTo infra:observability-events ;
+    kg:consumesFrom infra:export-command-queue ;
+    kg:exposesEndpoint endpoint:file-export-api ;
+    kg:monitoredBy monitor:payment-latency-monitor ;
+    kg:shownOn dashboard:payments-slo-dashboard ;
+    kg:coveredByPolicy policy:production-change-approval ;
+    kg:monthlyCostUSD "135.4"^^xsd:decimal ;
+    kg:criticality "medium" ;
+    kg:tier "tier-2" ;
+    kg:sloAvailability "99.9"^^xsd:decimal ;
+    kg:dependsOn service:analytics-query-api ;
+    kg:dependsOn service:audit-log-api ;
+    kg:dependsOn service:api-gateway .
+
+endpoint:file-export-api
+    a kg:Endpoint ;
+    kg:name "File Export API Endpoint" ;
+    kg:httpMethod "GET" ;
+    kg:path "/v1/file-export" ;
+    kg:exposedBy gateway:internal-api-gateway .
+
+service:media-metadata-api
+    a kg:Service ;
+    kg:name "Media Metadata API" ;
+    kg:ownedBy team:media-platform ;
+    kg:partOfDomain domain:media ;
+    kg:deployedIn environment:prod ;
+    kg:hasRuntime runtime:go-1-23 ;
+    kg:runsOn infra:kr-api-node-01 ;
+    kg:readsFrom infra:media-metadata-postgres ;
+    kg:writesTo infra:media-metadata-postgres ;
+    kg:usesCache infra:catalog-redis ;
+    kg:dependsOn infra:media-metadata-postgres ;
+    kg:dependsOn infra:catalog-redis ;
+    kg:publishesTo infra:media-events ;
+    kg:emitsTelemetryTo infra:observability-events ;
+    kg:consumesFrom infra:export-command-queue ;
+    kg:exposesEndpoint endpoint:media-metadata-api ;
+    kg:monitoredBy monitor:identity-auth-monitor ;
+    kg:shownOn dashboard:identity-risk-dashboard ;
+    kg:coveredByPolicy policy:production-change-approval ;
+    kg:monthlyCostUSD "112.8"^^xsd:decimal ;
+    kg:criticality "medium" ;
+    kg:tier "tier-2" ;
+    kg:sloAvailability "99.9"^^xsd:decimal ;
+    kg:dependsOn service:asset-delivery-api ;
+    kg:dependsOn service:partner-api ;
+    kg:synchronizesWith service:file-export-api .
+
+endpoint:media-metadata-api
+    a kg:Endpoint ;
+    kg:name "Media Metadata API Endpoint" ;
+    kg:httpMethod "GET" ;
+    kg:path "/v1/media-metadata" ;
+    kg:exposedBy gateway:internal-api-gateway .
+
+service:asset-delivery-api
+    a kg:Service ;
+    kg:name "Asset Delivery API" ;
+    kg:ownedBy team:media-platform ;
+    kg:partOfDomain domain:media ;
+    kg:deployedIn environment:prod ;
+    kg:hasRuntime runtime:rust-1-82 ;
+    kg:runsOn infra:kr-api-node-02 ;
+    kg:readsFrom infra:media-metadata-postgres ;
+    kg:writesTo infra:media-metadata-postgres ;
+    kg:usesCache infra:catalog-redis ;
+    kg:dependsOn infra:media-metadata-postgres ;
+    kg:dependsOn infra:catalog-redis ;
+    kg:publishesTo infra:media-events ;
+    kg:emitsTelemetryTo infra:observability-events ;
+    kg:consumesFrom infra:export-command-queue ;
+    kg:exposesEndpoint endpoint:asset-delivery-api ;
+    kg:monitoredBy monitor:order-funnel-monitor ;
+    kg:shownOn dashboard:commerce-order-dashboard ;
+    kg:coveredByPolicy policy:production-change-approval ;
+    kg:monthlyCostUSD "186.3"^^xsd:decimal ;
+    kg:criticality "high" ;
+    kg:tier "tier-2" ;
+    kg:sloAvailability "99.9"^^xsd:decimal ;
+    kg:dependsOn service:media-metadata-api ;
+    kg:dependsOn service:webhook-dispatcher .
+
+endpoint:asset-delivery-api
+    a kg:Endpoint ;
+    kg:name "Asset Delivery API Endpoint" ;
+    kg:httpMethod "GET" ;
+    kg:path "/v1/asset-delivery" ;
+    kg:exposedBy gateway:edge-content-gateway .
+
+service:support-case-api
+    a kg:Service ;
+    kg:name "Support Case API" ;
+    kg:ownedBy team:support-ops ;
+    kg:partOfDomain domain:support ;
+    kg:deployedIn environment:prod ;
+    kg:hasRuntime runtime:nodejs-22 ;
+    kg:runsOn infra:kr-api-node-03 ;
+    kg:readsFrom infra:support-postgres ;
+    kg:writesTo infra:support-postgres ;
+    kg:usesCache infra:partner-redis ;
+    kg:dependsOn infra:support-postgres ;
+    kg:dependsOn infra:partner-redis ;
+    kg:publishesTo infra:support-events ;
+    kg:emitsTelemetryTo infra:observability-events ;
+    kg:consumesFrom infra:support-sync-queue ;
+    kg:exposesEndpoint endpoint:support-case-api ;
+    kg:monitoredBy monitor:inventory-freshness-monitor ;
+    kg:shownOn dashboard:fulfillment-control-dashboard ;
+    kg:coveredByPolicy policy:production-change-approval ;
+    kg:monthlyCostUSD "98.25"^^xsd:decimal ;
+    kg:criticality "medium" ;
+    kg:tier "tier-2" ;
+    kg:sloAvailability "99.9"^^xsd:decimal ;
+    kg:dependsOn service:customer-profile-api ;
+    kg:dependsOn service:file-export-api .
+
+endpoint:support-case-api
+    a kg:Endpoint ;
+    kg:name "Support Case API Endpoint" ;
+    kg:httpMethod "GET" ;
+    kg:path "/v1/support-case" ;
+    kg:exposedBy gateway:internal-api-gateway .
+
+service:ticket-sync-worker
+    a kg:Service ;
+    kg:name "Ticket Sync Worker" ;
+    kg:ownedBy team:support-ops ;
+    kg:partOfDomain domain:support ;
+    kg:deployedIn environment:prod ;
+    kg:hasRuntime runtime:nodejs-22 ;
+    kg:runsOn infra:kr-api-node-04 ;
+    kg:readsFrom infra:support-postgres ;
+    kg:writesTo infra:support-postgres ;
+    kg:usesCache infra:partner-redis ;
+    kg:dependsOn infra:support-postgres ;
+    kg:dependsOn infra:partner-redis ;
+    kg:publishesTo infra:support-events ;
+    kg:emitsTelemetryTo infra:observability-events ;
+    kg:consumesFrom infra:support-sync-queue ;
+    kg:exposesEndpoint endpoint:ticket-sync-worker ;
+    kg:monitoredBy monitor:fraud-decision-monitor ;
+    kg:shownOn dashboard:growth-campaign-dashboard ;
+    kg:coveredByPolicy policy:production-change-approval ;
+    kg:monthlyCostUSD "76.6"^^xsd:decimal ;
+    kg:criticality "medium" ;
+    kg:tier "tier-2" ;
+    kg:sloAvailability "99.9"^^xsd:decimal ;
+    kg:dependsOn service:support-case-api ;
+    kg:dependsOn service:crm-sync-api ;
+    kg:dependsOn service:media-metadata-api .
+
+endpoint:ticket-sync-worker
+    a kg:Endpoint ;
+    kg:name "Ticket Sync Worker Endpoint" ;
+    kg:httpMethod "POST" ;
+    kg:path "/v1/ticket-sync" ;
+    kg:exposedBy gateway:internal-api-gateway .
+
+service:crm-sync-api
+    a kg:Service ;
+    kg:name "CRM Sync API" ;
+    kg:ownedBy team:support-ops ;
+    kg:partOfDomain domain:support ;
+    kg:deployedIn environment:prod ;
+    kg:hasRuntime runtime:nodejs-22 ;
+    kg:runsOn infra:worker-node-01 ;
+    kg:readsFrom infra:support-postgres ;
+    kg:writesTo infra:support-postgres ;
+    kg:usesCache infra:partner-redis ;
+    kg:dependsOn infra:support-postgres ;
+    kg:dependsOn infra:partner-redis ;
+    kg:publishesTo infra:support-events ;
+    kg:emitsTelemetryTo infra:observability-events ;
+    kg:consumesFrom infra:support-sync-queue ;
+    kg:exposesEndpoint endpoint:crm-sync-api ;
+    kg:monitoredBy monitor:notification-delivery-monitor ;
+    kg:shownOn dashboard:search-quality-dashboard ;
+    kg:coveredByPolicy policy:production-change-approval ;
+    kg:monthlyCostUSD "90.1"^^xsd:decimal ;
+    kg:criticality "medium" ;
+    kg:tier "tier-2" ;
+    kg:sloAvailability "99.9"^^xsd:decimal ;
+    kg:dependsOn service:partner-api ;
+    kg:dependsOn service:asset-delivery-api ;
+    kg:integratesWith vendor:salesforce .
+
+endpoint:crm-sync-api
+    a kg:Endpoint ;
+    kg:name "CRM Sync API Endpoint" ;
+    kg:httpMethod "GET" ;
+    kg:path "/v1/crm-sync" ;
+    kg:exposedBy gateway:internal-api-gateway .
+
+service:mobile-bff
+    a kg:Service ;
+    kg:name "Mobile BFF" ;
+    kg:ownedBy team:frontend-platform ;
+    kg:partOfDomain domain:experience ;
+    kg:deployedIn environment:prod ;
+    kg:hasRuntime runtime:nodejs-22 ;
+    kg:runsOn infra:worker-node-02 ;
+    kg:readsFrom infra:customer-postgres ;
+    kg:writesTo infra:customer-postgres ;
+    kg:usesCache infra:session-redis ;
+    kg:dependsOn infra:customer-postgres ;
+    kg:dependsOn infra:session-redis ;
+    kg:publishesTo infra:customer-events ;
+    kg:emitsTelemetryTo infra:observability-events ;
+    kg:consumesFrom infra:support-sync-queue ;
+    kg:exposesEndpoint endpoint:mobile-bff ;
+    kg:monitoredBy monitor:event-router-lag-monitor ;
+    kg:shownOn dashboard:data-platform-pipeline-dashboard ;
+    kg:coveredByPolicy policy:production-change-approval ;
+    kg:monthlyCostUSD "152.7"^^xsd:decimal ;
+    kg:criticality "high" ;
+    kg:tier "tier-2" ;
+    kg:sloAvailability "99.9"^^xsd:decimal ;
+    kg:dependsOn service:identity-api ;
+    kg:dependsOn service:order-api ;
+    kg:dependsOn service:notification-api ;
+    kg:dependsOn service:support-case-api ;
+    kg:synchronizesWith service:crm-sync-api .
+
+endpoint:mobile-bff
+    a kg:Endpoint ;
+    kg:name "Mobile BFF Endpoint" ;
+    kg:httpMethod "GET" ;
+    kg:path "/v1/mobile-bff" ;
+    kg:exposedBy gateway:public-api-gateway .
+
+service:web-bff
+    a kg:Service ;
+    kg:name "Web BFF" ;
+    kg:ownedBy team:frontend-platform ;
+    kg:partOfDomain domain:experience ;
+    kg:deployedIn environment:prod ;
+    kg:hasRuntime runtime:nodejs-22 ;
+    kg:runsOn infra:worker-node-03 ;
+    kg:readsFrom infra:customer-postgres ;
+    kg:writesTo infra:customer-postgres ;
+    kg:usesCache infra:session-redis ;
+    kg:dependsOn infra:customer-postgres ;
+    kg:dependsOn infra:session-redis ;
+    kg:publishesTo infra:customer-events ;
+    kg:emitsTelemetryTo infra:observability-events ;
+    kg:consumesFrom infra:support-sync-queue ;
+    kg:exposesEndpoint endpoint:web-bff ;
+    kg:monitoredBy monitor:analytics-query-monitor ;
+    kg:shownOn dashboard:analytics-usage-dashboard ;
+    kg:coveredByPolicy policy:production-change-approval ;
+    kg:monthlyCostUSD "147.3"^^xsd:decimal ;
+    kg:criticality "high" ;
+    kg:tier "tier-2" ;
+    kg:sloAvailability "99.9"^^xsd:decimal ;
+    kg:dependsOn service:identity-api ;
+    kg:dependsOn service:catalog-api ;
+    kg:dependsOn service:cart-api ;
+    kg:dependsOn service:ticket-sync-worker .
+
+endpoint:web-bff
+    a kg:Endpoint ;
+    kg:name "Web BFF Endpoint" ;
+    kg:httpMethod "GET" ;
+    kg:path "/v1/web-bff" ;
+    kg:exposedBy gateway:public-api-gateway .
+
+service:reporting-api
+    a kg:Service ;
+    kg:name "Reporting API" ;
+    kg:ownedBy team:analytics-engineering ;
+    kg:partOfDomain domain:analytics ;
+    kg:deployedIn environment:prod ;
+    kg:hasRuntime runtime:python-3-12 ;
+    kg:runsOn infra:worker-node-04 ;
+    kg:readsFrom infra:analytics-clickhouse ;
+    kg:writesTo infra:analytics-clickhouse ;
+    kg:usesCache infra:feature-redis ;
+    kg:dependsOn infra:analytics-clickhouse ;
+    kg:dependsOn infra:feature-redis ;
+    kg:publishesTo infra:observability-events ;
+    kg:emitsTelemetryTo infra:observability-events ;
+    kg:consumesFrom infra:export-command-queue ;
+    kg:exposesEndpoint endpoint:reporting-api ;
+    kg:monitoredBy monitor:feature-store-freshness-monitor ;
+    kg:shownOn dashboard:ml-model-health-dashboard ;
+    kg:coveredByPolicy policy:production-change-approval ;
+    kg:monthlyCostUSD "167.2"^^xsd:decimal ;
+    kg:criticality "high" ;
+    kg:tier "tier-2" ;
+    kg:sloAvailability "99.9"^^xsd:decimal ;
+    kg:dependsOn service:analytics-query-api ;
+    kg:dependsOn service:file-export-api ;
+    kg:dependsOn service:crm-sync-api .
+
+endpoint:reporting-api
+    a kg:Endpoint ;
+    kg:name "Reporting API Endpoint" ;
+    kg:httpMethod "GET" ;
+    kg:path "/v1/reporting" ;
+    kg:exposedBy gateway:internal-api-gateway .
+
+service:ml-inference-api
+    a kg:Service ;
+    kg:name "ML Inference API" ;
+    kg:ownedBy team:ml-platform ;
+    kg:partOfDomain domain:machine-learning ;
+    kg:deployedIn environment:prod ;
+    kg:hasRuntime runtime:python-3-12 ;
+    kg:runsOn infra:kr-data-node-01 ;
+    kg:readsFrom infra:model-registry-postgres ;
+    kg:writesTo infra:model-registry-postgres ;
+    kg:usesCache infra:feature-redis ;
+    kg:dependsOn infra:model-registry-postgres ;
+    kg:dependsOn infra:feature-redis ;
+    kg:publishesTo infra:feature-events ;
+    kg:emitsTelemetryTo infra:observability-events ;
+    kg:consumesFrom infra:ml-training-queue ;
+    kg:exposesEndpoint endpoint:ml-inference-api ;
+    kg:monitoredBy monitor:privacy-request-monitor ;
+    kg:shownOn dashboard:privacy-governance-dashboard ;
+    kg:coveredByPolicy policy:model-risk-review ;
+    kg:monthlyCostUSD "258.45"^^xsd:decimal ;
+    kg:criticality "critical" ;
+    kg:tier "tier-1" ;
+    kg:sloAvailability "99.95"^^xsd:decimal ;
+    kg:dependsOn service:model-registry-api ;
+    kg:dependsOn service:feature-store-api ;
+    kg:dependsOn service:mobile-bff .
+
+endpoint:ml-inference-api
+    a kg:Endpoint ;
+    kg:name "ML Inference API Endpoint" ;
+    kg:httpMethod "GET" ;
+    kg:path "/v1/ml-inference" ;
+    kg:exposedBy gateway:internal-api-gateway .
+
+service:model-registry-api
+    a kg:Service ;
+    kg:name "Model Registry API" ;
+    kg:ownedBy team:ml-platform ;
+    kg:partOfDomain domain:machine-learning ;
+    kg:deployedIn environment:prod ;
+    kg:hasRuntime runtime:python-3-12 ;
+    kg:runsOn infra:kr-data-node-02 ;
+    kg:readsFrom infra:model-registry-postgres ;
+    kg:writesTo infra:model-registry-postgres ;
+    kg:usesCache infra:feature-redis ;
+    kg:dependsOn infra:model-registry-postgres ;
+    kg:dependsOn infra:feature-redis ;
+    kg:publishesTo infra:feature-events ;
+    kg:emitsTelemetryTo infra:observability-events ;
+    kg:consumesFrom infra:ml-training-queue ;
+    kg:exposesEndpoint endpoint:model-registry-api ;
+    kg:monitoredBy monitor:partner-webhook-monitor ;
+    kg:shownOn dashboard:partner-api-dashboard ;
+    kg:coveredByPolicy policy:model-risk-review ;
+    kg:monthlyCostUSD "139.95"^^xsd:decimal ;
+    kg:criticality "high" ;
+    kg:tier "tier-2" ;
+    kg:sloAvailability "99.9"^^xsd:decimal ;
+    kg:dependsOn service:feature-store-api ;
+    kg:dependsOn service:web-bff .
+
+endpoint:model-registry-api
+    a kg:Endpoint ;
+    kg:name "Model Registry API Endpoint" ;
+    kg:httpMethod "GET" ;
+    kg:path "/v1/model-registry" ;
+    kg:exposedBy gateway:internal-api-gateway .
+
+service:content-moderation-api
+    a kg:Service ;
+    kg:name "Content Moderation API" ;
+    kg:ownedBy team:security ;
+    kg:partOfDomain domain:security ;
+    kg:deployedIn environment:prod ;
+    kg:hasRuntime runtime:python-3-12 ;
+    kg:runsOn infra:kr-ml-node-01 ;
+    kg:readsFrom infra:risk-postgres ;
+    kg:writesTo infra:risk-postgres ;
+    kg:usesCache infra:feature-redis ;
+    kg:dependsOn infra:risk-postgres ;
+    kg:dependsOn infra:feature-redis ;
+    kg:publishesTo infra:risk-events ;
+    kg:emitsTelemetryTo infra:observability-events ;
+    kg:consumesFrom infra:security-work-queue ;
+    kg:exposesEndpoint endpoint:content-moderation-api ;
+    kg:monitoredBy monitor:media-cache-hit-monitor ;
+    kg:shownOn dashboard:media-delivery-dashboard ;
+    kg:coveredByPolicy policy:incident-severity-routing ;
+    kg:monthlyCostUSD "133.55"^^xsd:decimal ;
+    kg:criticality "high" ;
+    kg:tier "tier-2" ;
+    kg:sloAvailability "99.9"^^xsd:decimal ;
+    kg:dependsOn service:ml-inference-api ;
+    kg:dependsOn service:audit-log-api ;
+    kg:dependsOn service:reporting-api ;
+    kg:synchronizesWith service:model-registry-api .
+
+endpoint:content-moderation-api
+    a kg:Endpoint ;
+    kg:name "Content Moderation API Endpoint" ;
+    kg:httpMethod "GET" ;
+    kg:path "/v1/content-moderation" ;
+    kg:exposedBy gateway:internal-api-gateway .
+
+service:review-api
+    a kg:Service ;
+    kg:name "Review API" ;
+    kg:ownedBy team:commerce-platform ;
+    kg:partOfDomain domain:experience ;
+    kg:deployedIn environment:prod ;
+    kg:hasRuntime runtime:nodejs-22 ;
+    kg:runsOn infra:kr-ml-node-02 ;
+    kg:readsFrom infra:customer-postgres ;
+    kg:writesTo infra:customer-postgres ;
+    kg:usesCache infra:recommendation-redis ;
+    kg:dependsOn infra:customer-postgres ;
+    kg:dependsOn infra:recommendation-redis ;
+    kg:publishesTo infra:customer-events ;
+    kg:emitsTelemetryTo infra:observability-events ;
+    kg:consumesFrom infra:support-sync-queue ;
+    kg:exposesEndpoint endpoint:review-api ;
+    kg:monitoredBy monitor:support-sync-monitor ;
+    kg:shownOn dashboard:support-ops-dashboard ;
+    kg:coveredByPolicy policy:production-change-approval ;
+    kg:monthlyCostUSD "103.3"^^xsd:decimal ;
+    kg:criticality "medium" ;
+    kg:tier "tier-2" ;
+    kg:sloAvailability "99.9"^^xsd:decimal ;
+    kg:dependsOn service:customer-profile-api ;
+    kg:dependsOn service:content-moderation-api ;
+    kg:dependsOn service:ml-inference-api .
+
+endpoint:review-api
+    a kg:Endpoint ;
+    kg:name "Review API Endpoint" ;
+    kg:httpMethod "GET" ;
+    kg:path "/v1/review" ;
+    kg:exposedBy gateway:public-api-gateway .
+
+service:warehouse-sync-worker
+    a kg:Service ;
+    kg:name "Warehouse Sync Worker" ;
+    kg:ownedBy team:data-platform ;
+    kg:partOfDomain domain:data ;
+    kg:deployedIn environment:prod ;
+    kg:hasRuntime runtime:spark-3-5 ;
+    kg:runsOn infra:kr-edge-node-01 ;
+    kg:readsFrom infra:warehouse-bigquery ;
+    kg:writesTo infra:warehouse-bigquery ;
+    kg:usesCache infra:feature-redis ;
+    kg:dependsOn infra:warehouse-bigquery ;
+    kg:dependsOn infra:feature-redis ;
+    kg:publishesTo infra:audit-events ;
+    kg:emitsTelemetryTo infra:observability-events ;
+    kg:consumesFrom infra:export-command-queue ;
+    kg:exposesEndpoint endpoint:warehouse-sync-worker ;
+    kg:monitoredBy monitor:security-feed-monitor ;
+    kg:shownOn dashboard:security-posture-dashboard ;
+    kg:coveredByPolicy policy:production-change-approval ;
+    kg:monthlyCostUSD "184.9"^^xsd:decimal ;
+    kg:criticality "high" ;
+    kg:tier "tier-2" ;
+    kg:sloAvailability "99.9"^^xsd:decimal ;
+    kg:dependsOn service:data-ingestion-api ;
+    kg:dependsOn service:analytics-query-api ;
+    kg:dependsOn service:model-registry-api .
+
+endpoint:warehouse-sync-worker
+    a kg:Endpoint ;
+    kg:name "Warehouse Sync Worker Endpoint" ;
+    kg:httpMethod "POST" ;
+    kg:path "/v1/warehouse-sync" ;
+    kg:exposedBy gateway:internal-api-gateway .
+
+service:data-quality-api
+    a kg:Service ;
+    kg:name "Data Quality API" ;
+    kg:ownedBy team:data-platform ;
+    kg:partOfDomain domain:data ;
+    kg:deployedIn environment:prod ;
+    kg:hasRuntime runtime:python-3-12 ;
+    kg:runsOn infra:kr-edge-node-02 ;
+    kg:readsFrom infra:warehouse-bigquery ;
+    kg:writesTo infra:warehouse-bigquery ;
+    kg:usesCache infra:feature-redis ;
+    kg:dependsOn infra:warehouse-bigquery ;
+    kg:dependsOn infra:feature-redis ;
+    kg:publishesTo infra:observability-events ;
+    kg:emitsTelemetryTo infra:observability-events ;
+    kg:consumesFrom infra:export-command-queue ;
+    kg:exposesEndpoint endpoint:data-quality-api ;
+    kg:monitoredBy monitor:capacity-forecast-monitor ;
+    kg:shownOn dashboard:reliability-command-dashboard ;
+    kg:coveredByPolicy policy:production-change-approval ;
+    kg:monthlyCostUSD "122.45"^^xsd:decimal ;
+    kg:criticality "medium" ;
+    kg:tier "tier-2" ;
+    kg:sloAvailability "99.9"^^xsd:decimal ;
+    kg:dependsOn service:warehouse-sync-worker ;
+    kg:dependsOn service:content-moderation-api .
+
+endpoint:data-quality-api
+    a kg:Endpoint ;
+    kg:name "Data Quality API Endpoint" ;
+    kg:httpMethod "GET" ;
+    kg:path "/v1/data-quality" ;
+    kg:exposedBy gateway:internal-api-gateway .
+
+service:observability-api
+    a kg:Service ;
+    kg:name "Observability API" ;
+    kg:ownedBy team:reliability ;
+    kg:partOfDomain domain:reliability ;
+    kg:deployedIn environment:prod ;
+    kg:hasRuntime runtime:go-1-23 ;
+    kg:runsOn infra:server-a ;
+    kg:readsFrom infra:analytics-clickhouse ;
+    kg:writesTo infra:analytics-clickhouse ;
+    kg:usesCache infra:redis-prod ;
+    kg:dependsOn infra:analytics-clickhouse ;
+    kg:dependsOn infra:redis-prod ;
+    kg:publishesTo infra:observability-events ;
+    kg:emitsTelemetryTo infra:observability-events ;
+    kg:consumesFrom infra:security-work-queue ;
+    kg:exposesEndpoint endpoint:observability-api ;
+    kg:monitoredBy monitor:billing-api-slo-monitor ;
+    kg:shownOn dashboard:finance-ops-dashboard ;
+    kg:coveredByPolicy policy:incident-severity-routing ;
+    kg:monthlyCostUSD "156.8"^^xsd:decimal ;
+    kg:criticality "high" ;
+    kg:tier "tier-2" ;
+    kg:sloAvailability "99.9"^^xsd:decimal ;
+    kg:dependsOn service:event-router ;
+    kg:dependsOn service:review-api ;
+    kg:integratesWith vendor:sentry .
+
+endpoint:observability-api
+    a kg:Endpoint ;
+    kg:name "Observability API Endpoint" ;
+    kg:httpMethod "GET" ;
+    kg:path "/v1/observability" ;
+    kg:exposedBy gateway:internal-api-gateway .
+
+service:incident-routing-api
+    a kg:Service ;
+    kg:name "Incident Routing API" ;
+    kg:ownedBy team:reliability ;
+    kg:partOfDomain domain:reliability ;
+    kg:deployedIn environment:prod ;
+    kg:hasRuntime runtime:go-1-23 ;
+    kg:runsOn infra:server-b ;
+    kg:readsFrom infra:audit-postgres ;
+    kg:writesTo infra:audit-postgres ;
+    kg:usesCache infra:redis-prod ;
+    kg:dependsOn infra:audit-postgres ;
+    kg:dependsOn infra:redis-prod ;
+    kg:publishesTo infra:observability-events ;
+    kg:emitsTelemetryTo infra:observability-events ;
+    kg:consumesFrom infra:security-work-queue ;
+    kg:exposesEndpoint endpoint:incident-routing-api ;
+    kg:monitoredBy monitor:payment-latency-monitor ;
+    kg:shownOn dashboard:payments-slo-dashboard ;
+    kg:coveredByPolicy policy:incident-severity-routing ;
+    kg:monthlyCostUSD "142.2"^^xsd:decimal ;
+    kg:criticality "critical" ;
+    kg:tier "tier-1" ;
+    kg:sloAvailability "99.95"^^xsd:decimal ;
+    kg:dependsOn service:observability-api ;
+    kg:dependsOn service:notification-api ;
+    kg:dependsOn service:warehouse-sync-worker ;
+    kg:synchronizesWith service:observability-api ;
+    kg:integratesWith vendor:sentry .
+
+endpoint:incident-routing-api
+    a kg:Endpoint ;
+    kg:name "Incident Routing API Endpoint" ;
+    kg:httpMethod "GET" ;
+    kg:path "/v1/incident-routing" ;
+    kg:exposedBy gateway:internal-api-gateway .
+
+service:capacity-planner-api
+    a kg:Service ;
+    kg:name "Capacity Planner API" ;
+    kg:ownedBy team:reliability ;
+    kg:partOfDomain domain:reliability ;
+    kg:deployedIn environment:prod ;
+    kg:hasRuntime runtime:python-3-12 ;
+    kg:runsOn infra:kr-api-node-01 ;
+    kg:readsFrom infra:analytics-clickhouse ;
+    kg:writesTo infra:analytics-clickhouse ;
+    kg:usesCache infra:feature-redis ;
+    kg:dependsOn infra:analytics-clickhouse ;
+    kg:dependsOn infra:feature-redis ;
+    kg:publishesTo infra:observability-events ;
+    kg:emitsTelemetryTo infra:observability-events ;
+    kg:consumesFrom infra:ml-training-queue ;
+    kg:exposesEndpoint endpoint:capacity-planner-api ;
+    kg:monitoredBy monitor:identity-auth-monitor ;
+    kg:shownOn dashboard:identity-risk-dashboard ;
+    kg:coveredByPolicy policy:incident-severity-routing ;
+    kg:monthlyCostUSD "174.6"^^xsd:decimal ;
+    kg:criticality "high" ;
+    kg:tier "tier-2" ;
+    kg:sloAvailability "99.9"^^xsd:decimal ;
+    kg:dependsOn service:analytics-query-api ;
+    kg:dependsOn service:feature-store-api ;
+    kg:dependsOn service:data-quality-api .
+
+endpoint:capacity-planner-api
+    a kg:Endpoint ;
+    kg:name "Capacity Planner API Endpoint" ;
+    kg:httpMethod "GET" ;
+    kg:path "/v1/capacity-planner" ;
+    kg:exposedBy gateway:internal-api-gateway .
+
+service:secret-rotation-worker
+    a kg:Service ;
+    kg:name "Secret Rotation Worker" ;
+    kg:ownedBy team:security ;
+    kg:partOfDomain domain:security ;
+    kg:deployedIn environment:prod ;
+    kg:hasRuntime runtime:go-1-23 ;
+    kg:runsOn infra:kr-api-node-02 ;
+    kg:readsFrom infra:audit-postgres ;
+    kg:writesTo infra:audit-postgres ;
+    kg:usesCache infra:session-redis ;
+    kg:dependsOn infra:audit-postgres ;
+    kg:dependsOn infra:session-redis ;
+    kg:publishesTo infra:audit-events ;
+    kg:emitsTelemetryTo infra:observability-events ;
+    kg:consumesFrom infra:security-work-queue ;
+    kg:exposesEndpoint endpoint:secret-rotation-worker ;
+    kg:monitoredBy monitor:order-funnel-monitor ;
+    kg:shownOn dashboard:commerce-order-dashboard ;
+    kg:coveredByPolicy policy:incident-severity-routing ;
+    kg:monthlyCostUSD "119.75"^^xsd:decimal ;
+    kg:criticality "critical" ;
+    kg:tier "tier-1" ;
+    kg:sloAvailability "99.95"^^xsd:decimal ;
+    kg:dependsOn service:identity-api ;
+    kg:dependsOn service:audit-log-api ;
+    kg:dependsOn service:observability-api .
+
+endpoint:secret-rotation-worker
+    a kg:Endpoint ;
+    kg:name "Secret Rotation Worker Endpoint" ;
+    kg:httpMethod "POST" ;
+    kg:path "/v1/secret-rotation" ;
+    kg:exposedBy gateway:internal-api-gateway .
+
+service:vulnerability-intake-api
+    a kg:Service ;
+    kg:name "Vulnerability Intake API" ;
+    kg:ownedBy team:security ;
+    kg:partOfDomain domain:security ;
+    kg:deployedIn environment:prod ;
+    kg:hasRuntime runtime:python-3-12 ;
+    kg:runsOn infra:kr-api-node-03 ;
+    kg:readsFrom infra:risk-postgres ;
+    kg:writesTo infra:risk-postgres ;
+    kg:usesCache infra:feature-redis ;
+    kg:dependsOn infra:risk-postgres ;
+    kg:dependsOn infra:feature-redis ;
+    kg:publishesTo infra:risk-events ;
+    kg:emitsTelemetryTo infra:observability-events ;
+    kg:consumesFrom infra:security-work-queue ;
+    kg:exposesEndpoint endpoint:vulnerability-intake-api ;
+    kg:monitoredBy monitor:inventory-freshness-monitor ;
+    kg:shownOn dashboard:fulfillment-control-dashboard ;
+    kg:coveredByPolicy policy:incident-severity-routing ;
+    kg:monthlyCostUSD "127.65"^^xsd:decimal ;
+    kg:criticality "high" ;
+    kg:tier "tier-2" ;
+    kg:sloAvailability "99.9"^^xsd:decimal ;
+    kg:dependsOn service:content-moderation-api ;
+    kg:dependsOn service:audit-log-api ;
+    kg:dependsOn service:incident-routing-api .
+
+endpoint:vulnerability-intake-api
+    a kg:Endpoint ;
+    kg:name "Vulnerability Intake API Endpoint" ;
+    kg:httpMethod "GET" ;
+    kg:path "/v1/vulnerability-intake" ;
+    kg:exposedBy gateway:internal-api-gateway .
+
+service:rate-limit-api
+    a kg:Service ;
+    kg:name "Rate Limit API" ;
+    kg:ownedBy team:reliability ;
+    kg:partOfDomain domain:platform ;
+    kg:deployedIn environment:prod ;
+    kg:hasRuntime runtime:go-1-23 ;
+    kg:runsOn infra:kr-api-node-04 ;
+    kg:readsFrom infra:audit-postgres ;
+    kg:writesTo infra:audit-postgres ;
+    kg:usesCache infra:rate-limit-redis ;
+    kg:dependsOn infra:audit-postgres ;
+    kg:dependsOn infra:rate-limit-redis ;
+    kg:publishesTo infra:observability-events ;
+    kg:emitsTelemetryTo infra:observability-events ;
+    kg:consumesFrom infra:security-work-queue ;
+    kg:exposesEndpoint endpoint:rate-limit-api ;
+    kg:monitoredBy monitor:fraud-decision-monitor ;
+    kg:shownOn dashboard:growth-campaign-dashboard ;
+    kg:coveredByPolicy policy:production-change-approval ;
+    kg:monthlyCostUSD "89.95"^^xsd:decimal ;
+    kg:criticality "critical" ;
+    kg:tier "tier-1" ;
+    kg:sloAvailability "99.95"^^xsd:decimal ;
+    kg:dependsOn service:identity-api ;
+    kg:dependsOn service:capacity-planner-api .
+
+endpoint:rate-limit-api
+    a kg:Endpoint ;
+    kg:name "Rate Limit API Endpoint" ;
+    kg:httpMethod "GET" ;
+    kg:path "/v1/rate-limit" ;
+    kg:exposedBy gateway:internal-api-gateway .
+
+job:nightly-billing-close
+    a kg:BatchJob ;
+    kg:name "Nightly Billing Close" ;
+    kg:ownedBy team:payments ;
+    kg:partOfDomain domain:finance ;
+    kg:deployedIn environment:prod ;
+    kg:hasRuntime runtime:python-3-12 ;
+    kg:runsOn infra:worker-node-01 ;
+    kg:readsFrom infra:billing-ledger-postgres ;
+    kg:writesTo infra:warehouse-bigquery ;
+    kg:consumesFrom infra:billing-command-queue ;
+    kg:dependsOn service:billing-api ;
+    kg:publishesTo infra:audit-events ;
+    kg:emitsTelemetryTo infra:observability-events ;
+    kg:monitoredBy monitor:event-router-lag-monitor ;
+    kg:shownOn dashboard:data-platform-pipeline-dashboard ;
+    kg:schedule "0 2 * * *" ;
+    kg:criticality "high" .
+
+job:daily-ledger-reconciliation
+    a kg:BatchJob ;
+    kg:name "Daily Ledger Reconciliation" ;
+    kg:ownedBy team:payments ;
+    kg:partOfDomain domain:finance ;
+    kg:deployedIn environment:prod ;
+    kg:hasRuntime runtime:python-3-12 ;
+    kg:runsOn infra:worker-node-02 ;
+    kg:readsFrom infra:billing-ledger-postgres ;
+    kg:writesTo infra:audit-postgres ;
+    kg:consumesFrom infra:billing-command-queue ;
+    kg:dependsOn service:ledger-api ;
+    kg:publishesTo infra:audit-events ;
+    kg:emitsTelemetryTo infra:observability-events ;
+    kg:monitoredBy monitor:analytics-query-monitor ;
+    kg:shownOn dashboard:analytics-usage-dashboard ;
+    kg:schedule "0 3 * * *" ;
+    kg:criticality "medium" .
+
+job:invoice-pdf-render
+    a kg:BatchJob ;
+    kg:name "Invoice PDF Render" ;
+    kg:ownedBy team:payments ;
+    kg:partOfDomain domain:finance ;
+    kg:deployedIn environment:prod ;
+    kg:hasRuntime runtime:nodejs-22 ;
+    kg:runsOn infra:worker-node-03 ;
+    kg:readsFrom infra:billing-ledger-postgres ;
+    kg:writesTo infra:media-metadata-postgres ;
+    kg:consumesFrom infra:export-command-queue ;
+    kg:dependsOn service:invoice-api ;
+    kg:publishesTo infra:audit-events ;
+    kg:emitsTelemetryTo infra:observability-events ;
+    kg:monitoredBy monitor:feature-store-freshness-monitor ;
+    kg:shownOn dashboard:ml-model-health-dashboard ;
+    kg:schedule "*/15 * * * *" ;
+    kg:criticality "medium" .
+
+job:subscription-renewal-sweeper
+    a kg:BatchJob ;
+    kg:name "Subscription Renewal Sweeper" ;
+    kg:ownedBy team:payments ;
+    kg:partOfDomain domain:finance ;
+    kg:deployedIn environment:prod ;
+    kg:hasRuntime runtime:java-21 ;
+    kg:runsOn infra:worker-node-04 ;
+    kg:readsFrom infra:billing-ledger-postgres ;
+    kg:writesTo infra:billing-ledger-postgres ;
+    kg:consumesFrom infra:billing-command-queue ;
+    kg:dependsOn service:subscription-api ;
+    kg:publishesTo infra:audit-events ;
+    kg:emitsTelemetryTo infra:observability-events ;
+    kg:monitoredBy monitor:privacy-request-monitor ;
+    kg:shownOn dashboard:privacy-governance-dashboard ;
+    kg:schedule "0 */2 * * *" ;
+    kg:criticality "high" .
+
+job:settlement-bank-file-export
+    a kg:BatchJob ;
+    kg:name "Settlement Bank File Export" ;
+    kg:ownedBy team:payments ;
+    kg:partOfDomain domain:finance ;
+    kg:deployedIn environment:prod ;
+    kg:hasRuntime runtime:python-3-12 ;
+    kg:runsOn infra:kr-data-node-03 ;
+    kg:readsFrom infra:billing-ledger-postgres ;
+    kg:writesTo infra:warehouse-bigquery ;
+    kg:consumesFrom infra:export-command-queue ;
+    kg:dependsOn service:settlement-api ;
+    kg:publishesTo infra:audit-events ;
+    kg:emitsTelemetryTo infra:observability-events ;
+    kg:monitoredBy monitor:security-feed-monitor ;
+    kg:shownOn dashboard:security-posture-dashboard ;
+    kg:schedule "0 4 * * 1-5" ;
+    kg:criticality "medium" .
+
+job:tax-rate-refresh
+    a kg:BatchJob ;
+    kg:name "Tax Rate Refresh" ;
+    kg:ownedBy team:payments ;
+    kg:partOfDomain domain:finance ;
+    kg:deployedIn environment:prod ;
+    kg:hasRuntime runtime:python-3-12 ;
+    kg:runsOn infra:kr-data-node-04 ;
+    kg:readsFrom infra:billing-ledger-postgres ;
+    kg:writesTo infra:catalog-postgres ;
+    kg:consumesFrom infra:export-command-queue ;
+    kg:dependsOn service:tax-api ;
+    kg:publishesTo infra:audit-events ;
+    kg:emitsTelemetryTo infra:observability-events ;
+    kg:monitoredBy monitor:capacity-forecast-monitor ;
+    kg:shownOn dashboard:reliability-command-dashboard ;
+    kg:schedule "0 1 * * *" ;
+    kg:criticality "medium" .
+
+job:inventory-reorder-planner
+    a kg:BatchJob ;
+    kg:name "Inventory Reorder Planner" ;
+    kg:ownedBy team:fulfillment-ops ;
+    kg:partOfDomain domain:operations ;
+    kg:deployedIn environment:prod ;
+    kg:hasRuntime runtime:python-3-12 ;
+    kg:runsOn infra:worker-node-01 ;
+    kg:readsFrom infra:inventory-postgres ;
+    kg:writesTo infra:warehouse-bigquery ;
+    kg:consumesFrom infra:fulfillment-command-queue ;
+    kg:dependsOn service:inventory-api ;
+    kg:publishesTo infra:audit-events ;
+    kg:emitsTelemetryTo infra:observability-events ;
+    kg:monitoredBy monitor:event-router-lag-monitor ;
+    kg:shownOn dashboard:data-platform-pipeline-dashboard ;
+    kg:schedule "30 1 * * *" ;
+    kg:criticality "high" .
+
+job:shipment-status-import
+    a kg:BatchJob ;
+    kg:name "Shipment Status Import" ;
+    kg:ownedBy team:fulfillment-ops ;
+    kg:partOfDomain domain:operations ;
+    kg:deployedIn environment:prod ;
+    kg:hasRuntime runtime:go-1-23 ;
+    kg:runsOn infra:worker-node-02 ;
+    kg:readsFrom infra:inventory-postgres ;
+    kg:writesTo infra:order-postgres ;
+    kg:consumesFrom infra:fulfillment-command-queue ;
+    kg:dependsOn service:shipment-api ;
+    kg:publishesTo infra:audit-events ;
+    kg:emitsTelemetryTo infra:observability-events ;
+    kg:monitoredBy monitor:analytics-query-monitor ;
+    kg:shownOn dashboard:analytics-usage-dashboard ;
+    kg:schedule "*/10 * * * *" ;
+    kg:criticality "medium" .
+
+job:returns-refund-settlement
+    a kg:BatchJob ;
+    kg:name "Returns Refund Settlement" ;
+    kg:ownedBy team:fulfillment-ops ;
+    kg:partOfDomain domain:operations ;
+    kg:deployedIn environment:prod ;
+    kg:hasRuntime runtime:java-21 ;
+    kg:runsOn infra:worker-node-03 ;
+    kg:readsFrom infra:order-postgres ;
+    kg:writesTo infra:billing-ledger-postgres ;
+    kg:consumesFrom infra:payment-command-queue ;
+    kg:dependsOn service:returns-api ;
+    kg:publishesTo infra:audit-events ;
+    kg:emitsTelemetryTo infra:observability-events ;
+    kg:monitoredBy monitor:feature-store-freshness-monitor ;
+    kg:shownOn dashboard:ml-model-health-dashboard ;
+    kg:schedule "*/30 * * * *" ;
+    kg:criticality "medium" .
+
+job:campaign-audience-refresh
+    a kg:BatchJob ;
+    kg:name "Campaign Audience Refresh" ;
+    kg:ownedBy team:growth-platform ;
+    kg:partOfDomain domain:growth ;
+    kg:deployedIn environment:prod ;
+    kg:hasRuntime runtime:python-3-12 ;
+    kg:runsOn infra:worker-node-04 ;
+    kg:readsFrom infra:customer-postgres ;
+    kg:writesTo infra:analytics-clickhouse ;
+    kg:consumesFrom infra:notification-command-queue ;
+    kg:dependsOn service:campaign-api ;
+    kg:publishesTo infra:audit-events ;
+    kg:emitsTelemetryTo infra:observability-events ;
+    kg:monitoredBy monitor:privacy-request-monitor ;
+    kg:shownOn dashboard:privacy-governance-dashboard ;
+    kg:schedule "0 */4 * * *" ;
+    kg:criticality "high" .
+
+job:recommendation-model-train
+    a kg:BatchJob ;
+    kg:name "Recommendation Model Train" ;
+    kg:ownedBy team:ml-platform ;
+    kg:partOfDomain domain:machine-learning ;
+    kg:deployedIn environment:prod ;
+    kg:hasRuntime runtime:python-3-12 ;
+    kg:runsOn infra:kr-data-node-03 ;
+    kg:readsFrom infra:feature-store-postgres ;
+    kg:writesTo infra:model-registry-postgres ;
+    kg:consumesFrom infra:ml-training-queue ;
+    kg:dependsOn service:recommendation-api ;
+    kg:publishesTo infra:audit-events ;
+    kg:emitsTelemetryTo infra:observability-events ;
+    kg:monitoredBy monitor:security-feed-monitor ;
+    kg:shownOn dashboard:security-posture-dashboard ;
+    kg:schedule "0 5 * * *" ;
+    kg:criticality "medium" .
+
+job:search-index-compaction
+    a kg:BatchJob ;
+    kg:name "Search Index Compaction" ;
+    kg:ownedBy team:commerce-platform ;
+    kg:partOfDomain domain:discovery ;
+    kg:deployedIn environment:prod ;
+    kg:hasRuntime runtime:rust-1-82 ;
+    kg:runsOn infra:kr-data-node-04 ;
+    kg:readsFrom infra:catalog-postgres ;
+    kg:writesTo infra:catalog-postgres ;
+    kg:consumesFrom infra:fulfillment-command-queue ;
+    kg:dependsOn service:search-api ;
+    kg:publishesTo infra:audit-events ;
+    kg:emitsTelemetryTo infra:observability-events ;
+    kg:monitoredBy monitor:capacity-forecast-monitor ;
+    kg:shownOn dashboard:reliability-command-dashboard ;
+    kg:schedule "0 0 * * 0" ;
+    kg:criticality "medium" .
+
+job:clickstream-rollup
+    a kg:BatchJob ;
+    kg:name "Clickstream Rollup" ;
+    kg:ownedBy team:analytics-engineering ;
+    kg:partOfDomain domain:analytics ;
+    kg:deployedIn environment:prod ;
+    kg:hasRuntime runtime:spark-3-5 ;
+    kg:runsOn infra:worker-node-01 ;
+    kg:readsFrom infra:analytics-clickhouse ;
+    kg:writesTo infra:warehouse-bigquery ;
+    kg:consumesFrom infra:export-command-queue ;
+    kg:dependsOn service:analytics-query-api ;
+    kg:publishesTo infra:audit-events ;
+    kg:emitsTelemetryTo infra:observability-events ;
+    kg:monitoredBy monitor:event-router-lag-monitor ;
+    kg:shownOn dashboard:data-platform-pipeline-dashboard ;
+    kg:schedule "0 * * * *" ;
+    kg:criticality "high" .
+
+job:warehouse-dimension-sync
+    a kg:BatchJob ;
+    kg:name "Warehouse Dimension Sync" ;
+    kg:ownedBy team:data-platform ;
+    kg:partOfDomain domain:data ;
+    kg:deployedIn environment:prod ;
+    kg:hasRuntime runtime:spark-3-5 ;
+    kg:runsOn infra:worker-node-02 ;
+    kg:readsFrom infra:warehouse-bigquery ;
+    kg:writesTo infra:warehouse-bigquery ;
+    kg:consumesFrom infra:export-command-queue ;
+    kg:dependsOn service:warehouse-sync-worker ;
+    kg:publishesTo infra:audit-events ;
+    kg:emitsTelemetryTo infra:observability-events ;
+    kg:monitoredBy monitor:analytics-query-monitor ;
+    kg:shownOn dashboard:analytics-usage-dashboard ;
+    kg:schedule "15 * * * *" ;
+    kg:criticality "medium" .
+
+job:feature-store-materializer
+    a kg:BatchJob ;
+    kg:name "Feature Store Materializer" ;
+    kg:ownedBy team:ml-platform ;
+    kg:partOfDomain domain:machine-learning ;
+    kg:deployedIn environment:prod ;
+    kg:hasRuntime runtime:flink-1-19 ;
+    kg:runsOn infra:worker-node-03 ;
+    kg:readsFrom infra:warehouse-bigquery ;
+    kg:writesTo infra:feature-store-postgres ;
+    kg:consumesFrom infra:ml-training-queue ;
+    kg:dependsOn service:feature-store-api ;
+    kg:publishesTo infra:audit-events ;
+    kg:emitsTelemetryTo infra:observability-events ;
+    kg:monitoredBy monitor:feature-store-freshness-monitor ;
+    kg:shownOn dashboard:ml-model-health-dashboard ;
+    kg:schedule "*/20 * * * *" ;
+    kg:criticality "medium" .
+
+job:privacy-erasure-sweeper
+    a kg:BatchJob ;
+    kg:name "Privacy Erasure Sweeper" ;
+    kg:ownedBy team:governance-risk ;
+    kg:partOfDomain domain:privacy-governance ;
+    kg:deployedIn environment:prod ;
+    kg:hasRuntime runtime:python-3-12 ;
+    kg:runsOn infra:worker-node-04 ;
+    kg:readsFrom infra:consent-postgres ;
+    kg:writesTo infra:audit-postgres ;
+    kg:consumesFrom infra:security-work-queue ;
+    kg:dependsOn service:privacy-request-api ;
+    kg:publishesTo infra:audit-events ;
+    kg:emitsTelemetryTo infra:observability-events ;
+    kg:monitoredBy monitor:privacy-request-monitor ;
+    kg:shownOn dashboard:privacy-governance-dashboard ;
+    kg:schedule "0 */6 * * *" ;
+    kg:criticality "high" .
+
+job:audit-log-retention-rollup
+    a kg:BatchJob ;
+    kg:name "Audit Log Retention Rollup" ;
+    kg:ownedBy team:governance-risk ;
+    kg:partOfDomain domain:privacy-governance ;
+    kg:deployedIn environment:prod ;
+    kg:hasRuntime runtime:spark-3-5 ;
+    kg:runsOn infra:kr-data-node-03 ;
+    kg:readsFrom infra:audit-postgres ;
+    kg:writesTo infra:warehouse-bigquery ;
+    kg:consumesFrom infra:security-work-queue ;
+    kg:dependsOn service:audit-log-api ;
+    kg:publishesTo infra:audit-events ;
+    kg:emitsTelemetryTo infra:observability-events ;
+    kg:monitoredBy monitor:security-feed-monitor ;
+    kg:shownOn dashboard:security-posture-dashboard ;
+    kg:schedule "30 2 * * *" ;
+    kg:criticality "medium" .
+
+job:cost-anomaly-detector
+    a kg:BatchJob ;
+    kg:name "Cost Anomaly Detector" ;
+    kg:ownedBy team:data-platform ;
+    kg:partOfDomain domain:finance ;
+    kg:deployedIn environment:prod ;
+    kg:hasRuntime runtime:python-3-12 ;
+    kg:runsOn infra:kr-data-node-04 ;
+    kg:readsFrom infra:cost-allocation-postgres ;
+    kg:writesTo infra:analytics-clickhouse ;
+    kg:consumesFrom infra:ml-training-queue ;
+    kg:dependsOn service:cost-allocation-api ;
+    kg:publishesTo infra:audit-events ;
+    kg:emitsTelemetryTo infra:observability-events ;
+    kg:monitoredBy monitor:capacity-forecast-monitor ;
+    kg:shownOn dashboard:reliability-command-dashboard ;
+    kg:schedule "0 * * * *" ;
+    kg:criticality "medium" .
+
+job:capacity-forecast-trainer
+    a kg:BatchJob ;
+    kg:name "Capacity Forecast Trainer" ;
+    kg:ownedBy team:reliability ;
+    kg:partOfDomain domain:reliability ;
+    kg:deployedIn environment:prod ;
+    kg:hasRuntime runtime:python-3-12 ;
+    kg:runsOn infra:worker-node-01 ;
+    kg:readsFrom infra:analytics-clickhouse ;
+    kg:writesTo infra:model-registry-postgres ;
+    kg:consumesFrom infra:ml-training-queue ;
+    kg:dependsOn service:capacity-planner-api ;
+    kg:publishesTo infra:audit-events ;
+    kg:emitsTelemetryTo infra:observability-events ;
+    kg:monitoredBy monitor:event-router-lag-monitor ;
+    kg:shownOn dashboard:data-platform-pipeline-dashboard ;
+    kg:schedule "0 6 * * *" ;
+    kg:criticality "high" .
+
+job:vulnerability-feed-import
+    a kg:BatchJob ;
+    kg:name "Vulnerability Feed Import" ;
+    kg:ownedBy team:security ;
+    kg:partOfDomain domain:security ;
+    kg:deployedIn environment:prod ;
+    kg:hasRuntime runtime:python-3-12 ;
+    kg:runsOn infra:worker-node-02 ;
+    kg:readsFrom infra:risk-postgres ;
+    kg:writesTo infra:risk-postgres ;
+    kg:consumesFrom infra:security-work-queue ;
+    kg:dependsOn service:vulnerability-intake-api ;
+    kg:publishesTo infra:audit-events ;
+    kg:emitsTelemetryTo infra:observability-events ;
+    kg:monitoredBy monitor:analytics-query-monitor ;
+    kg:shownOn dashboard:analytics-usage-dashboard ;
+    kg:schedule "*/30 * * * *" ;
+    kg:criticality "medium" .
