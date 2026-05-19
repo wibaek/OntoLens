@@ -125,7 +125,9 @@ export type LiteralProperty = {
 };
 
 export type NeighborLink = {
+  subject: GraphNode;
   node: GraphNode;
+  object: GraphNode;
   direction: "incoming" | "outgoing";
   predicate: string;
   label: string;

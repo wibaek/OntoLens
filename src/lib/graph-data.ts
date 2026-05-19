@@ -195,12 +195,16 @@ export function getNodeDetails(graph: GraphData, nodeId: string | null): NodeDet
   ]
     .map(({ edge, direction, neighborId }) => {
       const neighbor = nodeMap.get(neighborId);
-      if (!neighbor || neighbor.kind === "literal") {
+      const subject = nodeMap.get(edge.source);
+      const object = nodeMap.get(edge.target);
+      if (!neighbor || !subject || !object || neighbor.kind === "literal") {
         return null;
       }
 
       return {
+        subject,
         node: neighbor,
+        object,
         direction,
         predicate: edge.predicate,
         label: edge.label,

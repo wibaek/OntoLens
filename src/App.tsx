@@ -965,6 +965,7 @@ function App() {
                           <NeighborLinkButton
                             key={`${link.direction}|${link.predicate}|${link.node.id}`}
                             link={link}
+                            selectedNodeId={selectedDetails.node.id}
                             onClick={() => selectGraphNode(link.node.id)}
                           />
                         ))
@@ -1263,12 +1264,20 @@ function LiteralProperties({ properties }: { properties: LiteralProperty[] }) {
   );
 }
 
-function NeighborLinkButton({ link, onClick }: { link: NeighborLink; onClick: () => void }) {
+function NeighborLinkButton({
+  link,
+  selectedNodeId,
+  onClick,
+}: {
+  link: NeighborLink;
+  selectedNodeId: string;
+  onClick: () => void;
+}) {
   return (
     <button
       type="button"
       onClick={onClick}
-      className="flex w-full flex-col gap-1 border-b border-slate-100 py-2 text-left text-sm last:border-0 hover:bg-slate-50"
+      className="flex w-full flex-col gap-2 border-b border-slate-100 py-2 text-left text-sm last:border-0 hover:bg-slate-50"
     >
       <div className="flex items-center justify-between gap-3">
         <span className="truncate text-slate-800">{link.node.label}</span>
@@ -1276,17 +1285,14 @@ function NeighborLinkButton({ link, onClick }: { link: NeighborLink; onClick: ()
           {link.node.kind}
         </span>
       </div>
-      <div className="flex items-center gap-1.5 text-xs">
-        <span
-          className={`rounded px-1.5 py-0.5 font-mono font-semibold ${
-            link.direction === "outgoing"
-              ? "bg-blue-50 text-blue-700"
-              : "bg-emerald-50 text-emerald-700"
-          }`}
-        >
-          {link.direction === "outgoing" ? "out" : "in"}
+      <div className="grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-1.5 text-xs">
+        <TripleTerm node={link.subject} selected={link.subject.id === selectedNodeId} />
+        <span className="truncate rounded bg-slate-100 px-1.5 py-1 font-mono font-semibold text-slate-600">
+          {link.label}
         </span>
-        <span className="truncate font-mono text-slate-500">{link.label}</span>
+        <TripleTerm node={link.object} selected={link.object.id === selectedNodeId} />
+      </div>
+      <div className="flex items-center gap-1.5 text-xs">
         {link.count > 1 ? (
           <span className="rounded bg-slate-100 px-1.5 py-0.5 font-mono text-[10px] text-slate-500">
             x{link.count}
@@ -1294,6 +1300,19 @@ function NeighborLinkButton({ link, onClick }: { link: NeighborLink; onClick: ()
         ) : null}
       </div>
     </button>
+  );
+}
+
+function TripleTerm({ node, selected }: { node: NeighborLink["node"]; selected: boolean }) {
+  return (
+    <span
+      className={`truncate rounded px-1.5 py-1 font-mono font-semibold ${
+        selected ? "bg-slate-950 text-white" : "bg-white text-slate-500"
+      }`}
+      title={node.iri}
+    >
+      {node.label}
+    </span>
   );
 }
 
