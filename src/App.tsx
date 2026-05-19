@@ -50,6 +50,7 @@ import type {
   ExplorerSettings,
   GraphData,
   GraphFilters,
+  LiteralProperty,
   LoadState,
   NamespaceFilters,
   SearchResult,
@@ -123,7 +124,7 @@ function App() {
   const visibleCounts = useMemo(() => {
     const allowedNodes = new Set(
       graphData.nodes
-        .filter((node) => namespaceFilters[node.namespaceGroup])
+        .filter((node) => node.kind !== "literal" && namespaceFilters[node.namespaceGroup])
         .map((node) => node.id),
     );
     const visibleEdges = graphData.edges.filter(
@@ -910,6 +911,8 @@ function App() {
                   ) : null}
                 </div>
 
+                <LiteralProperties properties={selectedDetails.literalProperties} />
+
                 <div className="grid grid-cols-2 gap-2">
                   <ActionButton
                     icon={<Layers className="h-4 w-4" aria-hidden="true" />}
@@ -1208,6 +1211,56 @@ function Detail({ label, value, mono = false }: { label: string; value: string; 
         }`}
       >
         {value}
+      </div>
+    </div>
+  );
+}
+
+function LiteralProperties({ properties }: { properties: LiteralProperty[] }) {
+  if (!properties.length) {
+    return null;
+  }
+
+  return (
+    <div>
+      <h3 className="mb-2 text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">
+        속성
+      </h3>
+      <div className="max-h-64 overflow-auto border-y border-slate-200">
+        {properties.slice(0, 80).map((property) => (
+          <div
+            key={`${property.predicate}|${property.value}|${property.datatype ?? ""}|${property.language ?? ""}`}
+            className="border-b border-slate-100 py-2 last:border-0"
+          >
+            <div className="flex items-center justify-between gap-3">
+              <span className="truncate text-xs font-semibold text-amber-700">
+                {property.label}
+              </span>
+              {property.count > 1 ? (
+                <span className="rounded bg-slate-100 px-1.5 py-0.5 font-mono text-[10px] text-slate-500">
+                  x{property.count}
+                </span>
+              ) : null}
+            </div>
+            <div className="mt-1 break-words text-sm leading-6 text-slate-800">
+              {property.value}
+            </div>
+            {property.datatype || property.language ? (
+              <div className="mt-1 flex flex-wrap gap-1.5">
+                {property.datatype ? (
+                  <span className="rounded bg-amber-50 px-1.5 py-0.5 font-mono text-[10px] font-semibold text-amber-700">
+                    {compactIri(property.datatype)}
+                  </span>
+                ) : null}
+                {property.language ? (
+                  <span className="rounded bg-slate-100 px-1.5 py-0.5 font-mono text-[10px] font-semibold text-slate-500">
+                    @{property.language}
+                  </span>
+                ) : null}
+              </div>
+            ) : null}
+          </div>
+        ))}
       </div>
     </div>
   );

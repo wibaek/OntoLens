@@ -70,6 +70,8 @@ export type GraphNode = {
   types: string[];
   count?: number;
   literalPreview?: string;
+  literalDatatype?: string;
+  literalLanguage?: string;
   x?: number;
   y?: number;
 };
@@ -113,10 +115,20 @@ export type GraphFilters = {
   predicate: string;
 };
 
+export type LiteralProperty = {
+  predicate: string;
+  label: string;
+  value: string;
+  datatype?: string;
+  language?: string;
+  count: number;
+};
+
 export type NodeDetails = {
   node: GraphNode;
   incoming: number;
   outgoing: number;
   neighbors: GraphNode[];
+  literalProperties: LiteralProperty[];
   predicates: string[];
 };

@@ -516,7 +516,9 @@ export function GraphCanvas({
 }
 
 function buildVisibleGraph(graphData: GraphData, filters: GraphFilters): VisibleGraph {
-  const includedNodes = graphData.nodes.filter((node) => filters.namespaces[node.namespaceGroup]);
+  const includedNodes = graphData.nodes.filter(
+    (node) => node.kind !== "literal" && filters.namespaces[node.namespaceGroup],
+  );
   const includedNodeIds = new Set(includedNodes.map((node) => node.id));
   const degree = new Map<string, number>();
   const edges = graphData.edges

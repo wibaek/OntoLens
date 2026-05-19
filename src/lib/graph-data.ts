@@ -165,6 +165,23 @@ export function getNodeDetails(graph: GraphData, nodeId: string | null): NodeDet
   const incomingEdges = graph.edges.filter((edge) => edge.target === nodeId);
   const outgoingEdges = graph.edges.filter((edge) => edge.source === nodeId);
   const neighborIds = new Set<string>();
+  const literalProperties = outgoingEdges
+    .map((edge) => {
+      const target = nodeMap.get(edge.target);
+      if (!target || target.kind !== "literal") {
+        return null;
+      }
+
+      return {
+        predicate: edge.predicate,
+        label: edge.label,
+        value: target.iri,
+        datatype: target.literalDatatype,
+        language: target.literalLanguage,
+        count: edge.count,
+      };
+    })
+    .filter((item): item is NonNullable<typeof item> => !!item);
 
   for (const edge of [...incomingEdges, ...outgoingEdges]) {
     if (edge.source !== nodeId) {
@@ -181,7 +198,8 @@ export function getNodeDetails(graph: GraphData, nodeId: string | null): NodeDet
     outgoing: outgoingEdges.length,
     neighbors: [...neighborIds]
       .map((id) => nodeMap.get(id))
-      .filter((item): item is GraphNode => !!item),
+      .filter((item): item is GraphNode => !!item && item.kind !== "literal"),
+    literalProperties,
     predicates: [...new Set([...incomingEdges, ...outgoingEdges].map((edge) => edge.label))],
   };
 }
@@ -236,6 +254,8 @@ function ensureNode(
     namespaceGroup,
     types: [],
     literalPreview: isLiteral ? truncateLiteral(term.value) : undefined,
+    literalDatatype: isLiteral ? term.datatype : undefined,
+    literalLanguage: isLiteral ? term.language : undefined,
   };
 
   nodes.set(id, node);
@@ -305,6 +325,8 @@ function mergeNode(base: GraphNode, incoming: GraphNode): GraphNode {
     types: [...new Set([...base.types, ...incoming.types])],
     count: base.count ?? incoming.count,
     literalPreview: base.literalPreview ?? incoming.literalPreview,
+    literalDatatype: base.literalDatatype ?? incoming.literalDatatype,
+    literalLanguage: base.literalLanguage ?? incoming.literalLanguage,
   };
 }
 
