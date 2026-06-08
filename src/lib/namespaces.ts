@@ -61,7 +61,9 @@ export function compactIri(value: string, namespaceHints: string[] = []) {
 
   const hintedNamespace = namespaceHints.find((namespace) => value.startsWith(namespace));
   if (hintedNamespace) {
-    return `local:${value.slice(hintedNamespace.length) || getLocalName(value)}`;
+    return `${compactNamespace(hintedNamespace)}:${
+      value.slice(hintedNamespace.length) || getLocalName(value)
+    }`;
   }
 
   return getLocalName(value);
@@ -138,7 +140,7 @@ export function inferNamespaceCandidates(values: string[], classNamespaces: stri
     .slice(0, 18)
     .map(([namespace, count]) => ({
       namespace,
-      label: STANDARD_NAMESPACES[namespace] ?? compactNamespace(namespace, localNamespaces),
+      label: STANDARD_NAMESPACES[namespace] ?? compactNamespace(namespace),
       group: detectNamespaceGroup(namespace, localNamespaces),
       count,
     }));
@@ -146,13 +148,9 @@ export function inferNamespaceCandidates(values: string[], classNamespaces: stri
   return { candidates, localNamespaces };
 }
 
-export function compactNamespace(namespace: string, localNamespaces: string[] = []) {
+export function compactNamespace(namespace: string) {
   if (STANDARD_NAMESPACES[namespace]) {
     return STANDARD_NAMESPACES[namespace];
-  }
-
-  if (localNamespaces.includes(namespace)) {
-    return "local";
   }
 
   if (!isIri(namespace)) {
@@ -162,8 +160,18 @@ export function compactNamespace(namespace: string, localNamespaces: string[] = 
   try {
     const url = new URL(namespace);
     const lastPath = getLocalName(namespace);
-    return lastPath && lastPath !== url.hostname ? `${url.hostname}/${lastPath}` : url.hostname;
+    return toPrefixLabel(lastPath && lastPath !== url.hostname ? lastPath : url.hostname);
   } catch {
     return truncateMiddle(namespace, 32);
   }
+}
+
+function toPrefixLabel(value: string) {
+  const normalized = value
+    .trim()
+    .replace(/^[^A-Za-z_]+/, "")
+    .replace(/[^A-Za-z0-9_-]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+
+  return normalized || "ns";
 }
