@@ -82,6 +82,15 @@ type RawResult = {
   meta: string;
 };
 
+type NodeHistory = {
+  items: string[];
+  index: number;
+};
+
+type NodeHistoryMode = "push" | "skip";
+
+const maxNodeHistoryLength = 80;
+
 function isNamespaceEnabled(namespace: string, filters: NamespaceFilters) {
   return !namespace || (filters[namespace] ?? true);
 }
@@ -113,6 +122,13 @@ function App() {
   const cacheRef = useRef(new Map<string, GraphData>());
   const autoConnectRef = useRef(false);
   const neighborhoodRequestRef = useRef(0);
+  const nodeHistoryRef = useRef<NodeHistory>({ items: [], index: -1 });
+  const nodeHistoryNavigationRef = useRef<(direction: -1 | 1) => void>(() => undefined);
+  const mouseHistoryEventRef = useRef({ button: -1, timestamp: 0 });
+
+  const resetNodeHistory = useCallback(() => {
+    nodeHistoryRef.current = { items: [], index: -1 };
+  }, []);
 
   const selectedDetails = useMemo(
     () => getNodeDetails(graphData, selectedNodeId),
@@ -177,6 +193,7 @@ function App() {
       setLastError(null);
       setMessage("endpoint 요약을 가져오는 중입니다.");
       setSelectedNodeId(null);
+      resetNodeHistory();
       setSelectResult(null);
       setActiveView("graph");
       setSearchResults([]);
@@ -255,7 +272,7 @@ function App() {
         reportError(error, "Endpoint 연결 및 요약 조회");
       }
     },
-    [endpoint, graphScope, reportError, settings],
+    [endpoint, graphScope, reportError, resetNodeHistory, settings],
   );
 
   useEffect(() => {
@@ -266,7 +283,12 @@ function App() {
     void connectEndpoint();
   }, [connectEndpoint]);
 
-  async function loadNeighborhood(iri: string, depth = settings.depth, replace = true) {
+  async function loadNeighborhood(
+    iri: string,
+    depth = settings.depth,
+    replace = true,
+    historyMode: NodeHistoryMode = "push",
+  ) {
     const requestId = neighborhoodRequestRef.current + 1;
     neighborhoodRequestRef.current = requestId;
     const safeDepth = Math.max(1, Math.min(3, depth));
@@ -314,8 +336,7 @@ function App() {
 
       setGraphData(limited.graph);
       setSelectResult(null);
-      setSelectedNodeId(iri);
-      setFocusToken((value) => value + 1);
+      selectNode(iri, historyMode);
       setStatus("ready");
       setMessage(
         limited.droppedNodes || limited.droppedEdges
@@ -335,12 +356,61 @@ function App() {
     const node = graphData.nodes.find((item) => item.id === nodeId);
 
     if (!node || !isIri(node.iri)) {
-      setSelectedNodeId(nodeId);
-      setFocusToken((value) => value + 1);
+      selectNode(nodeId);
       return;
     }
 
     void loadNeighborhood(node.iri, settings.depth, true);
+  }
+
+  function selectNode(nodeId: string, historyMode: NodeHistoryMode = "push") {
+    if (historyMode === "push") {
+      pushNodeHistory(nodeId);
+    }
+
+    setSelectedNodeId(nodeId);
+    setFocusToken((value) => value + 1);
+  }
+
+  function pushNodeHistory(nodeId: string) {
+    const current = nodeHistoryRef.current;
+
+    if (current.items[current.index] === nodeId) {
+      return;
+    }
+
+    const nextItems = [...current.items.slice(0, current.index + 1), nodeId].slice(
+      -maxNodeHistoryLength,
+    );
+    nodeHistoryRef.current = {
+      items: nextItems,
+      index: nextItems.length - 1,
+    };
+  }
+
+  function navigateNodeHistory(direction: -1 | 1) {
+    const current = nodeHistoryRef.current;
+    const nextIndex = current.index + direction;
+
+    if (nextIndex < 0 || nextIndex >= current.items.length) {
+      setMessage(direction < 0 ? "이전 선택 노드 없음" : "다음 선택 노드 없음");
+      return;
+    }
+
+    const nextNodeId = current.items[nextIndex];
+    nodeHistoryRef.current = {
+      ...current,
+      index: nextIndex,
+    };
+    const node = graphData.nodes.find((item) => item.id === nextNodeId);
+    const iri = node?.iri ?? nextNodeId;
+
+    if (!isIri(iri)) {
+      selectNode(nextNodeId, "skip");
+      return;
+    }
+
+    void loadNeighborhood(iri, settings.depth, true, "skip");
   }
 
   async function loadFullGraph() {
@@ -375,6 +445,7 @@ function App() {
       });
       setSelectResult(null);
       setSelectedNodeId(null);
+      resetNodeHistory();
       setStatus("ready");
       setMessage("full graph ready");
     } catch (error) {
@@ -438,6 +509,7 @@ function App() {
       });
       setSelectResult(null);
       setSelectedNodeId(null);
+      resetNodeHistory();
       setStatus("ready");
       setMessage("custom SPARQL graph ready");
     } catch (error) {
@@ -516,6 +588,39 @@ function App() {
       void loadNeighborhood(selectedNode.iri, nextDepth, true);
     }
   }
+
+  nodeHistoryNavigationRef.current = navigateNodeHistory;
+
+  useEffect(() => {
+    function handleMouseHistoryButton(event: MouseEvent) {
+      if (event.button !== 3 && event.button !== 4) {
+        return;
+      }
+
+      event.preventDefault();
+      event.stopPropagation();
+
+      const now = Date.now();
+      const lastEvent = mouseHistoryEventRef.current;
+      if (lastEvent.button === event.button && now - lastEvent.timestamp < 250) {
+        return;
+      }
+
+      mouseHistoryEventRef.current = {
+        button: event.button,
+        timestamp: now,
+      };
+      nodeHistoryNavigationRef.current(event.button === 3 ? -1 : 1);
+    }
+
+    window.addEventListener("mousedown", handleMouseHistoryButton, true);
+    window.addEventListener("auxclick", handleMouseHistoryButton, true);
+
+    return () => {
+      window.removeEventListener("mousedown", handleMouseHistoryButton, true);
+      window.removeEventListener("auxclick", handleMouseHistoryButton, true);
+    };
+  }, []);
 
   return (
     <div className="flex h-screen min-h-[720px] flex-col bg-[#f8fafc] text-slate-950">
