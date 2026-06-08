@@ -2,6 +2,8 @@ export const DEFAULT_ENDPOINT = "https://rnd-fuseki.ninewatt.com/ds/query";
 
 export type NodeKind = "class" | "instance" | "property" | "literal" | "external" | "unknown";
 
+export type NodeLabelSource = "iri" | "literal" | "rdfs";
+
 export type NamespaceGroup = "local" | "standard" | "external" | "unknown";
 
 export type LoadState = "idle" | "loading" | "ready" | "error";
@@ -66,6 +68,8 @@ export type GraphNode = {
   id: string;
   iri: string;
   label: string;
+  secondaryLabel?: string;
+  labelSource: NodeLabelSource;
   kind: NodeKind;
   namespace: string;
   namespaceGroup: NamespaceGroup;

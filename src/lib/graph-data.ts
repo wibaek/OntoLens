@@ -20,6 +20,7 @@ import type {
 
 const RDF_TYPE = "http://www.w3.org/1999/02/22-rdf-syntax-ns#type";
 const RDFS_CLASS = "http://www.w3.org/2000/01/rdf-schema#Class";
+const RDFS_LABEL = "http://www.w3.org/2000/01/rdf-schema#label";
 const RDFS_SUBCLASS = "http://www.w3.org/2000/01/rdf-schema#subClassOf";
 const OWL_CLASS = "http://www.w3.org/2002/07/owl#Class";
 const RDF_PROPERTY = "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property";
@@ -50,7 +51,13 @@ export function buildClassMapGraph(
     nodes.set(item.iri, {
       id: item.iri,
       iri: item.iri,
-      label: compactIri(item.iri, localNamespaces),
+      label:
+        existing?.labelSource === "rdfs" ? existing.label : compactIri(item.iri, localNamespaces),
+      secondaryLabel:
+        existing?.labelSource === "rdfs"
+          ? (existing.secondaryLabel ?? compactIri(item.iri, localNamespaces))
+          : undefined,
+      labelSource: existing?.labelSource === "rdfs" ? "rdfs" : "iri",
       kind: "class",
       namespace,
       namespaceGroup: detectNamespaceGroup(item.iri, localNamespaces),
@@ -84,6 +91,11 @@ export function quadsToGraphData(quads: RdfQuad[], localNamespaces: string[]): G
 
   for (const quad of quads) {
     const subject = ensureNode(nodes, quad.subject, effectiveLocalNamespaces);
+    if (quad.predicate.value === RDFS_LABEL && quad.object.termType === "literal") {
+      applyRdfsLiteralLabel(subject, quad.object.value);
+      continue;
+    }
+
     const object = ensureNode(nodes, quad.object, effectiveLocalNamespaces);
     applySemanticHints(subject, object, quad.predicate.value);
 
@@ -141,17 +153,27 @@ export function mergeGraphData(base: GraphData, incoming: GraphData, limits: Gra
 }
 
 export function enforceGraphLimits(graph: GraphData, limits: GraphLimits) {
-  const nodes = graph.nodes.slice(0, limits.nodeLimit);
+  const nodes = graph.nodes
+    .map((node, index) => ({ node, index }))
+    .sort((a, b) => nodeLimitRank(a.node) - nodeLimitRank(b.node) || a.index - b.index)
+    .slice(0, limits.nodeLimit)
+    .map(({ node }) => node);
   const nodeIds = new Set(nodes.map((node) => node.id));
+  const nodeById = new Map(graph.nodes.map((node) => [node.id, node]));
   const edges = graph.edges
     .filter((edge) => nodeIds.has(edge.source) && nodeIds.has(edge.target))
+    .map((edge, index) => ({ edge, index }))
+    .sort(
+      (a, b) =>
+        edgeLimitRank(a.edge, nodeById) - edgeLimitRank(b.edge, nodeById) || a.index - b.index,
+    )
     .slice(0, limits.edgeLimit);
 
   return {
     graph: {
       ...graph,
       nodes,
-      edges,
+      edges: edges.map(({ edge }) => edge),
     },
     droppedNodes: Math.max(0, graph.nodes.length - nodes.length),
     droppedEdges: Math.max(0, graph.edges.length - edges.length),
@@ -275,6 +297,7 @@ function ensureNode(
     id,
     iri: term.value,
     label: isLiteral ? truncateLiteral(term.value, 48) : compactIri(term.value, localNamespaces),
+    labelSource: isLiteral ? "literal" : "iri",
     kind: isLiteral ? "literal" : namespaceGroup === "external" ? "external" : "unknown",
     namespace,
     namespaceGroup,
@@ -301,6 +324,11 @@ function getTermId(term: RdfTerm) {
 }
 
 function applySemanticHints(subject: GraphNode, object: GraphNode, predicate: string) {
+  if (predicate === RDFS_LABEL) {
+    applyRdfsLabel(subject, object);
+    return;
+  }
+
   if (predicate === RDFS_SUBCLASS) {
     upgradeKind(subject, "class");
     upgradeKind(object, "class");
@@ -330,7 +358,40 @@ function applySemanticHints(subject: GraphNode, object: GraphNode, predicate: st
     return;
   }
 
+  upgradeKind(object, "class");
   upgradeKind(subject, "instance");
+}
+
+function applyRdfsLabel(subject: GraphNode, object: GraphNode) {
+  if (object.kind !== "literal") {
+    return;
+  }
+
+  applyRdfsLiteralLabel(subject, object.iri);
+}
+
+function applyRdfsLiteralLabel(subject: GraphNode, value: string) {
+  const label = truncateLiteral(value, 48);
+  if (!label) {
+    return;
+  }
+
+  const secondaryLabel = subject.labelSource === "iri" ? subject.label : subject.secondaryLabel;
+  subject.label = label;
+  if (secondaryLabel && secondaryLabel !== label) {
+    subject.secondaryLabel = secondaryLabel;
+  }
+  subject.labelSource = "rdfs";
+}
+
+function nodeLimitRank(node: GraphNode) {
+  return node.kind === "literal" ? 1 : 0;
+}
+
+function edgeLimitRank(edge: GraphEdge, nodeById: Map<string, GraphNode>) {
+  const source = nodeById.get(edge.source);
+  const target = nodeById.get(edge.target);
+  return source?.kind === "literal" || target?.kind === "literal" ? 1 : 0;
 }
 
 function upgradeKind(node: GraphNode, kind: NodeKind) {
@@ -345,8 +406,15 @@ function upgradeKind(node: GraphNode, kind: NodeKind) {
 }
 
 function mergeNode(base: GraphNode, incoming: GraphNode): GraphNode {
+  const useIncomingLabel = incoming.labelSource === "rdfs" && base.labelSource !== "rdfs";
+
   return {
     ...base,
+    label: useIncomingLabel ? incoming.label : base.label,
+    secondaryLabel: useIncomingLabel
+      ? (incoming.secondaryLabel ?? base.label)
+      : (base.secondaryLabel ?? incoming.secondaryLabel),
+    labelSource: useIncomingLabel ? incoming.labelSource : base.labelSource,
     kind: rankKind(incoming.kind) > rankKind(base.kind) ? incoming.kind : base.kind,
     types: [...new Set([...base.types, ...incoming.types])],
     count: base.count ?? incoming.count,

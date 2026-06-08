@@ -208,6 +208,17 @@ button:disabled {
   stroke-width: 5px;
 }
 
+.ontolens-node-secondary-label {
+  fill: #64748b;
+  font-size: 9px;
+  font-weight: 650;
+  opacity: 0.74;
+  paint-order: stroke;
+  pointer-events: none;
+  stroke: rgba(255, 255, 255, 0.86);
+  stroke-width: 4px;
+}
+
 .ontolens-graph-node.is-literal .ontolens-node-label {
   font-size: 10px;
 }

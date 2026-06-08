@@ -28,6 +28,7 @@ const height = 900;
 const defaultViewBox = { x: 0, y: 0, width, height };
 const minViewBoxWidth = width / 4.5;
 const maxViewBoxWidth = width * 2.6;
+const layoutFrameIntervalMs = 1000 / 30;
 
 const nodeColors: Record<NodeKind, string> = {
   class: "#8b5cf6",
@@ -94,6 +95,7 @@ export function GraphCanvas({
   const edgesRef = useRef<SimEdge[]>([]);
   const simulationRef = useRef<Simulation<SimNode, undefined> | null>(null);
   const frameRef = useRef<number | null>(null);
+  const lastLayoutSyncRef = useRef(0);
   const physicsEnabledRef = useRef(physicsEnabled);
   const dragRef = useRef<{
     nodeId: string;
@@ -108,20 +110,33 @@ export function GraphCanvas({
     viewBox: ViewBox;
   } | null>(null);
 
-  const syncLayout = useCallback(() => {
-    if (frameRef.current !== null) {
-      return;
-    }
+  const syncLayout = useCallback(
+    (force = false) => {
+      if (frameRef.current !== null) {
+        if (!force) {
+          return;
+        }
 
-    frameRef.current = window.requestAnimationFrame(() => {
-      frameRef.current = null;
-      setLayout({
-        nodes: nodesRef.current.map((node) => ({ ...node })),
-        edges: edgesRef.current.map((edge) => ({ ...edge })),
-        labelIds: visibleGraph.labelIds,
+        window.cancelAnimationFrame(frameRef.current);
+        frameRef.current = null;
+      }
+
+      frameRef.current = window.requestAnimationFrame((timestamp) => {
+        frameRef.current = null;
+        if (!force && timestamp - lastLayoutSyncRef.current < layoutFrameIntervalMs) {
+          return;
+        }
+
+        lastLayoutSyncRef.current = timestamp;
+        setLayout({
+          nodes: nodesRef.current.map((node) => ({ ...node })),
+          edges: edgesRef.current.map((edge) => ({ ...edge })),
+          labelIds: visibleGraph.labelIds,
+        });
       });
-    });
-  }, [visibleGraph.labelIds]);
+    },
+    [visibleGraph.labelIds],
+  );
 
   useEffect(() => {
     physicsEnabledRef.current = physicsEnabled;
@@ -161,6 +176,7 @@ export function GraphCanvas({
 
     nodesRef.current = nodes;
     edgesRef.current = edges;
+    lastLayoutSyncRef.current = 0;
     setLayout({ nodes, edges, labelIds: visibleGraph.labelIds });
     setViewBox(defaultViewBox);
 
@@ -502,15 +518,7 @@ export function GraphCanvas({
               >
                 <title>{node.iri}</title>
                 <NodeShape node={node} />
-                {labelVisible ? (
-                  <text
-                    className="ontolens-node-label"
-                    x={nodeRadius(node) + 8}
-                    y={node.kind === "literal" ? 4 : 5}
-                  >
-                    {node.label}
-                  </text>
-                ) : null}
+                {labelVisible ? <NodeLabel node={node} /> : null}
               </g>
             );
           })}
@@ -566,7 +574,7 @@ function buildVisibleGraph(graphData: GraphData, filters: GraphFilters): Visible
 function createSimulation(
   nodes: SimNode[],
   edges: SimEdge[],
-  onTick: () => void,
+  onTick: (force?: boolean) => void,
 ): Simulation<SimNode, undefined> {
   const density = Math.min(1, edges.length / Math.max(1, nodes.length * 7));
 
@@ -597,7 +605,27 @@ function createSimulation(
     )
     .alpha(0.96)
     .alphaDecay(0.035)
-    .on("tick", onTick);
+    .on("tick", () => onTick())
+    .on("end", () => onTick(true));
+}
+
+function NodeLabel({ node }: { node: SimNode }) {
+  const x = nodeRadius(node) + 8;
+  const y = node.kind === "literal" ? 4 : 5;
+  const secondaryLabel = node.kind !== "literal" ? node.secondaryLabel : undefined;
+
+  return (
+    <>
+      <text className="ontolens-node-label" x={x} y={y}>
+        {node.label}
+      </text>
+      {secondaryLabel ? (
+        <text className="ontolens-node-secondary-label" x={x} y={y + 13}>
+          {secondaryLabel}
+        </text>
+      ) : null}
+    </>
+  );
 }
 
 function NodeShape({ node }: { node: SimNode }) {
@@ -658,7 +686,7 @@ function labelPadding(node: SimNode) {
     return 8;
   }
   if (node.labelRank || node.kind === "class" || node.kind === "property") {
-    return 18;
+    return node.secondaryLabel ? 28 : 18;
   }
   return 8;
 }
