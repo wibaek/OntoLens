@@ -263,18 +263,28 @@ export function isolateNode(graph: GraphData, nodeId: string): GraphData {
 }
 
 export function getNamespaceCounts(graph: GraphData) {
-  const counts: Record<NamespaceGroup, number> = {
-    local: 0,
-    standard: 0,
-    external: 0,
-    unknown: 0,
-  };
+  const counts = new Map<string, { count: number; group: NamespaceGroup }>();
 
   for (const node of graph.nodes) {
-    counts[node.namespaceGroup] += 1;
+    if (node.kind === "literal" || !node.namespace) {
+      continue;
+    }
+
+    const current = counts.get(node.namespace);
+    counts.set(node.namespace, {
+      count: (current?.count ?? 0) + 1,
+      group: current?.group ?? node.namespaceGroup,
+    });
   }
 
-  return counts;
+  return [...counts.entries()]
+    .map(([namespace, item]) => ({
+      namespace,
+      label: namespace,
+      group: item.group,
+      count: item.count,
+    }))
+    .sort((a, b) => b.count - a.count || a.namespace.localeCompare(b.namespace));
 }
 
 function ensureNode(

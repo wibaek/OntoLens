@@ -21,7 +21,14 @@ import {
   useState,
   type WheelEvent,
 } from "react";
-import type { GraphData, GraphEdge, GraphFilters, GraphNode, NodeKind } from "../lib/types";
+import type {
+  GraphData,
+  GraphEdge,
+  GraphFilters,
+  GraphNode,
+  NamespaceFilters,
+  NodeKind,
+} from "../lib/types";
 
 const width = 1440;
 const height = 900;
@@ -530,7 +537,7 @@ export function GraphCanvas({
 
 function buildVisibleGraph(graphData: GraphData, filters: GraphFilters): VisibleGraph {
   const includedNodes = graphData.nodes.filter(
-    (node) => node.kind !== "literal" && filters.namespaces[node.namespaceGroup],
+    (node) => node.kind !== "literal" && isNamespaceEnabled(node.namespace, filters.namespaces),
   );
   const includedNodeIds = new Set(includedNodes.map((node) => node.id));
   const degree = new Map<string, number>();
@@ -569,6 +576,10 @@ function buildVisibleGraph(graphData: GraphData, filters: GraphFilters): Visible
     edges,
     labelIds: rankedIds,
   };
+}
+
+function isNamespaceEnabled(namespace: string, filters: NamespaceFilters) {
+  return !namespace || (filters[namespace] ?? true);
 }
 
 function createSimulation(

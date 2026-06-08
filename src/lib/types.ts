@@ -115,7 +115,7 @@ export type ExplorerSettings = GraphLimits & {
   physicsEnabled: boolean;
 };
 
-export type NamespaceFilters = Record<NamespaceGroup, boolean>;
+export type NamespaceFilters = Record<string, boolean>;
 
 export type GraphScope = {
   includeDefault: boolean;

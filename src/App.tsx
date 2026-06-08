@@ -69,23 +69,9 @@ const defaultSettings: ExplorerSettings = {
   physicsEnabled: true,
 };
 
-const defaultNamespaceFilters: NamespaceFilters = {
-  local: true,
-  standard: true,
-  external: true,
-  unknown: true,
-};
-
 const autoGraphScope: GraphScope = {
   includeDefault: false,
   namedGraphIris: [],
-};
-
-const namespaceLabels = {
-  local: "local project namespace",
-  standard: "rdf / rdfs / owl",
-  external: "external namespace",
-  unknown: "unknown / raw IRI",
 };
 
 type ResultView = "graph" | "table" | "raw";
@@ -95,6 +81,10 @@ type RawResult = {
   content: string;
   meta: string;
 };
+
+function isNamespaceEnabled(namespace: string, filters: NamespaceFilters) {
+  return !namespace || (filters[namespace] ?? true);
+}
 
 function App() {
   const [endpoint, setEndpoint] = useState(DEFAULT_ENDPOINT);
@@ -106,7 +96,7 @@ function App() {
   const [activeView, setActiveView] = useState<ResultView>("graph");
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
   const [settings, setSettings] = useState(defaultSettings);
-  const [namespaceFilters, setNamespaceFilters] = useState(defaultNamespaceFilters);
+  const [namespaceFilters, setNamespaceFilters] = useState<NamespaceFilters>({});
   const [predicateFilter, setPredicateFilter] = useState("all");
   const [status, setStatus] = useState<LoadState>("idle");
   const [lastError, setLastError] = useState<ErrorDiagnostic | null>(null);
@@ -132,7 +122,9 @@ function App() {
   const visibleCounts = useMemo(() => {
     const allowedNodes = new Set(
       graphData.nodes
-        .filter((node) => node.kind !== "literal" && namespaceFilters[node.namespaceGroup])
+        .filter(
+          (node) => node.kind !== "literal" && isNamespaceEnabled(node.namespace, namespaceFilters),
+        )
         .map((node) => node.id),
     );
     const visibleEdges = graphData.edges.filter(
@@ -481,10 +473,10 @@ function App() {
     }
   }
 
-  function updateNamespaceFilter(group: keyof NamespaceFilters) {
+  function updateNamespaceFilter(namespace: string) {
     setNamespaceFilters((current) => ({
       ...current,
-      [group]: !current[group],
+      [namespace]: !(current[namespace] ?? true),
     }));
   }
 
@@ -633,26 +625,33 @@ function App() {
               <h2 className="text-sm font-semibold text-slate-900">Namespace</h2>
               <Filter className="h-4 w-4 text-slate-500" aria-hidden="true" />
             </div>
-            <div className="space-y-2">
-              {Object.entries(namespaceLabels).map(([group, label]) => (
-                <label
-                  key={group}
-                  className="flex cursor-pointer items-center justify-between gap-3 rounded-md px-1 py-1 text-sm hover:bg-slate-50"
-                >
-                  <span className="flex items-center gap-2">
+            <div className="max-h-56 space-y-1 overflow-auto pr-1">
+              {namespaceCounts.length ? (
+                namespaceCounts.map((item) => (
+                  <label
+                    key={item.namespace}
+                    className="grid cursor-pointer grid-cols-[auto_minmax(0,1fr)_auto] items-start gap-2 rounded-md px-1 py-1.5 text-sm hover:bg-slate-50"
+                  >
                     <input
                       type="checkbox"
-                      checked={namespaceFilters[group as keyof NamespaceFilters]}
-                      onChange={() => updateNamespaceFilter(group as keyof NamespaceFilters)}
-                      className="h-4 w-4 rounded border-slate-300 text-blue-600"
+                      checked={namespaceFilters[item.namespace] ?? true}
+                      onChange={() => updateNamespaceFilter(item.namespace)}
+                      className="mt-0.5 h-4 w-4 rounded border-slate-300 text-blue-600"
                     />
-                    <span className="text-slate-700">{label}</span>
-                  </span>
-                  <span className="font-mono text-xs text-slate-400">
-                    {namespaceCounts[group as keyof NamespaceFilters]}
-                  </span>
-                </label>
-              ))}
+                    <span
+                      className="min-w-0 break-all font-mono text-[11px] leading-4 text-slate-700"
+                      title={item.namespace}
+                    >
+                      {item.label}
+                    </span>
+                    <span className="font-mono text-xs text-slate-400">
+                      {formatCount(item.count)}
+                    </span>
+                  </label>
+                ))
+              ) : (
+                <p className="px-1 py-2 text-xs text-slate-400">표시할 namespace 없음</p>
+              )}
             </div>
           </section>
 
