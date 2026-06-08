@@ -43,6 +43,7 @@ export type CountItem = {
 export type NamedGraph = {
   iri: string;
   label: string;
+  count: number;
 };
 
 export type NamespaceCandidate = {
@@ -54,6 +55,7 @@ export type NamespaceCandidate = {
 
 export type EndpointSummary = {
   tripleCount: number | null;
+  defaultGraphTripleCount: number | null;
   classes: CountItem[];
   predicates: CountItem[];
   namedGraphs: NamedGraph[];
@@ -110,6 +112,11 @@ export type ExplorerSettings = GraphLimits & {
 };
 
 export type NamespaceFilters = Record<NamespaceGroup, boolean>;
+
+export type GraphScope = {
+  includeDefault: boolean;
+  namedGraphIris: string[];
+};
 
 export type GraphFilters = {
   namespaces: NamespaceFilters;

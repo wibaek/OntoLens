@@ -3,6 +3,7 @@ import { compactIri, getNamespace, inferNamespaceCandidates } from "./namespaces
 import type {
   CountItem,
   EndpointSummary,
+  GraphScope,
   NamedGraph,
   RdfQuad,
   RdfTerm,
@@ -211,14 +212,54 @@ function bindingValue(binding?: SparqlBindingValue) {
   return binding?.value ?? "";
 }
 
-function graphPattern(body: string, graphIri: string | null = null) {
-  if (!graphIri) {
+type GraphQueryScope = GraphScope | string | null;
+
+function graphPattern(body: string, graphScope: GraphQueryScope = null) {
+  const scope = normalizeGraphScope(graphScope);
+
+  if (scope.includeDefault && scope.namedGraphIris.length === 0) {
     return body;
   }
 
-  return `GRAPH <${graphIri}> {
+  const branches = [
+    ...(scope.includeDefault
+      ? [
+          `{
 ${indent(body)}
-  }`;
+}`,
+        ]
+      : []),
+    ...scope.namedGraphIris.map(
+      (graphIri) => `{
+  GRAPH <${graphIri}> {
+${indent(body)}
+  }
+}`,
+    ),
+  ];
+
+  return branches.length ? branches.join("\n  UNION\n  ") : "FILTER(false)";
+}
+
+function normalizeGraphScope(graphScope: GraphQueryScope): GraphScope {
+  if (typeof graphScope === "string") {
+    return {
+      includeDefault: false,
+      namedGraphIris: [graphScope],
+    };
+  }
+
+  if (graphScope) {
+    return {
+      includeDefault: graphScope.includeDefault,
+      namedGraphIris: [...new Set(graphScope.namedGraphIris)],
+    };
+  }
+
+  return {
+    includeDefault: true,
+    namedGraphIris: [],
+  };
 }
 
 function indent(value: string) {
@@ -230,24 +271,27 @@ function indent(value: string) {
 
 export async function fetchEndpointSummary(
   endpoint: string,
-  graphIri: string | null = null,
+  graphScope: GraphQueryScope = null,
 ): Promise<EndpointSummary> {
-  const [tripleCountJson, classJson, predicateJson, iriJson, graphResult] = await Promise.all([
-    executeSelect(endpoint, buildTripleCountQuery(graphIri)),
-    executeSelect(endpoint, buildClassListQuery(100, graphIri)),
-    executeSelect(endpoint, buildPredicateListQuery(100, graphIri)),
-    executeSelect(endpoint, buildIriSampleQuery(250, graphIri)),
-    executeSelect(endpoint, buildNamedGraphQuery(100)).catch(() => null),
-  ]);
+  const [tripleCountJson, defaultCountJson, classJson, predicateJson, iriJson, graphResult] =
+    await Promise.all([
+      executeSelect(endpoint, buildTripleCountQuery(graphScope)),
+      executeSelect(endpoint, buildTripleCountQuery(null)),
+      executeSelect(endpoint, buildClassListQuery(100, graphScope)),
+      executeSelect(endpoint, buildPredicateListQuery(100, graphScope)),
+      executeSelect(endpoint, buildIriSampleQuery(250, graphScope)),
+      executeSelect(endpoint, buildNamedGraphQuery(100)).catch(() => null),
+    ]);
 
   const tripleCount = countFromBinding(tripleCountJson.results.bindings[0]?.count);
+  const defaultGraphTripleCount = countFromBinding(defaultCountJson.results.bindings[0]?.count);
 
   const classes = classJson.results.bindings.map((binding) => toCountItem(binding, "class"));
   const predicates = predicateJson.results.bindings.map((binding) => toCountItem(binding, "p"));
   const namedGraphs: NamedGraph[] =
     graphResult?.results.bindings.map((binding) => {
       const iri = bindingValue(binding.g);
-      return { iri, label: compactIri(iri) };
+      return { iri, label: compactIri(iri), count: countFromBinding(binding.count) };
     }) ?? [];
 
   const namespaceValues = [
@@ -260,6 +304,7 @@ export async function fetchEndpointSummary(
 
   return {
     tripleCount,
+    defaultGraphTripleCount,
     classes,
     predicates,
     namedGraphs,
@@ -277,20 +322,20 @@ function toCountItem(binding: Record<string, SparqlBindingValue>, variable: stri
   };
 }
 
-export function buildTripleCountQuery(graphIri: string | null = null) {
+export function buildTripleCountQuery(graphScope: GraphQueryScope = null) {
   return `${PREFIXES}
 SELECT (COUNT(*) AS ?count) WHERE {
-  ${graphPattern("?s ?p ?o .", graphIri)}
+  ${graphPattern("?s ?p ?o .", graphScope)}
 }`;
 }
 
-export function buildClassListQuery(limit: number, graphIri: string | null = null) {
+export function buildClassListQuery(limit: number, graphScope: GraphQueryScope = null) {
   return `${PREFIXES}
 SELECT ?class (COUNT(*) AS ?count) WHERE {
   ${graphPattern(
     `?s a ?class .
 FILTER(isIRI(?class))`,
-    graphIri,
+    graphScope,
   )}
 }
 GROUP BY ?class
@@ -298,13 +343,13 @@ ORDER BY DESC(?count)
 LIMIT ${limit}`;
 }
 
-export function buildPredicateListQuery(limit: number, graphIri: string | null = null) {
+export function buildPredicateListQuery(limit: number, graphScope: GraphQueryScope = null) {
   return `${PREFIXES}
 SELECT ?p (COUNT(*) AS ?count) WHERE {
   ${graphPattern(
     `?s ?p ?o .
 FILTER(isIRI(?p))`,
-    graphIri,
+    graphScope,
   )}
 }
 GROUP BY ?p
@@ -314,15 +359,17 @@ LIMIT ${limit}`;
 
 export function buildNamedGraphQuery(limit: number) {
   return `${PREFIXES}
-SELECT DISTINCT ?g WHERE {
+SELECT ?g (COUNT(*) AS ?count) WHERE {
   GRAPH ?g {
     ?s ?p ?o .
   }
 }
+GROUP BY ?g
+ORDER BY DESC(?count)
 LIMIT ${limit}`;
 }
 
-export function buildIriSampleQuery(limit: number, graphIri: string | null = null) {
+export function buildIriSampleQuery(limit: number, graphScope: GraphQueryScope = null) {
   return `${PREFIXES}
 SELECT DISTINCT ?iri WHERE {
   ${graphPattern(
@@ -338,17 +385,19 @@ SELECT DISTINCT ?iri WHERE {
     ?s ?p ?iri .
     FILTER(isIRI(?iri))
   }`,
-    graphIri,
+    graphScope,
   )}
 }
 LIMIT ${limit}`;
 }
 
-export function buildClassMapConstructQuery(limit: number, graphIri: string | null = null) {
+export function buildClassMapConstructQuery(limit: number, graphScope: GraphQueryScope = null) {
   return `${PREFIXES}
 CONSTRUCT {
   ?class a owl:Class .
   ?class rdfs:subClassOf ?parent .
+  ?class rdfs:label ?label .
+  ?parent rdfs:label ?parentLabel .
 }
 WHERE {
   ${graphPattern(
@@ -372,14 +421,22 @@ WHERE {
   OPTIONAL {
     ?class rdfs:subClassOf ?parent .
     FILTER(isIRI(?parent))
+    OPTIONAL {
+      ?parent rdfs:label ?parentLabel .
+      FILTER(isLiteral(?parentLabel))
+    }
+  }
+  OPTIONAL {
+    ?class rdfs:label ?label .
+    FILTER(isLiteral(?label))
   }`,
-    graphIri,
+    graphScope,
   )}
 }
 LIMIT ${limit}`;
 }
 
-export function buildFullGraphConstructQuery(limit: number, graphIri: string | null = null) {
+export function buildFullGraphConstructQuery(limit: number, graphScope: GraphQueryScope = null) {
   const schemaLimit = Math.min(Math.max(20, Math.floor(limit * 0.18)), Math.floor(limit * 0.4));
   const dataLimit = Math.max(1, limit - schemaLimit);
 
@@ -399,7 +456,7 @@ FILTER NOT EXISTS { ?s a rdfs:Class . }
 FILTER NOT EXISTS { ?s a rdf:Property . }
 FILTER NOT EXISTS { ?s a owl:ObjectProperty . }
 FILTER NOT EXISTS { ?s a owl:DatatypeProperty . }`,
-        graphIri,
+        graphScope,
       )}
     }
     LIMIT ${dataLimit}
@@ -424,7 +481,7 @@ UNION {
   ?s ?p ?o .
   FILTER(?p IN (rdf:type, rdfs:domain, rdfs:range, rdfs:label))
 }`,
-        graphIri,
+        graphScope,
       )}
     }
     LIMIT ${schemaLimit}
@@ -437,7 +494,7 @@ export function buildNeighborhoodConstructQuery(
   iri: string,
   depth: number,
   limit: number,
-  graphIri: string | null = null,
+  graphScope: GraphQueryScope = null,
 ) {
   const safeDepth = Math.max(1, Math.min(depth, 3));
   const levels: string[] = [
@@ -501,7 +558,7 @@ CONSTRUCT {
   ?i3 ?ip3 ?i2 .
 }
 WHERE {
-  ${graphPattern(levels.join("\n  UNION\n  "), graphIri)}
+  ${graphPattern(levels.join("\n  UNION\n  "), graphScope)}
 }
 LIMIT ${limit}`;
 }
@@ -509,7 +566,7 @@ LIMIT ${limit}`;
 export function buildSearchQuery(
   searchTerm: string,
   limit: number,
-  graphIri: string | null = null,
+  graphScope: GraphQueryScope = null,
 ) {
   const escaped = escapeSparqlString(searchTerm.trim());
 
@@ -534,7 +591,7 @@ SELECT DISTINCT ?iri ?label ?type WHERE {
     CONTAINS(LCASE(STR(?iri)), LCASE("${escaped}")) ||
     (BOUND(?label) && CONTAINS(LCASE(STR(?label)), LCASE("${escaped}")))
   )`,
-    graphIri,
+    graphScope,
   )}
 }
 LIMIT ${limit}`;
@@ -544,9 +601,9 @@ export async function searchEndpoint(
   endpoint: string,
   searchTerm: string,
   limit: number,
-  graphIri: string | null = null,
+  graphScope: GraphQueryScope = null,
 ): Promise<SearchResult[]> {
-  const json = await executeSelect(endpoint, buildSearchQuery(searchTerm, limit, graphIri));
+  const json = await executeSelect(endpoint, buildSearchQuery(searchTerm, limit, graphScope));
 
   return json.results.bindings.map((binding) => {
     const iri = bindingValue(binding.iri);

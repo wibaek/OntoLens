@@ -50,6 +50,7 @@ import type {
   ExplorerSettings,
   GraphData,
   GraphFilters,
+  GraphScope,
   LiteralProperty,
   LoadState,
   NamespaceFilters,
@@ -75,6 +76,11 @@ const defaultNamespaceFilters: NamespaceFilters = {
   unknown: true,
 };
 
+const autoGraphScope: GraphScope = {
+  includeDefault: false,
+  namedGraphIris: [],
+};
+
 const namespaceLabels = {
   local: "local project namespace",
   standard: "rdf / rdfs / owl",
@@ -92,7 +98,7 @@ type RawResult = {
 
 function App() {
   const [endpoint, setEndpoint] = useState(DEFAULT_ENDPOINT);
-  const [selectedGraph, setSelectedGraph] = useState("auto");
+  const [graphScope, setGraphScope] = useState<GraphScope>(autoGraphScope);
   const [summary, setSummary] = useState<EndpointSummary | null>(null);
   const [graphData, setGraphData] = useState<GraphData>(emptyGraphData);
   const [selectResult, setSelectResult] = useState<SparqlSelectResult | null>(null);
@@ -150,8 +156,10 @@ function App() {
     [namespaceFilters, predicateFilter],
   );
 
-  const selectedGraphIri =
-    selectedGraph === "auto" || selectedGraph === "default" ? null : selectedGraph;
+  const graphScopeSummary = useMemo(
+    () => summarizeGraphScope(graphScope, summary),
+    [graphScope, summary],
+  );
 
   const reportDiagnostic = useCallback((diagnostic: ErrorDiagnostic) => {
     setLastError(diagnostic);
@@ -167,10 +175,11 @@ function App() {
   );
 
   const connectEndpoint = useCallback(
-    async (graphSelectionOverride?: string) => {
-      const graphSelection = graphSelectionOverride ?? selectedGraph;
-      let graphIri =
-        graphSelection === "auto" || graphSelection === "default" ? null : graphSelection;
+    async (graphScopeOverride?: GraphScope) => {
+      const requestedGraphScope = graphScopeOverride ?? graphScope;
+      let queryGraphScope: GraphScope | null = hasGraphScopeSelection(requestedGraphScope)
+        ? requestedGraphScope
+        : null;
 
       setStatus("loading");
       setLastError(null);
@@ -179,15 +188,33 @@ function App() {
       setSelectResult(null);
       setActiveView("graph");
       setSearchResults([]);
-      neighborhoodRequestRef.current += 1;
+      const requestId = neighborhoodRequestRef.current + 1;
+      neighborhoodRequestRef.current = requestId;
 
       try {
-        let nextSummary = await fetchEndpointSummary(endpoint, graphIri);
+        let nextSummary = await fetchEndpointSummary(endpoint, queryGraphScope);
+        if (requestId !== neighborhoodRequestRef.current) {
+          return;
+        }
 
-        if (graphSelection === "auto" && nextSummary.namedGraphs.length > 0) {
-          graphIri = nextSummary.namedGraphs[0].iri;
-          setSelectedGraph(graphIri);
-          nextSummary = await fetchEndpointSummary(endpoint, graphIri);
+        if (!queryGraphScope) {
+          queryGraphScope = nextSummary.namedGraphs.length
+            ? {
+                includeDefault: false,
+                namedGraphIris: [nextSummary.namedGraphs[0].iri],
+              }
+            : {
+                includeDefault: true,
+                namedGraphIris: [],
+              };
+          setGraphScope(queryGraphScope);
+
+          if (nextSummary.namedGraphs.length > 0) {
+            nextSummary = await fetchEndpointSummary(endpoint, queryGraphScope);
+            if (requestId !== neighborhoodRequestRef.current) {
+              return;
+            }
+          }
         }
 
         const namespaceValues = [
@@ -198,11 +225,14 @@ function App() {
         const canLoadFullOverview =
           (nextSummary.tripleCount ?? Number.POSITIVE_INFINITY) <= settings.edgeLimit;
         const initialQuery = canLoadFullOverview
-          ? buildFullGraphConstructQuery(settings.edgeLimit, graphIri)
-          : buildClassMapConstructQuery(settings.edgeLimit, graphIri);
+          ? buildFullGraphConstructQuery(settings.edgeLimit, queryGraphScope)
+          : buildClassMapConstructQuery(settings.edgeLimit, queryGraphScope);
         setSparqlDraft(initialQuery);
 
-        const initialQuads = await executeConstruct(endpoint, initialQuery).catch(() => []);
+        const initialQuads = await executeConstruct(endpoint, initialQuery);
+        if (requestId !== neighborhoodRequestRef.current) {
+          return;
+        }
         const initialGraph = canLoadFullOverview
           ? quadsToGraphData(initialQuads, namespaceValues)
           : buildClassMapGraph(nextSummary.classes, initialQuads, namespaceValues);
@@ -220,17 +250,20 @@ function App() {
         setMessage(
           limited.droppedNodes || limited.droppedEdges
             ? `limit 적용: node ${limited.droppedNodes}개, edge ${limited.droppedEdges}개를 제외했습니다.`
-            : graphIri
-              ? `${compactIri(graphIri)} ${canLoadFullOverview ? "overview" : "class map"} ready`
-              : `default ${canLoadFullOverview ? "overview" : "class map"} ready`,
+            : `${formatGraphScopeLabel(queryGraphScope, nextSummary)} ${
+                canLoadFullOverview ? "overview" : "class map"
+              } ready`,
         );
       } catch (error) {
+        if (requestId !== neighborhoodRequestRef.current) {
+          return;
+        }
         setSummary(null);
         setGraphData(emptyGraphData);
         reportError(error, "Endpoint 연결 및 요약 조회");
       }
     },
-    [endpoint, reportError, selectedGraph, settings],
+    [endpoint, graphScope, reportError, settings],
   );
 
   useEffect(() => {
@@ -245,14 +278,9 @@ function App() {
     const requestId = neighborhoodRequestRef.current + 1;
     neighborhoodRequestRef.current = requestId;
     const safeDepth = Math.max(1, Math.min(3, depth));
-    const cacheKey = `${endpoint}|${selectedGraphIri ?? "default"}|${iri}|${safeDepth}|${settings.edgeLimit}`;
+    const cacheKey = `${endpoint}|${graphScopeKey(graphScope)}|${iri}|${safeDepth}|${settings.edgeLimit}`;
     const cached = cacheRef.current.get(cacheKey);
-    const query = buildNeighborhoodConstructQuery(
-      iri,
-      safeDepth,
-      settings.edgeLimit,
-      selectedGraphIri,
-    );
+    const query = buildNeighborhoodConstructQuery(iri, safeDepth, settings.edgeLimit, graphScope);
     setSparqlDraft(query);
     setStatus("loading");
     setLastError(null);
@@ -335,7 +363,7 @@ function App() {
       return;
     }
 
-    const query = buildFullGraphConstructQuery(settings.edgeLimit, selectedGraphIri);
+    const query = buildFullGraphConstructQuery(settings.edgeLimit, graphScope);
     setSparqlDraft(query);
     setStatus("loading");
     setLastError(null);
@@ -441,7 +469,7 @@ function App() {
     setLastError(null);
 
     try {
-      const results = await searchEndpoint(endpoint, trimmed, 24, selectedGraphIri);
+      const results = await searchEndpoint(endpoint, trimmed, 24, graphScope);
       setSearchResults(results);
       setSearchState(results.length ? "ready" : "error");
       if (!results.length) {
@@ -458,6 +486,17 @@ function App() {
       ...current,
       [group]: !current[group],
     }));
+  }
+
+  function updateGraphScope(graphIri: string | null) {
+    const nextGraphScope = toggleGraphScope(graphScope, graphIri);
+
+    if (!hasGraphScopeSelection(nextGraphScope)) {
+      return;
+    }
+
+    setGraphScope(nextGraphScope);
+    void connectEndpoint(nextGraphScope);
   }
 
   function updateSetting<Key extends keyof ExplorerSettings>(
@@ -508,7 +547,7 @@ function App() {
             value={endpoint}
             onChange={(event) => {
               setEndpoint(event.target.value);
-              setSelectedGraph("auto");
+              setGraphScope(autoGraphScope);
             }}
             className="min-w-0 flex-1 bg-transparent font-mono text-xs text-slate-700 outline-none"
           />
@@ -619,6 +658,14 @@ function App() {
 
           <section className="border-b border-slate-200 p-4">
             <div className="mb-3 flex items-center justify-between">
+              <h2 className="text-sm font-semibold text-slate-900">Graph</h2>
+              <Layers className="h-4 w-4 text-slate-500" aria-hidden="true" />
+            </div>
+            <GraphScopeList graphScope={graphScope} summary={summary} onToggle={updateGraphScope} />
+          </section>
+
+          <section className="border-b border-slate-200 p-4">
+            <div className="mb-3 flex items-center justify-between">
               <h2 className="text-sm font-semibold text-slate-900">탐색 범위</h2>
               <Layers className="h-4 w-4 text-slate-500" aria-hidden="true" />
             </div>
@@ -688,26 +735,17 @@ function App() {
               <Metric label="Graphs" value={formatCount(summary?.namedGraphs.length)} />
             </div>
 
-            <label className="mb-3 block text-xs font-medium text-slate-500">
-              Graph
-              <select
-                value={selectedGraph}
-                onChange={(event) => {
-                  const nextGraph = event.target.value;
-                  setSelectedGraph(nextGraph);
-                  void connectEndpoint(nextGraph);
-                }}
-                className="mt-1 h-9 w-full rounded-md border border-slate-200 bg-white px-2 text-sm text-slate-700 outline-none focus:border-blue-500"
+            <div className="mb-3 rounded-md border border-slate-200 bg-slate-50 px-3 py-2">
+              <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-400">
+                Active graph
+              </div>
+              <div
+                className="mt-1 break-all font-mono text-[11px] font-semibold leading-5 text-slate-900"
+                title={graphScopeSummary}
               >
-                <option value="auto">auto: first named graph</option>
-                <option value="default">default graph</option>
-                {summary?.namedGraphs.map((graph) => (
-                  <option key={graph.iri} value={graph.iri}>
-                    {graph.label}
-                  </option>
-                ))}
-              </select>
-            </label>
+                {graphScopeSummary}
+              </div>
+            </div>
 
             <label className="mb-3 block text-xs font-medium text-slate-500">
               Predicate filter
@@ -732,7 +770,6 @@ function App() {
                 onPick={(iri) => void loadNeighborhood(iri, settings.depth, true)}
               />
               <SummaryList title="Predicate frequency" items={summary?.predicates ?? []} />
-              <NamedGraphList items={summary?.namedGraphs ?? []} />
             </div>
           </section>
         </aside>
@@ -967,7 +1004,7 @@ function App() {
                           selectedDetails.node.iri,
                           settings.depth,
                           settings.edgeLimit,
-                          selectedGraphIri,
+                          graphScope,
                         ),
                       );
                       setSparqlOpen(true);
@@ -1079,6 +1116,65 @@ function App() {
       ) : null}
     </div>
   );
+}
+
+function hasGraphScopeSelection(graphScope: GraphScope) {
+  return graphScope.includeDefault || graphScope.namedGraphIris.length > 0;
+}
+
+function toggleGraphScope(graphScope: GraphScope, graphIri: string | null): GraphScope {
+  if (!graphIri) {
+    return {
+      ...graphScope,
+      includeDefault: !graphScope.includeDefault,
+    };
+  }
+
+  const currentIris = new Set(graphScope.namedGraphIris);
+  if (currentIris.has(graphIri)) {
+    currentIris.delete(graphIri);
+  } else {
+    currentIris.add(graphIri);
+  }
+
+  return {
+    ...graphScope,
+    namedGraphIris: [...currentIris],
+  };
+}
+
+function graphScopeKey(graphScope: GraphScope) {
+  if (!hasGraphScopeSelection(graphScope)) {
+    return "auto";
+  }
+
+  return [graphScope.includeDefault ? "default" : null, ...graphScope.namedGraphIris]
+    .filter(Boolean)
+    .join(",");
+}
+
+function summarizeGraphScope(graphScope: GraphScope, summary: EndpointSummary | null) {
+  if (!hasGraphScopeSelection(graphScope)) {
+    return "auto graph";
+  }
+
+  const labels = [
+    ...(graphScope.includeDefault ? ["default graph"] : []),
+    ...graphScope.namedGraphIris.map((graphIri) => {
+      const graph = summary?.namedGraphs.find((item) => item.iri === graphIri);
+      return graph?.iri ?? graphIri;
+    }),
+  ];
+
+  if (labels.length <= 2) {
+    return labels.join(", ");
+  }
+
+  return `${labels.length} graphs`;
+}
+
+function formatGraphScopeLabel(graphScope: GraphScope, summary: EndpointSummary) {
+  return summarizeGraphScope(graphScope, summary);
 }
 
 function createErrorDiagnostic(error: unknown, context: string): ErrorDiagnostic {
@@ -1197,25 +1293,74 @@ function SummaryList({
   );
 }
 
-function NamedGraphList({ items }: { items: { iri: string; label: string }[] }) {
-  if (!items.length) {
-    return null;
-  }
-
+function GraphScopeList({
+  graphScope,
+  summary,
+  onToggle,
+}: {
+  graphScope: GraphScope;
+  summary: EndpointSummary | null;
+  onToggle: (graphIri: string | null) => void;
+}) {
   return (
-    <div>
-      <h3 className="mb-2 text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">
-        Named graph
-      </h3>
-      <div className="max-h-36 overflow-auto border-y border-slate-200">
-        {items.slice(0, 20).map((item) => (
-          <div key={item.iri} className="border-b border-slate-100 py-2 text-sm last:border-0">
-            <div className="truncate font-medium text-slate-800">{item.label}</div>
-            <div className="truncate font-mono text-[11px] text-slate-400">{item.iri}</div>
-          </div>
-        ))}
-      </div>
+    <div className="max-h-52 space-y-2 overflow-auto">
+      <GraphScopeOption
+        checked={graphScope.includeDefault}
+        count={summary?.defaultGraphTripleCount ?? 0}
+        disabled={!summary}
+        label="default graph"
+        onToggle={() => onToggle(null)}
+      />
+      {summary?.namedGraphs.map((graph) => (
+        <GraphScopeOption
+          checked={graphScope.namedGraphIris.includes(graph.iri)}
+          count={graph.count}
+          key={graph.iri}
+          label={graph.iri}
+          title={graph.iri}
+          onToggle={() => onToggle(graph.iri)}
+        />
+      ))}
     </div>
+  );
+}
+
+function GraphScopeOption({
+  checked,
+  count,
+  disabled = false,
+  label,
+  title,
+  onToggle,
+}: {
+  checked: boolean;
+  count: number;
+  disabled?: boolean;
+  label: string;
+  title?: string;
+  onToggle: () => void;
+}) {
+  return (
+    <label
+      className={`flex items-start justify-between gap-3 rounded-md px-1 py-1 text-sm ${
+        disabled ? "cursor-not-allowed opacity-50" : "cursor-pointer hover:bg-slate-50"
+      }`}
+      title={title}
+    >
+      <span className="flex min-w-0 items-start gap-2">
+        <input
+          type="checkbox"
+          checked={checked}
+          disabled={disabled}
+          onChange={onToggle}
+          className="mt-0.5 h-4 w-4 shrink-0 rounded border-slate-300 text-blue-600"
+        />
+        <span className="min-w-0 break-all font-mono text-[11px] leading-5 text-slate-700">
+          {label}
+        </span>
+      </span>
+      <span className="mt-0.5 shrink-0 font-mono text-xs text-slate-400">{formatCount(count)}</span>
+    </label>
   );
 }
 
