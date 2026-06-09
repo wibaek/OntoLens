@@ -168,6 +168,10 @@ function App() {
     () => summarizeGraphScope(graphScope, summary),
     [graphScope, summary],
   );
+  const graphScopeTitle = useMemo(
+    () => summarizeGraphScope(graphScope, summary, "full"),
+    [graphScope, summary],
+  );
 
   const reportDiagnostic = useCallback((diagnostic: ErrorDiagnostic) => {
     setLastError(diagnostic);
@@ -845,7 +849,7 @@ function App() {
               </div>
               <div
                 className="mt-1 break-all font-mono text-[11px] font-semibold leading-5 text-slate-900"
-                title={graphScopeSummary}
+                title={graphScopeTitle}
               >
                 {graphScopeSummary}
               </div>
@@ -1257,7 +1261,11 @@ function graphScopeKey(graphScope: GraphScope) {
     .join(",");
 }
 
-function summarizeGraphScope(graphScope: GraphScope, summary: EndpointSummary | null) {
+function summarizeGraphScope(
+  graphScope: GraphScope,
+  summary: EndpointSummary | null,
+  format: "display" | "full" = "display",
+) {
   if (!hasGraphScopeSelection(graphScope)) {
     return "auto graph";
   }
@@ -1266,7 +1274,8 @@ function summarizeGraphScope(graphScope: GraphScope, summary: EndpointSummary | 
     ...(graphScope.includeDefault ? ["default graph"] : []),
     ...graphScope.namedGraphIris.map((graphIri) => {
       const graph = summary?.namedGraphs.find((item) => item.iri === graphIri);
-      return graph?.iri ?? graphIri;
+      const iri = graph?.iri ?? graphIri;
+      return format === "full" ? iri : formatGraphIriLabel(iri);
     }),
   ];
 
@@ -1279,6 +1288,20 @@ function summarizeGraphScope(graphScope: GraphScope, summary: EndpointSummary | 
 
 function formatGraphScopeLabel(graphScope: GraphScope, summary: EndpointSummary) {
   return summarizeGraphScope(graphScope, summary);
+}
+
+function formatGraphIriLabel(graphIri: string) {
+  if (!isIri(graphIri)) {
+    return graphIri;
+  }
+
+  try {
+    const url = new URL(graphIri);
+    const label = `${url.pathname}${url.search}${url.hash}`;
+    return label || graphIri;
+  } catch {
+    return graphIri;
+  }
 }
 
 function createErrorDiagnostic(error: unknown, context: string): ErrorDiagnostic {
@@ -1420,7 +1443,7 @@ function GraphScopeList({
           checked={graphScope.namedGraphIris.includes(graph.iri)}
           count={graph.count}
           key={graph.iri}
-          label={graph.iri}
+          label={formatGraphIriLabel(graph.iri)}
           title={graph.iri}
           onToggle={() => onToggle(graph.iri)}
         />
