@@ -21,15 +21,9 @@ import {
   useState,
   type WheelEvent,
 } from "react";
+import { graphNodeVisuals } from "../lib/graph-legend";
 import { formatIriPath } from "../lib/namespaces";
-import type {
-  GraphData,
-  GraphEdge,
-  GraphFilters,
-  GraphNode,
-  NamespaceFilters,
-  NodeKind,
-} from "../lib/types";
+import type { GraphData, GraphEdge, GraphFilters, GraphNode, NamespaceFilters } from "../lib/types";
 
 const width = 1440;
 const height = 900;
@@ -40,14 +34,6 @@ const layoutFrameIntervalMs = 1000 / 30;
 const viewBoxIdleDelayMs = 90;
 const panSurfaceExtent = 1_000_000;
 
-const nodeColors: Record<NodeKind, string> = {
-  class: "#8b5cf6",
-  instance: "#12b981",
-  property: "#f59e0b",
-  literal: "#fbbf24",
-  external: "#ef4444",
-  unknown: "#64748b",
-};
 const rdfTypePredicate = "http://www.w3.org/1999/02/22-rdf-syntax-ns#type";
 
 type ViewBox = typeof defaultViewBox;
@@ -587,7 +573,7 @@ export function GraphCanvas({
                   .join(" ")}
                 key={node.id}
                 role="button"
-                style={{ "--node-color": nodeColors[node.kind] } as CSSProperties}
+                style={{ "--node-color": graphNodeVisuals[node.kind].color } as CSSProperties}
                 tabIndex={0}
                 transform={`translate(${node.x ?? width / 2} ${node.y ?? height / 2})`}
                 onClick={(event) => {
