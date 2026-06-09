@@ -302,9 +302,9 @@ function App() {
     const requestId = neighborhoodRequestRef.current + 1;
     neighborhoodRequestRef.current = requestId;
     const safeDepth = Math.max(1, Math.min(3, depth));
-    const cacheKey = `${endpoint}|${graphScopeKey(graphScope)}|${iri}|${safeDepth}|${settings.edgeLimit}`;
-    const cached = cacheRef.current.get(cacheKey);
     const query = buildNeighborhoodConstructQuery(iri, safeDepth, settings.edgeLimit, graphScope);
+    const cacheKey = `${endpoint}|${query}`;
+    const cached = cacheRef.current.get(cacheKey);
     setSparqlDraft(query);
     setStatus("loading");
     setLastError(null);
@@ -1320,16 +1320,6 @@ function toggleGraphScope(graphScope: GraphScope, graphIri: string | null): Grap
     ...graphScope,
     namedGraphIris: [...currentIris],
   };
-}
-
-function graphScopeKey(graphScope: GraphScope) {
-  if (!hasGraphScopeSelection(graphScope)) {
-    return "auto";
-  }
-
-  return [graphScope.includeDefault ? "default" : null, ...graphScope.namedGraphIris]
-    .filter(Boolean)
-    .join(",");
 }
 
 function summarizeGraphScope(

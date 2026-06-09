@@ -559,10 +559,9 @@ CONSTRUCT {
   ?labelNode rdfs:label ?nodeLabel .
 }
 WHERE {
-  ${graphPattern(
-    `{
+  {
     SELECT ?root ?p1 ?o1 ?i1 ?ip1 ?p2 ?o2 ?i2 ?ip2 ?p3 ?o3 ?i3 ?ip3 WHERE {
-      ${indent(levels.join("\n      UNION\n"))}
+      ${indent(graphPattern(levels.join("\n      UNION\n"), graphScope))}
     }
     LIMIT ${limit}
   }
@@ -589,11 +588,12 @@ WHERE {
       BIND(?i3 AS ?labelNode)
     }
     FILTER(BOUND(?labelNode) && (isIRI(?labelNode) || isBlank(?labelNode)))
-    ?labelNode (rdfs:label|skos:prefLabel|schema:name) ?nodeLabel .
-    FILTER(isLiteral(?nodeLabel))
-  }`,
-    graphScope,
-  )}
+    ${graphPattern(
+      `?labelNode (rdfs:label|skos:prefLabel|schema:name) ?nodeLabel .
+FILTER(isLiteral(?nodeLabel))`,
+      graphScope,
+    )}
+  }
 }`;
 }
 
