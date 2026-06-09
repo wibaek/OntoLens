@@ -4,26 +4,27 @@ import type { SparqlBindingValue, SparqlSelectResult } from "../lib/types";
 type ResultTableProps = {
   result: SparqlSelectResult | null;
   localNamespaces: string[];
-  title?: string;
-  emptyTitle?: string;
-  emptyDescription?: string;
   onOpenIri: (iri: string) => void;
 };
 
-export function ResultTable({
-  result,
-  localNamespaces,
-  title = "SELECT 결과",
-  emptyTitle = "표시할 SELECT 결과가 없습니다",
-  emptyDescription = "SPARQL 패널에서 SELECT 쿼리를 실행하면 테이블이 표시됩니다.",
-  onOpenIri,
-}: ResultTableProps) {
-  if (!result?.rows.length) {
+export function ResultTable({ result, localNamespaces, onOpenIri }: ResultTableProps) {
+  if (!result) {
     return (
       <div className="grid h-full place-items-center bg-white text-center text-sm text-slate-500">
         <div>
-          <p className="font-semibold text-slate-900">{emptyTitle}</p>
-          <p className="mt-2">{emptyDescription}</p>
+          <p className="font-semibold text-slate-900">표시할 SELECT 결과가 없습니다</p>
+          <p className="mt-2">SPARQL 패널에서 SELECT 쿼리를 실행하면 테이블이 표시됩니다.</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!result.rows.length) {
+    return (
+      <div className="grid h-full place-items-center bg-white text-center text-sm text-slate-500">
+        <div>
+          <p className="font-semibold text-slate-900">빈 결과</p>
+          <p className="mt-2">쿼리는 실행됐지만 반환된 row가 없습니다.</p>
         </div>
       </div>
     );
@@ -35,7 +36,7 @@ export function ResultTable({
     <div className="flex h-full min-h-0 flex-col bg-white">
       <div className="flex h-12 shrink-0 items-center justify-between border-b border-slate-200 px-4">
         <div>
-          <h2 className="text-sm font-semibold text-slate-900">{title}</h2>
+          <h2 className="text-sm font-semibold text-slate-900">SELECT 결과</h2>
           <p className="text-xs text-slate-500">
             {result.rows.length.toLocaleString("en-US")} rows /{" "}
             {result.variables.length.toLocaleString("en-US")} columns
