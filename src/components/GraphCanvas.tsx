@@ -21,6 +21,7 @@ import {
   useState,
   type WheelEvent,
 } from "react";
+import { formatIriPath } from "../lib/namespaces";
 import type {
   GraphData,
   GraphEdge,
@@ -457,10 +458,13 @@ export function GraphCanvas({
                 62;
             const mid = midpoint(source, target, edge);
             const edgeLabel =
-              compactRdfType && edge.predicate === rdfTypePredicate ? "a" : edge.label;
+              compactRdfType && edge.predicate === rdfTypePredicate
+                ? "a"
+                : graphIriPathLabel(edge.predicate, edge.label);
 
             return (
               <g key={edge.id} className={active ? "is-active" : undefined}>
+                <title>{edge.predicate}</title>
                 {/* biome-ignore lint/a11y/useSemanticElements: SVG graph edges cannot be native buttons. */}
                 <path
                   aria-label={`${edgeLabel} edge`}
@@ -623,12 +627,13 @@ function createSimulation(
 function NodeLabel({ node }: { node: SimNode }) {
   const x = nodeRadius(node) + 8;
   const y = node.kind === "literal" ? 4 : 5;
-  const secondaryLabel = node.kind !== "literal" ? node.secondaryLabel : undefined;
+  const primaryLabel = graphNodePrimaryLabel(node);
+  const secondaryLabel = graphNodeSecondaryLabel(node);
 
   return (
     <>
       <text className="ontolens-node-label" x={x} y={y}>
-        {node.label}
+        {primaryLabel}
       </text>
       {secondaryLabel ? (
         <text className="ontolens-node-secondary-label" x={x} y={y + 13}>
@@ -637,6 +642,31 @@ function NodeLabel({ node }: { node: SimNode }) {
       ) : null}
     </>
   );
+}
+
+function graphNodePrimaryLabel(node: SimNode) {
+  if (node.kind === "literal" || node.labelSource === "rdfs") {
+    return node.label;
+  }
+
+  return graphIriPathLabel(node.iri, node.label);
+}
+
+function graphNodeSecondaryLabel(node: SimNode) {
+  if (node.kind === "literal") {
+    return undefined;
+  }
+
+  if (node.labelSource === "rdfs") {
+    return graphIriPathLabel(node.iri, node.secondaryLabel ?? node.label);
+  }
+
+  return undefined;
+}
+
+function graphIriPathLabel(iri: string, fallback: string) {
+  const label = formatIriPath(iri);
+  return label || fallback;
 }
 
 function NodeShape({ node }: { node: SimNode }) {

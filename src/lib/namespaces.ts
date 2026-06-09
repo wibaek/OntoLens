@@ -69,6 +69,21 @@ export function compactIri(value: string, namespaceHints: string[] = []) {
   return getLocalName(value);
 }
 
+export function formatIriPath(value: string) {
+  if (!isIri(value)) {
+    return value;
+  }
+
+  try {
+    const url = new URL(value);
+    const path = `${url.pathname}${url.search}${url.hash}`.replace(/^\/+/, "");
+    return path || value;
+  } catch {
+    const namespace = getNamespace(value);
+    return (namespace ? value.slice(namespace.length) : "") || getLocalName(value);
+  }
+}
+
 export function truncateMiddle(value: string, maxLength = 72) {
   if (value.length <= maxLength) {
     return value;
