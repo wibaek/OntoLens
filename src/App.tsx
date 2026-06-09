@@ -898,7 +898,7 @@ function App() {
         </aside>
 
         <section className="relative min-w-0 overflow-hidden bg-white">
-          <div className="absolute inset-0 graph-grid" />
+          <div className="pointer-events-none absolute inset-0 z-0 graph-grid" />
           <div className="absolute left-4 top-4 z-10 flex items-center gap-2 rounded-md border border-slate-200 bg-white/90 px-3 py-2 text-xs shadow-sm backdrop-blur">
             <Database className="h-4 w-4 text-slate-500" aria-hidden="true" />
             <span className="font-medium text-slate-700">
@@ -981,31 +981,33 @@ function App() {
             ) : null}
           </div>
 
-          {activeView === "graph" ? (
-            <GraphErrorBoundary
-              resetKey={`${graphData.nodes.length}:${graphData.edges.length}:${selectedNodeId ?? "none"}`}
-            >
-              <GraphCanvas
-                graphData={graphData}
-                filters={graphFilters}
-                selectedNodeId={selectedNodeId}
-                showEdgeLabels={settings.showEdgeLabels}
-                compactRdfType={settings.compactRdfType}
-                physicsEnabled={settings.physicsEnabled}
-                focusToken={focusToken}
-                onNodeSelect={selectGraphNode}
-                onStageClick={() => setSearchResults([])}
+          <div className="relative z-[1] h-full min-h-0">
+            {activeView === "graph" ? (
+              <GraphErrorBoundary
+                resetKey={`${graphData.nodes.length}:${graphData.edges.length}:${selectedNodeId ?? "none"}`}
+              >
+                <GraphCanvas
+                  graphData={graphData}
+                  filters={graphFilters}
+                  selectedNodeId={selectedNodeId}
+                  showEdgeLabels={settings.showEdgeLabels}
+                  compactRdfType={settings.compactRdfType}
+                  physicsEnabled={settings.physicsEnabled}
+                  focusToken={focusToken}
+                  onNodeSelect={selectGraphNode}
+                  onStageClick={() => setSearchResults([])}
+                />
+              </GraphErrorBoundary>
+            ) : activeView === "table" ? (
+              <ResultTable
+                result={selectResult}
+                localNamespaces={graphData.localNamespaces}
+                onOpenIri={(iri) => void loadNeighborhood(iri, settings.depth, true)}
               />
-            </GraphErrorBoundary>
-          ) : activeView === "table" ? (
-            <ResultTable
-              result={selectResult}
-              localNamespaces={graphData.localNamespaces}
-              onOpenIri={(iri) => void loadNeighborhood(iri, settings.depth, true)}
-            />
-          ) : (
-            <RawResultPanel result={rawResult} />
-          )}
+            ) : (
+              <RawResultPanel result={rawResult} />
+            )}
+          </div>
 
           {activeView === "graph" && graphData.nodes.length === 0 ? (
             <div className="pointer-events-none absolute inset-0 z-10 grid place-items-center">
