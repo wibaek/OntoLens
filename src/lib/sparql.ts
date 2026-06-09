@@ -556,11 +556,45 @@ CONSTRUCT {
   ?i2 ?ip2 ?i1 .
   ?o2 ?p3 ?o3 .
   ?i3 ?ip3 ?i2 .
+  ?labelNode rdfs:label ?nodeLabel .
 }
 WHERE {
-  ${graphPattern(levels.join("\n  UNION\n  "), graphScope)}
-}
-LIMIT ${limit}`;
+  ${graphPattern(
+    `{
+    SELECT ?root ?p1 ?o1 ?i1 ?ip1 ?p2 ?o2 ?i2 ?ip2 ?p3 ?o3 ?i3 ?ip3 WHERE {
+      ${indent(levels.join("\n      UNION\n"))}
+    }
+    LIMIT ${limit}
+  }
+  OPTIONAL {
+    {
+      BIND(?root AS ?labelNode)
+    }
+    UNION {
+      BIND(?o1 AS ?labelNode)
+    }
+    UNION {
+      BIND(?i1 AS ?labelNode)
+    }
+    UNION {
+      BIND(?o2 AS ?labelNode)
+    }
+    UNION {
+      BIND(?i2 AS ?labelNode)
+    }
+    UNION {
+      BIND(?o3 AS ?labelNode)
+    }
+    UNION {
+      BIND(?i3 AS ?labelNode)
+    }
+    FILTER(BOUND(?labelNode) && (isIRI(?labelNode) || isBlank(?labelNode)))
+    ?labelNode (rdfs:label|skos:prefLabel|schema:name) ?nodeLabel .
+    FILTER(isLiteral(?nodeLabel))
+  }`,
+    graphScope,
+  )}
+}`;
 }
 
 export function buildSearchQuery(
