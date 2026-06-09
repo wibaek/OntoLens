@@ -37,6 +37,8 @@ const defaultViewBox = { x: 0, y: 0, width, height };
 const minViewBoxWidth = width / 4.5;
 const maxViewBoxWidth = width * 2.6;
 const layoutFrameIntervalMs = 1000 / 30;
+const viewBoxIdleDelayMs = 90;
+const panSurfaceExtent = 1_000_000;
 
 const nodeColors: Record<NodeKind, string> = {
   class: "#8b5cf6",
@@ -49,6 +51,10 @@ const nodeColors: Record<NodeKind, string> = {
 const rdfTypePredicate = "http://www.w3.org/1999/02/22-rdf-syntax-ns#type";
 
 type ViewBox = typeof defaultViewBox;
+
+function formatViewBox(box: ViewBox) {
+  return `${box.x} ${box.y} ${box.width} ${box.height}`;
+}
 
 type SimNode = GraphNode &
   SimulationNodeDatum & {
@@ -99,6 +105,8 @@ export function GraphCanvas({
   const [hoveredNodeId, setHoveredNodeId] = useState<string | null>(null);
   const [draggedNodeId, setDraggedNodeId] = useState<string | null>(null);
   const svgRef = useRef<SVGSVGElement | null>(null);
+  const viewBoxRef = useRef<ViewBox>(defaultViewBox);
+  const viewBoxIdleTimerRef = useRef<number | null>(null);
   const nodesRef = useRef<SimNode[]>([]);
   const edgesRef = useRef<SimEdge[]>([]);
   const simulationRef = useRef<Simulation<SimNode, undefined> | null>(null);
@@ -117,6 +125,35 @@ export function GraphCanvas({
     clientY: number;
     viewBox: ViewBox;
   } | null>(null);
+
+  const applyViewBox = useCallback((nextViewBox: ViewBox, commitState = false) => {
+    viewBoxRef.current = nextViewBox;
+    svgRef.current?.setAttribute("viewBox", formatViewBox(nextViewBox));
+
+    if (commitState) {
+      setViewBox(nextViewBox);
+    }
+  }, []);
+
+  const stopViewBoxNavigation = useCallback(() => {
+    svgRef.current?.classList.remove("is-navigating");
+  }, []);
+
+  const startViewBoxNavigation = useCallback(() => {
+    svgRef.current?.classList.add("is-navigating");
+  }, []);
+
+  const scheduleViewBoxCommit = useCallback(() => {
+    if (viewBoxIdleTimerRef.current !== null) {
+      window.clearTimeout(viewBoxIdleTimerRef.current);
+    }
+
+    viewBoxIdleTimerRef.current = window.setTimeout(() => {
+      viewBoxIdleTimerRef.current = null;
+      setViewBox(viewBoxRef.current);
+      stopViewBoxNavigation();
+    }, viewBoxIdleDelayMs);
+  }, [stopViewBoxNavigation]);
 
   const syncLayout = useCallback(
     (force = false) => {
@@ -145,6 +182,14 @@ export function GraphCanvas({
     },
     [visibleGraph.labelIds],
   );
+
+  useEffect(() => {
+    return () => {
+      if (viewBoxIdleTimerRef.current !== null) {
+        window.clearTimeout(viewBoxIdleTimerRef.current);
+      }
+    };
+  }, []);
 
   useEffect(() => {
     physicsEnabledRef.current = physicsEnabled;
@@ -186,7 +231,7 @@ export function GraphCanvas({
     edgesRef.current = edges;
     lastLayoutSyncRef.current = 0;
     setLayout({ nodes, edges, labelIds: visibleGraph.labelIds });
-    setViewBox(defaultViewBox);
+    applyViewBox(defaultViewBox, true);
 
     if (!physicsEnabledRef.current) {
       simulationRef.current = null;
@@ -207,7 +252,7 @@ export function GraphCanvas({
         frameRef.current = null;
       }
     };
-  }, [syncLayout, visibleGraph]);
+  }, [applyViewBox, syncLayout, visibleGraph]);
 
   useEffect(() => {
     if (!selectedNodeId || focusToken < 0) {
@@ -221,13 +266,16 @@ export function GraphCanvas({
 
     const nextWidth = width / 1.25;
     const nextHeight = nextWidth * (height / width);
-    setViewBox({
-      x: node.x - nextWidth / 2,
-      y: node.y - nextHeight / 2,
-      width: nextWidth,
-      height: nextHeight,
-    });
-  }, [focusToken, selectedNodeId]);
+    applyViewBox(
+      {
+        x: node.x - nextWidth / 2,
+        y: node.y - nextHeight / 2,
+        width: nextWidth,
+        height: nextHeight,
+      },
+      true,
+    );
+  }, [applyViewBox, focusToken, selectedNodeId]);
 
   const nodeById = useMemo(
     () => new Map(layout.nodes.map((node) => [node.id, node])),
@@ -251,8 +299,9 @@ export function GraphCanvas({
   }, [layout.edges, selectedNodeId]);
   const zoomPercent = Math.round((width / viewBox.width) * 100);
 
-  const zoomAt = useCallback((scale: number, point?: { clientX: number; clientY: number }) => {
-    setViewBox((current) => {
+  const zoomAt = useCallback(
+    (scale: number, point?: { clientX: number; clientY: number }, commitState = true) => {
+      const current = viewBoxRef.current;
       const nextWidth = Math.max(minViewBoxWidth, Math.min(maxViewBoxWidth, current.width * scale));
       const nextHeight = nextWidth * (height / width);
       const focus =
@@ -262,22 +311,31 @@ export function GraphCanvas({
       const widthRatio = nextWidth / current.width;
       const heightRatio = nextHeight / current.height;
 
-      return {
+      const nextViewBox = {
         x: focus.x - (focus.x - current.x) * widthRatio,
         y: focus.y - (focus.y - current.y) * heightRatio,
         width: nextWidth,
         height: nextHeight,
       };
-    });
-  }, []);
+
+      applyViewBox(nextViewBox, commitState);
+
+      if (!commitState) {
+        startViewBoxNavigation();
+        scheduleViewBoxCommit();
+      }
+    },
+    [applyViewBox, scheduleViewBoxCommit, startViewBoxNavigation],
+  );
 
   function resetView() {
-    setViewBox(defaultViewBox);
+    stopViewBoxNavigation();
+    applyViewBox(defaultViewBox, true);
   }
 
   function handleWheel(event: WheelEvent<SVGSVGElement>) {
     event.preventDefault();
-    zoomAt(event.deltaY > 0 ? 1.12 : 0.88, event);
+    zoomAt(event.deltaY > 0 ? 1.12 : 0.88, event, false);
   }
 
   function handlePanPointerDown(event: ReactPointerEvent<SVGRectElement>) {
@@ -285,11 +343,12 @@ export function GraphCanvas({
       return;
     }
     event.currentTarget.setPointerCapture(event.pointerId);
+    startViewBoxNavigation();
     panRef.current = {
       pointerId: event.pointerId,
       clientX: event.clientX,
       clientY: event.clientY,
-      viewBox,
+      viewBox: viewBoxRef.current,
     };
   }
 
@@ -302,7 +361,7 @@ export function GraphCanvas({
     const rect = svgRef.current.getBoundingClientRect();
     const dx = ((event.clientX - pan.clientX) / rect.width) * pan.viewBox.width;
     const dy = ((event.clientY - pan.clientY) / rect.height) * pan.viewBox.height;
-    setViewBox({
+    applyViewBox({
       ...pan.viewBox,
       x: pan.viewBox.x - dx,
       y: pan.viewBox.y - dy,
@@ -315,6 +374,8 @@ export function GraphCanvas({
     }
     event.currentTarget.releasePointerCapture(event.pointerId);
     panRef.current = null;
+    applyViewBox(viewBoxRef.current, true);
+    stopViewBoxNavigation();
   }
 
   function handleNodePointerDown(event: ReactPointerEvent<SVGGElement>, node: SimNode) {
@@ -324,7 +385,7 @@ export function GraphCanvas({
 
     event.stopPropagation();
     event.currentTarget.setPointerCapture(event.pointerId);
-    const point = pointInViewBox(event, svgRef.current, viewBox);
+    const point = pointInViewBox(event, svgRef.current, viewBoxRef.current);
     const liveNode = nodesRef.current.find((item) => item.id === node.id);
     if (!liveNode) {
       return;
@@ -337,6 +398,7 @@ export function GraphCanvas({
     dragRef.current = { nodeId: node.id, offsetX, offsetY, pointerId: event.pointerId };
     setDraggedNodeId(node.id);
     simulationRef.current?.alphaTarget(0.24).restart();
+    startViewBoxNavigation();
     syncLayout();
   }
 
@@ -347,7 +409,7 @@ export function GraphCanvas({
     }
 
     event.stopPropagation();
-    const point = pointInViewBox(event, svgRef.current, viewBox);
+    const point = pointInViewBox(event, svgRef.current, viewBoxRef.current);
     const liveNode = nodesRef.current.find((item) => item.id === node.id);
     if (!liveNode) {
       return;
@@ -370,6 +432,7 @@ export function GraphCanvas({
     dragRef.current = null;
     setDraggedNodeId(null);
     simulationRef.current?.alphaTarget(0);
+    stopViewBoxNavigation();
   }
 
   function handleKeyboardSelect<T extends SVGElement>(event: KeyboardEvent<T>, action: () => void) {
@@ -408,7 +471,7 @@ export function GraphCanvas({
         className="ontolens-graph-svg"
         ref={svgRef}
         role="img"
-        viewBox={`${viewBox.x} ${viewBox.y} ${viewBox.width} ${viewBox.height}`}
+        viewBox={formatViewBox(viewBox)}
         onWheel={handleWheel}
       >
         <defs>
@@ -426,10 +489,10 @@ export function GraphCanvas({
         {/* biome-ignore lint/a11y/noStaticElementInteractions: SVG pan surface uses pointer dragging; zoom/reset keyboard controls are exposed separately. */}
         <rect
           className="ontolens-pan-surface"
-          height={viewBox.height}
-          width={viewBox.width}
-          x={viewBox.x}
-          y={viewBox.y}
+          height={panSurfaceExtent * 2}
+          width={panSurfaceExtent * 2}
+          x={-panSurfaceExtent}
+          y={-panSurfaceExtent}
           onClick={onStageClick}
           onPointerCancel={handlePanPointerEnd}
           onPointerDown={handlePanPointerDown}

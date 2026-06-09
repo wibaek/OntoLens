@@ -69,7 +69,7 @@ button:disabled {
 
 .ontolens-pan-surface {
   cursor: grab;
-  fill: transparent;
+  fill: none;
   pointer-events: all;
 }
 
@@ -196,6 +196,16 @@ button:disabled {
   stroke: #1d4ed8;
   stroke-width: 4;
   filter: drop-shadow(0 16px 28px rgba(37, 99, 235, 0.28));
+}
+
+.ontolens-graph-svg.is-navigating .ontolens-graph-edge,
+.ontolens-graph-svg.is-navigating .ontolens-graph-node,
+.ontolens-graph-svg.is-navigating .ontolens-node-shape {
+  transition: none;
+}
+
+.ontolens-graph-svg.is-navigating .ontolens-node-shape {
+  filter: none;
 }
 
 .ontolens-node-label {
