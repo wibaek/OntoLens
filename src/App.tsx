@@ -122,6 +122,7 @@ function App() {
   const cacheRef = useRef(new Map<string, GraphData>());
   const autoConnectRef = useRef(false);
   const neighborhoodRequestRef = useRef(0);
+  const currentNeighborhoodIriRef = useRef<string | null>(null);
   const nodeHistoryRef = useRef<NodeHistory>({ items: [], index: -1 });
   const nodeHistoryNavigationRef = useRef<(direction: -1 | 1) => void>(() => undefined);
   const mouseHistoryEventRef = useRef({ button: -1, timestamp: 0 });
@@ -198,6 +199,7 @@ function App() {
       setMessage("endpoint 요약을 가져오는 중입니다.");
       setSelectedNodeId(null);
       resetNodeHistory();
+      currentNeighborhoodIriRef.current = null;
       setSelectResult(null);
       setActiveView("graph");
       setSearchResults([]);
@@ -338,14 +340,18 @@ function App() {
         ? enforceGraphLimits(incomingGraph, settings)
         : mergeGraphData(graphData, incomingGraph, settings);
 
+      currentNeighborhoodIriRef.current = iri;
       setGraphData(limited.graph);
       setSelectResult(null);
       selectNode(iri, historyMode);
       setStatus("ready");
+      const resultSummary = `${formatCount(limited.graph.nodes.length)} nodes / ${formatCount(
+        limited.graph.edges.length,
+      )} edges`;
       setMessage(
         limited.droppedNodes || limited.droppedEdges
           ? `결과가 limit을 넘어 node ${limited.droppedNodes}개, edge ${limited.droppedEdges}개를 제외했습니다.`
-          : "node neighborhood ready",
+          : `${compactIri(iri, graphData.localNamespaces)} ${safeDepth} depth 탐색 완료: ${resultSummary}`,
       );
     } catch (error) {
       if (requestId !== neighborhoodRequestRef.current) {
@@ -435,6 +441,7 @@ function App() {
     setLastError(null);
     setActiveView("graph");
     setMessage("전체 그래프를 가져오는 중입니다.");
+    currentNeighborhoodIriRef.current = null;
     neighborhoodRequestRef.current += 1;
 
     try {
@@ -464,6 +471,7 @@ function App() {
       setStatus("loading");
       setLastError(null);
       setMessage("SELECT 결과를 가져오는 중입니다.");
+      currentNeighborhoodIriRef.current = null;
       neighborhoodRequestRef.current += 1;
 
       try {
@@ -499,6 +507,7 @@ function App() {
     setLastError(null);
     setActiveView("graph");
     setMessage("SPARQL 결과를 그래프로 변환하는 중입니다.");
+    currentNeighborhoodIriRef.current = null;
     neighborhoodRequestRef.current += 1;
 
     try {
@@ -587,9 +596,15 @@ function App() {
     const selectedNode = selectedNodeId
       ? graphData.nodes.find((node) => node.id === selectedNodeId)
       : null;
+    const targetIri =
+      selectedNode && isIri(selectedNode.iri)
+        ? selectedNode.iri
+        : currentNeighborhoodIriRef.current;
 
-    if (selectedNode && isIri(selectedNode.iri)) {
-      void loadNeighborhood(selectedNode.iri, nextDepth, true);
+    if (targetIri) {
+      void loadNeighborhood(targetIri, nextDepth, true);
+    } else {
+      setMessage(`다음 노드 주변 탐색은 ${nextDepth} depth로 실행됩니다.`);
     }
   }
 
