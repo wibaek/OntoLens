@@ -83,6 +83,7 @@ type GraphCanvasProps = {
   showEdgeLabels: boolean;
   compactRdfType: boolean;
   physicsEnabled: boolean;
+  layoutSpacing: number;
   focusToken: number;
   onNodeSelect: (nodeId: string) => void;
   onStageClick: () => void;
@@ -95,6 +96,7 @@ export function GraphCanvas({
   showEdgeLabels,
   compactRdfType,
   physicsEnabled,
+  layoutSpacing,
   focusToken,
   onNodeSelect,
   onStageClick,
@@ -113,6 +115,7 @@ export function GraphCanvas({
   const frameRef = useRef<number | null>(null);
   const lastLayoutSyncRef = useRef(0);
   const physicsEnabledRef = useRef(physicsEnabled);
+  const layoutSpacingRef = useRef(layoutSpacing);
   const dragRef = useRef<{
     nodeId: string;
     offsetX: number;
@@ -201,9 +204,18 @@ export function GraphCanvas({
     }
 
     if (nodesRef.current.length && !simulationRef.current) {
-      simulationRef.current = createSimulation(nodesRef.current, edgesRef.current, syncLayout);
+      simulationRef.current = createSimulation(
+        nodesRef.current,
+        edgesRef.current,
+        syncLayout,
+        layoutSpacingRef.current,
+      );
     }
   }, [physicsEnabled, syncLayout]);
+
+  useEffect(() => {
+    layoutSpacingRef.current = layoutSpacing;
+  }, [layoutSpacing]);
 
   useEffect(() => {
     if (!visibleGraph.nodes.length) {
@@ -215,7 +227,7 @@ export function GraphCanvas({
 
     const nodes = visibleGraph.nodes.map((node, index) => {
       const angle = seededAngle(node.id, index);
-      const radius = initialRadius(node);
+      const radius = initialRadius(node, layoutSpacing);
       return {
         ...node,
         x: width / 2 + Math.cos(angle) * radius,
@@ -238,7 +250,7 @@ export function GraphCanvas({
       return;
     }
 
-    const simulation = createSimulation(nodes, edges, syncLayout);
+    const simulation = createSimulation(nodes, edges, syncLayout, layoutSpacing);
 
     simulationRef.current = simulation;
 
@@ -252,7 +264,7 @@ export function GraphCanvas({
         frameRef.current = null;
       }
     };
-  }, [applyViewBox, syncLayout, visibleGraph]);
+  }, [applyViewBox, layoutSpacing, syncLayout, visibleGraph]);
 
   useEffect(() => {
     if (!selectedNodeId || focusToken < 0) {
@@ -653,6 +665,7 @@ function createSimulation(
   nodes: SimNode[],
   edges: SimEdge[],
   onTick: (force?: boolean) => void,
+  layoutSpacing: number,
 ): Simulation<SimNode, undefined> {
   const density = Math.min(1, edges.length / Math.max(1, nodes.length * 7));
 
@@ -661,24 +674,26 @@ function createSimulation(
       "link",
       forceLink<SimNode, SimEdge>(edges)
         .id((node) => node.id)
-        .distance((edge) => linkDistance(edge))
+        .distance((edge) => linkDistance(edge) * layoutSpacing)
         .strength(0.16 - density * 0.08),
     )
     .force(
       "charge",
-      forceManyBody<SimNode>().strength((node) => chargeStrength(node, density)),
+      forceManyBody<SimNode>().strength((node) => chargeStrength(node, density) * layoutSpacing),
     )
     .force("center", forceCenter(width / 2, height / 2).strength(0.08))
     .force(
       "radial",
-      forceRadial<SimNode>((node) => radialDistance(node), width / 2, height / 2).strength(
-        (node) => (node.kind === "literal" ? 0.2 : 0.08),
-      ),
+      forceRadial<SimNode>(
+        (node) => radialDistance(node) * layoutSpacing,
+        width / 2,
+        height / 2,
+      ).strength((node) => (node.kind === "literal" ? 0.2 : 0.08)),
     )
     .force(
       "collide",
       forceCollide<SimNode>()
-        .radius((node) => nodeRadius(node) + labelPadding(node))
+        .radius((node) => nodeRadius(node) + labelPadding(node) * layoutSpacing)
         .iterations(2),
     )
     .alpha(0.96)
@@ -837,8 +852,8 @@ function radialDistance(node: SimNode) {
   return 275;
 }
 
-function initialRadius(node: SimNode) {
-  return radialDistance(node) * (0.76 + (hashNumber(node.id) % 19) / 60);
+function initialRadius(node: SimNode, layoutSpacing: number) {
+  return radialDistance(node) * layoutSpacing * (0.76 + (hashNumber(node.id) % 19) / 60);
 }
 
 function seededAngle(value: string, index: number) {

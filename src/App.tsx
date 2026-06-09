@@ -62,6 +62,7 @@ import { DEFAULT_ENDPOINT } from "./lib/types";
 
 const defaultSettings: ExplorerSettings = {
   depth: 2,
+  graphSpacing: 1.25,
   nodeLimit: 500,
   edgeLimit: 5000,
   showEdgeLabels: false,
@@ -953,6 +954,21 @@ function App() {
           <div className="absolute right-4 top-4 z-10 flex items-center gap-2">
             {activeView === "graph" ? (
               <>
+                <label className="flex h-10 items-center gap-2 rounded-md border border-slate-200 bg-white px-3 text-xs font-semibold text-slate-600 shadow-sm">
+                  <span>간격</span>
+                  <input
+                    type="range"
+                    min="0.85"
+                    max="1.8"
+                    step="0.05"
+                    value={settings.graphSpacing}
+                    onChange={(event) => updateSetting("graphSpacing", Number(event.target.value))}
+                    className="w-24 accent-blue-600"
+                  />
+                  <span className="w-9 text-right tabular-nums">
+                    {Math.round(settings.graphSpacing * 100)}%
+                  </span>
+                </label>
                 <button
                   type="button"
                   onClick={() => updateSetting("physicsEnabled", !settings.physicsEnabled)}
@@ -993,6 +1009,7 @@ function App() {
                   showEdgeLabels={settings.showEdgeLabels}
                   compactRdfType={settings.compactRdfType}
                   physicsEnabled={settings.physicsEnabled}
+                  layoutSpacing={settings.graphSpacing}
                   focusToken={focusToken}
                   onNodeSelect={selectGraphNode}
                   onStageClick={() => setSearchResults([])}
@@ -1046,6 +1063,10 @@ function App() {
                 <SettingRow label="Depth" value={`${settings.depth} / MVP max 3`} />
                 <SettingRow label="Node limit" value={String(settings.nodeLimit)} />
                 <SettingRow label="Edge limit" value={String(settings.edgeLimit)} />
+                <SettingRow
+                  label="Graph spacing"
+                  value={`${Math.round(settings.graphSpacing * 100)}%`}
+                />
                 <SettingRow label="Physics" value={settings.physicsEnabled ? "on" : "off"} />
                 <label className="flex items-center justify-between border-b border-slate-100 pb-2">
                   <span className="text-slate-500">rdf:type label</span>
