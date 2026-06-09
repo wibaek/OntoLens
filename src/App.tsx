@@ -50,12 +50,14 @@ import type {
   ExplorerSettings,
   GraphData,
   GraphFilters,
+  GraphNode,
   GraphScope,
   LiteralProperty,
   LoadState,
   NamespaceFilters,
   NeighborLink,
   SearchResult,
+  SparqlBindingValue,
   SparqlSelectResult,
 } from "./lib/types";
 import { DEFAULT_ENDPOINT } from "./lib/types";
@@ -93,6 +95,83 @@ const maxNodeHistoryLength = 80;
 
 function isNamespaceEnabled(namespace: string, filters: NamespaceFilters) {
   return !namespace || (filters[namespace] ?? true);
+}
+
+function buildGraphTableResult(graph: GraphData, filters: GraphFilters): SparqlSelectResult {
+  const nodeById = new Map(graph.nodes.map((node) => [node.id, node]));
+  const allowedNodeIds = new Set(
+    graph.nodes
+      .filter(
+        (node) => node.kind !== "literal" && isNamespaceEnabled(node.namespace, filters.namespaces),
+      )
+      .map((node) => node.id),
+  );
+  const rows = graph.edges
+    .filter(
+      (edge) =>
+        allowedNodeIds.has(edge.source) &&
+        allowedNodeIds.has(edge.target) &&
+        (filters.predicate === "all" || edge.predicate === filters.predicate),
+    )
+    .map((edge) => ({
+      subject: graphNodeBinding(nodeById.get(edge.source), edge.source),
+      predicate: {
+        type: "uri",
+        value: edge.predicate,
+      },
+      object: graphNodeBinding(nodeById.get(edge.target), edge.target),
+      count: {
+        type: "literal",
+        value: String(edge.count),
+      },
+    }));
+
+  return {
+    variables: ["subject", "predicate", "object", "count"],
+    rows,
+  };
+}
+
+function graphNodeBinding(node: GraphNode | undefined, fallback: string): SparqlBindingValue {
+  if (!node) {
+    return {
+      type: "literal",
+      value: fallback,
+    };
+  }
+
+  if (node.kind === "literal") {
+    return {
+      type: "literal",
+      value: node.iri,
+      datatype: node.literalDatatype,
+      "xml:lang": node.literalLanguage,
+    };
+  }
+
+  if (node.id.startsWith("blank:")) {
+    return {
+      type: "bnode",
+      value: node.iri,
+    };
+  }
+
+  return {
+    type: "uri",
+    value: node.iri,
+  };
+}
+
+function buildGraphRawResult(graph: GraphData): RawResult | null {
+  if (!graph.nodes.length && !graph.edges.length) {
+    return null;
+  }
+
+  return {
+    title: "Graph JSON",
+    content: JSON.stringify(graph, null, 2),
+    meta: `${formatCount(graph.nodes.length)} nodes / ${formatCount(graph.edges.length)} edges`,
+  };
 }
 
 function App() {
@@ -163,6 +242,16 @@ function App() {
       predicate: predicateFilter,
     }),
     [namespaceFilters, predicateFilter],
+  );
+  const graphTableResult = useMemo(
+    () => buildGraphTableResult(graphData, graphFilters),
+    [graphData, graphFilters],
+  );
+  const tableResult = selectResult ?? graphTableResult;
+  const tableIsSelectResult = selectResult !== null;
+  const activeRawResult = useMemo(
+    () => rawResult ?? buildGraphRawResult(graphData),
+    [rawResult, graphData],
   );
 
   const graphScopeSummary = useMemo(
@@ -902,10 +991,10 @@ function App() {
           <div className="absolute left-4 top-4 z-10 flex items-center gap-2 rounded-md border border-slate-200 bg-white/90 px-3 py-2 text-xs shadow-sm backdrop-blur">
             <Database className="h-4 w-4 text-slate-500" aria-hidden="true" />
             <span className="font-medium text-slate-700">
-              {activeView === "raw" && rawResult
-                ? `${rawResult.meta} / raw`
-                : activeView === "table" && selectResult
-                  ? `${formatCount(selectResult.rows.length)} rows / ${formatCount(selectResult.variables.length)} columns`
+              {activeView === "raw" && activeRawResult
+                ? `${activeRawResult.meta} / raw`
+                : activeView === "table"
+                  ? `${formatCount(tableResult.rows.length)} rows / ${formatCount(tableResult.variables.length)} columns`
                   : `${formatCount(visibleCounts.nodes)} nodes / ${formatCount(visibleCounts.edges)} edges`}
             </span>
           </div>
@@ -987,12 +1076,19 @@ function App() {
             </GraphErrorBoundary>
           ) : activeView === "table" ? (
             <ResultTable
-              result={selectResult}
+              result={tableResult}
               localNamespaces={graphData.localNamespaces}
+              title={tableIsSelectResult ? "SELECT 결과" : "Graph triples"}
+              emptyTitle={tableIsSelectResult ? "빈 결과" : "표시할 graph triple이 없습니다"}
+              emptyDescription={
+                tableIsSelectResult
+                  ? "쿼리는 실행됐지만 반환된 row가 없습니다."
+                  : "현재 graph filter에 해당하는 edge가 없습니다."
+              }
               onOpenIri={(iri) => void loadNeighborhood(iri, settings.depth, true)}
             />
           ) : (
-            <RawResultPanel result={rawResult} />
+            <RawResultPanel result={activeRawResult} />
           )}
 
           {activeView === "graph" && graphData.nodes.length === 0 ? (
