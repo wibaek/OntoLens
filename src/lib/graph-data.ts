@@ -1,5 +1,6 @@
 import {
   compactIri,
+  compactNamespace,
   detectNamespaceGroup,
   getNamespace,
   inferNamespaceCandidates,
@@ -280,7 +281,7 @@ export function getNamespaceCounts(graph: GraphData) {
   return [...counts.entries()]
     .map(([namespace, item]) => ({
       namespace,
-      label: namespace,
+      label: compactNamespace(namespace),
       group: item.group,
       count: item.count,
     }))
